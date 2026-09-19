@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Ink;
 using System.Windows.Input;
 using Mitschreibprogramm.Services;
@@ -16,6 +17,15 @@ public sealed class StrokeLogger
         _document = document;
         document.PreviewStylusDown += OnStylusDown;
         document.PreviewMouseDown += OnMouseDown;
+        // A foreign window coming to the front aborts a running stroke or pan; the self-test shows these lines on a failure.
+        document.Loaded += (_, _) =>
+        {
+            if (Window.GetWindow(document) is { } window)
+            {
+                window.Activated += (_, _) => DebugLog.Write($"window activated");
+                window.Deactivated += (_, _) => DebugLog.Write($"window deactivated");
+            }
+        };
         document.PageAdded += Attach;
         foreach (var page in document.Pages)
         {
