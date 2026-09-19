@@ -1,0 +1,45 @@
+<Window x:Class="Mitschreibprogramm.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:m="clr-namespace:Mitschreibprogramm.Models"
+        xmlns:v="clr-namespace:Mitschreibprogramm.Views"
+        Title="Mitschreibprogramm" Width="1150" Height="760" WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource WorkspaceBrush}">
+    <DockPanel>
+        <Border DockPanel.Dock="Top" Background="{DynamicResource ChromeBrush}"
+                BorderBrush="{DynamicResource ChromeBorderBrush}" BorderThickness="0,0,0,1" Padding="6,4">
+            <WrapPanel TextElement.Foreground="{DynamicResource ChromeTextBrush}">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="ColorBlack" Style="{StaticResource ColorDot}" GroupName="PenColor"
+                                 Tag="{x:Static m:PenColor.Black}" ToolTip="Schwarz (1)" Checked="OnColorChecked"/>
+                    <RadioButton x:Name="ColorBlue" Style="{StaticResource ColorDot}" GroupName="PenColor"
+                                 Tag="{x:Static m:PenColor.Blue}" ToolTip="Blau (2)" Checked="OnColorChecked"/>
+                    <RadioButton x:Name="ColorRed" Style="{StaticResource ColorDot}" GroupName="PenColor"
+                                 Tag="{x:Static m:PenColor.Red}" ToolTip="Rot (3)" Checked="OnColorChecked"/>
+                    <RadioButton x:Name="ColorGreen" Style="{StaticResource ColorDot}" GroupName="PenColor"
+                                 Tag="{x:Static m:PenColor.Green}" ToolTip="Grün (4)" Checked="OnColorChecked"/>
+                    <Border Style="{StaticResource ToolSeparator}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Slider x:Name="WidthSlider" Width="130" VerticalAlignment="Center" Focusable="False"
+                            Minimum="{x:Static m:AppConstants.MinStrokeWidth}"
+                            Maximum="{x:Static m:AppConstants.MaxStrokeWidth}"
+                            TickFrequency="{x:Static m:AppConstants.StrokeWidthStep}"
+                            IsSnapToTickEnabled="True" ToolTip="Strichbreite (+ / -)"/>
+                    <TextBlock x:Name="WidthLabel" Width="48" Margin="6,0,2,0" VerticalAlignment="Center"
+                               TextAlignment="Right"/>
+                    <Button x:Name="PresetThin" Style="{StaticResource FlatButton}" Content="dünn"
+                            Tag="{x:Static m:AppConstants.ThinStrokeWidth}" Click="OnPresetClick"/>
+                    <Button x:Name="PresetMedium" Style="{StaticResource FlatButton}" Content="mittel"
+                            Tag="{x:Static m:AppConstants.MediumStrokeWidth}" Click="OnPresetClick"/>
+                    <Button x:Name="PresetThick" Style="{StaticResource FlatButton}" Content="dick"
+                            Tag="{x:Static m:AppConstants.ThickStrokeWidth}" Click="OnPresetClick"/>
+                </StackPanel>
+            </WrapPanel>
+        </Border>
+        <ScrollViewer x:Name="Scroller" Focusable="False" HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
+            <v:DocumentView x:Name="Document" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="24"/>
+        </ScrollViewer>
+    </DockPanel>
+</Window>
