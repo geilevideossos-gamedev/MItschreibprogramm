@@ -3,7 +3,7 @@
 ## Selbsttest ohne Pen (vier Schichten)
 
 1. Synthetischer Pen: `tools/pen-sim.ps1` injiziert echte Pen-Eingaben (Position, Druck, Seitentaste, invertiert, Radierer) in das Fenster der laufenden App.
-2. Debug-Log: App mit `MSP_DEBUG_LOG=<pfad>` starten. Pro fertigem Strich eine Zeile (Punkte, min/max Druck, Breite, Modus, Seite, Zoom), dazu Zeilen für Undo/Redo. Zeigt, ob Eingaben als Stylus und nicht als Maus ankommen.
+2. Debug-Log: App mit `MSP_DEBUG_LOG=<pfad>` starten. Pro fertigem Strich eine Zeile (Punkte, min/max Druck, Breite, Modus, Seite, Zoom), dazu Zeilen für Undo/Redo und für `window activated` / `window deactivated`. Zeigt, ob Eingaben als Stylus und nicht als Maus ankommen.
 3. Screenshots: `tools/screenshot.ps1` speichert das App-Fenster als PNG nach tmp/. Bild anschauen.
 4. xUnit: `dotnet test` für Models/Services.
 

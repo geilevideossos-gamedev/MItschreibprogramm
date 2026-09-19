@@ -33,7 +33,7 @@
 - penFlags: BARREL = 1 (Seitentaste, schon im Hover setzen), INVERTED = 2, ERASER = 4 (nur mit Kontakt). Der Stift muss schon invertiert in den Bereich kommen. penMask PRESSURE = 1, Druck 0..1024.
 - Koordinaten sind physische Pixel. PowerShell 5.1 ist DPI-unaware, deshalb `SetThreadDpiAwarenessContext(-4)` im selben nativen Aufruf wie die Injektion.
 - Befund 2026-09-19: WPFs Standard-Stack liefert die Injektion als echten Stylus mit Druck, Barrel und Inverted (Debug-Log `device=stylus pmin=0.098 pmax=0.977`).
-- Sicherung: `tools/MspNative.cs` injiziert nur, wenn der Zielpixel zum App-Prozess gehört (`WindowFromPoint`), und holt das Fenster vorher in den Vordergrund. Ohne das landet der Strich im Fenster darüber und öffnet die Bildschirmtastatur.
+- Sicherung: `tools/MspNative.*.cs` injiziert nur, wenn der Zielpixel zum App-Prozess gehört (`RequireAppAt` mit `WindowFromPoint`). pen-sim.ps1 und app-control.ps1 holen das Fenster vorher mit `Activate` in den Vordergrund. Ohne das landet der Strich im Fenster darüber und öffnet die Bildschirmtastatur.
 
 ## Treiber-Fallstricke
 

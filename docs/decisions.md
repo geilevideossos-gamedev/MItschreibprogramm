@@ -48,7 +48,7 @@ Chronologisch. Je Eintrag: Entscheidung, Begründung, verworfene Alternative.
 - Entscheidung: Toolbar ist ein Border mit WrapPanel, Buttons nutzen den Style `FlatButton` mit DynamicResource-Pinseln.
 - Begründung: Die Aero2-Vorlagen von ToolBar (Overflow-Pfeil, Hover-Farben) sind fest verdrahtet und im Dark Mode nicht umfärbbar. WrapPanel bricht bei schmalem Fenster um, statt Buttons zu verstecken.
 
-## 2026-09-19 Selbsttest-Werkzeuge mit gemeinsamer MspNative.cs
+## 2026-09-19 Selbsttest-Werkzeuge mit gemeinsamer MspNative-Klasse
 
 - Entscheidung: P/Invoke-Code liegt einmal in `tools/MspNative.*.cs` (partielle Klasse, drei Dateien unter 300 Zeilen), die Skripte laden ihn per Add-Type. Zusätzlich zu pen-sim.ps1 und screenshot.ps1 gibt es app-control.ps1 (Tasten, Maus, UI Automation) und selftest.ps1 (fährt die Checkpoints, auch gegen dist/).
 - Begründung: Checkpoint 6 verlangt, den Selbsttest komplett gegen die exe zu wiederholen. Das geht nur verlässlich, wenn er ein Skript ist.
@@ -115,3 +115,15 @@ Ein zweiter, nur lesender Durchgang über den ganzen Code hat diese Fehler gefun
 - `selftest.ps1` startet nur, wenn seit `-IdleSeconds` (15 s) niemand Maus oder Tastatur benutzt hat (GetLastInputInfo), und bricht sonst nach `-IdleWaitSeconds` mit Exit-Code 99 ab.
 - `MspNative.KeyChord` und `TypeText` prüfen vor jedem einzelnen Tastendruck, ob ein Fenster der App im Vordergrund ist, und brechen sonst ab. Bereits gedrückte Tasten werden losgelassen. Pen und Maus prüfen wie bisher, dass der Zielpixel zur App gehört.
 - Grenze: Injizierte Eingaben setzen den Leerlauf-Zähler selbst zurück. Ob mitten im Lauf jemand dazukommt, lässt sich darüber nicht erkennen, nur über den Vordergrund-Check.
+
+## 2026-09-19 pen-sim zeichnet einen Strich, die definierten Striche stehen in den Checkpoints
+
+- pen-sim.ps1 injiziert genau einen parametrierten Strich (Start, Ende, Druck von / bis, Seitentaste, invertiert). Die in der Spezifikation genannten Striche (steigender Druck, Seitentaste über bestehendem Strich, invertiert, Strich bei 200 % Zoom) sind Aufrufe davon in `tools/selftest/checkpoint-1.ps1` und `checkpoint-2.ps1`.
+- Begründung: Ein Strich pro Aufruf lässt sich mit Tasten, Maus und Log-Prüfungen beliebig kombinieren. Feste Szenarien im Skript hätten jede neue Prüfung zu einer Skriptänderung gemacht.
+- Die P/Invoke-Structs bleiben in der partiellen Klasse `MspNative` verschachtelt. Sie haben außerhalb keine Bedeutung und werden per Add-Type gemeinsam übersetzt.
+
+## 2026-09-19 Fenster-Aktivierung im Debug-Log
+
+- Das Debug-Log schreibt zusätzlich `window activated` und `window deactivated`. Der Selbsttest blendet diese Zeilen bei den Zählprüfungen aus und zeigt sie bei jedem FAIL an.
+- Anlass: Beim ersten Anlauf von Checkpoint 6 blieben sporadisch injizierte Gesten wirkungslos (zweimal ein Pen-Strich, einmal ein Ziehen mit der mittleren Maustaste), jedes Mal an anderer Stelle, nur während parallel Hintergrundprozesse liefen. Ein fremdes Fenster im Vordergrund deaktiviert das App-Fenster, WPF bricht dann laufende Gesten ab. Mit den Zeilen ist das im Fehlerfall belegbar statt vermutet.
+- Regel für den Selbsttest: währenddessen nichts anderes auf dem Rechner starten, auch keine Hintergrund-Agenten oder Builds.

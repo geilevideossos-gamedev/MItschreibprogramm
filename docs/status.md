@@ -5,12 +5,12 @@ Stand: 2026-09-19
 ## Aktuell
 
 - Schritt 1 bis 4 fertig und committet: Skeleton, Pen (Druck, Radierer über Toolbar / E / Seitentaste / invertiert, Glättung), Debug-Log, Hintergrundstile mit Linienfarbe, Undo/Redo, Zoom und Pan, Seitenmodell (Seiten / Endlos, Konvertierung, Auto-Seite, Seitenzähler).
-- xUnit-Projekt Mitschreibprogramm.Tests steht (Konvertierung, .msp Round-Trip).
+- xUnit-Projekt Mitschreibprogramm.Tests: Konvertierung, .msp Round-Trip und tolerantes Laden, PDF-Export, Settings.
 - Schritt 8: app.manifest, build.sh, Publish nach dist/ (141 MB, eine Datei) und README fertig. Unabhängiger Code-Review gelaufen, alle Funde behoben (decisions.md). Es fehlt nur Checkpoint 6.
 - Schritt 7 fertig: Dark Mode (Button, Ctrl+D, gespeichert), alle Shortcuts, Statusleiste mit Zoom, Seite und Datei.
 - Schritt 6 fertig: PDF-Export mit PDFsharp 6.2.4 über Ctrl+E und Button.
 - Schritt 5 fertig: Dateiformat .msp, Datei-Befehle mit Dialogen, Titel mit `*`, Settings (laden, anwenden, beim Schließen speichern, Fensterlage). Shortcuts 1-4 und Plus / Minus sind ebenfalls drin.
-- Selbsttest-Werkzeuge in tools/: pen-sim.ps1, screenshot.ps1, app-control.ps1, selftest.ps1 (gemeinsamer Win32-Code in MspNative.cs).
+- Selbsttest-Werkzeuge in tools/: pen-sim.ps1, screenshot.ps1, app-control.ps1, selftest.ps1 (gemeinsamer Win32-Code in MspNative.*.cs, Checkpoints in tools/selftest/).
 - Checkpoint 1 bis 5 per Selbsttest bestanden (Details in testing.md).
 - Wichtigster Befund: WPFs Standard-Stylus-Stack nimmt den synthetischen Pen als Stylus mit Druck an. Kein Pointer-Stack-Switch nötig.
 
