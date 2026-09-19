@@ -52,6 +52,8 @@ public partial class MainWindow : Window
 
         Add(ModifierKeys.None, () => ToolPen.IsChecked = true, Key.P);
         Add(ModifierKeys.None, () => (ToolEraser.IsChecked == true ? ToolPen : ToolEraser).IsChecked = true, Key.E);
+        Add(ModifierKeys.Control, Document.Undo, Key.Z);
+        Add(ModifierKeys.Control, Document.Redo, Key.Y);
         Add(ModifierKeys.Control, () => PageStyleBox.SelectedIndex = (PageStyleBox.SelectedIndex + 1) % PageStyleBox.Items.Count, Key.L);
     }
 

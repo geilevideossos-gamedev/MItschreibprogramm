@@ -11,6 +11,7 @@ public sealed class DocumentView : StackPanel
 {
     private readonly DrawingAttributes _pen = new() { FitToCurve = true };
     private readonly List<PageView> _pages = [];
+    private readonly UndoHistory _history = new();
     private PageStyle _pageStyle;
     private LineColor _lineColor;
     private bool _eraser;
@@ -61,14 +62,38 @@ public sealed class DocumentView : StackPanel
         }
     }
 
+    public void Undo() => OnHistoryApplied("undo", _history.Undo());
+
+    public void Redo() => OnHistoryApplied("redo", _history.Redo());
+
     private void AddPage()
     {
         var page = new PageView(_pen);
         page.Paper.Update(_pageStyle, _lineColor);
+        page.Ink.StrokeCollected += (_, e) => OnStrokeCollected(page.Ink.Strokes, e.Stroke);
+        page.Ink.StrokeErasing += (_, e) => OnStrokeErasing(page.Ink.Strokes, e.Stroke);
         _pages.Add(page);
         Children.Add(page);
         UpdateEditingMode();
         PageAdded?.Invoke(page);
+    }
+
+    private void OnHistoryApplied(string kind, bool applied)
+    {
+        if (applied && DebugLog.IsEnabled)
+        {
+            DebugLog.Write($"{kind} strokes={_pages.Sum(page => page.Ink.Strokes.Count)}");
+        }
+    }
+
+    private void OnStrokeCollected(StrokeCollection strokes, Stroke stroke) =>
+        _history.Push(new UndoStep(() => strokes.Remove(stroke), () => strokes.Add(stroke)));
+
+    // Raised before the stroke leaves the collection, so its z-order position is still known.
+    private void OnStrokeErasing(StrokeCollection strokes, Stroke stroke)
+    {
+        var index = strokes.IndexOf(stroke);
+        _history.Push(new UndoStep(() => strokes.Insert(index, stroke), () => strokes.Remove(stroke)));
     }
 
     // The driver reports a held side button as barrel button; an inverted pen is handled by InkCanvas itself
