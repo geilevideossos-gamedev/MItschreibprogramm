@@ -16,6 +16,8 @@ public sealed class SideButtonWatcher
         // The button event can arrive after StylusDown when both change in one packet; the live state is already right here.
         source.PreviewStylusDown += (_, e) => Sync(e.StylusDevice);
         source.PreviewStylusOutOfRange += (_, _) => Set(false);
+        // Lifting the pen over the toolbar never reaches this element; without this the mouse would keep erasing.
+        source.StylusLeave += (_, _) => Set(false);
     }
 
     public event Action? Changed;
