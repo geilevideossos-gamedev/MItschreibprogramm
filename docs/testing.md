@@ -7,7 +7,7 @@
 3. Screenshots: `tools/screenshot.ps1` speichert das App-Fenster als PNG nach tmp/. Bild anschauen.
 4. xUnit: `dotnet test` für Models/Services.
 
-Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt währenddessen Maus oder Tastatur. Vor jedem Injektionslauf kurze Meldung im Chat. Die Skripte holen das Fenster selbst nach vorn und brechen ab, wenn der Zielpixel nicht zur App gehört.
+Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt währenddessen Maus oder Tastatur. Vor jedem Injektionslauf kurze Meldung im Chat. Die Skripte holen das Fenster selbst nach vorn und brechen ab, wenn der Zielpixel nicht zur App gehört oder ein fremdes Fenster in den Vordergrund kommt. `selftest.ps1` startet erst nach 15 s ohne Eingabe und gibt sonst mit Exit-Code 99 auf. Bei gesperrtem Bildschirm scheitert schon das Aktivieren des Fensters.
 
 ## Ablauf
 

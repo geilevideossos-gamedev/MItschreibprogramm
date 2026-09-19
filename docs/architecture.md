@@ -4,7 +4,7 @@
 
 - `Mitschreibprogramm/`: WPF-App, net8.0-windows. Ordner Models/, Views/, Services/, Rendering/.
 - `Mitschreibprogramm.Tests/`: xUnit, nur Models/Services.
-- `tools/`: Selbsttest (pen-sim.ps1, screenshot.ps1, app-control.ps1, selftest.ps1, MspNative.cs).
+- `tools/`: Selbsttest. pen-sim.ps1, screenshot.ps1, app-control.ps1, selftest.ps1 mit den Checkpoints in `tools/selftest/`, gemeinsamer Win32-Code als partielle Klasse in MspNative.Window.cs, MspNative.Pen.cs, MspNative.Input.cs.
 - `docs/`, `build.sh`, `dist/` (Build-Ausgabe, nicht im Repo).
 
 ## Klassen
@@ -20,7 +20,7 @@
 
 - `Palette`: Stift-, Seiten- und Hilfslinienfarben für hell und dunkel, dazu die Umrechnung logische Farbe zu angezeigter Farbe und zurück.
 - `Theme`: UI-Farben beider Themen, tauscht die Pinsel in den Application-Resources und färbt die Titelleiste (DWM).
-- `RuleLines`: Y-Positionen der Hilfslinien, pro A4-Höhe neu gestartet. Wird vom Bildschirm-Hintergrund und später vom PDF-Export benutzt.
+- `RuleLines`: Y-Positionen der Hilfslinien, pro A4-Höhe neu gestartet. Wird vom Bildschirm-Hintergrund und vom PDF-Export benutzt.
 - `PageBackground`: FrameworkElement, zeichnet Seite und Linien in OnRender (GuidelineSet für scharfe 1-px-Linien). Kein Strich, nicht radierbar.
 
 ### Views

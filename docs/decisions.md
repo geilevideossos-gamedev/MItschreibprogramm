@@ -50,7 +50,7 @@ Chronologisch. Je Eintrag: Entscheidung, Begründung, verworfene Alternative.
 
 ## 2026-09-19 Selbsttest-Werkzeuge mit gemeinsamer MspNative.cs
 
-- Entscheidung: P/Invoke-Code liegt einmal in `tools/MspNative.cs`, die Skripte laden ihn per Add-Type. Zusätzlich zu pen-sim.ps1 und screenshot.ps1 gibt es app-control.ps1 (Tasten, Maus, UI Automation) und selftest.ps1 (fährt die Checkpoints, auch gegen dist/).
+- Entscheidung: P/Invoke-Code liegt einmal in `tools/MspNative.*.cs` (partielle Klasse, drei Dateien unter 300 Zeilen), die Skripte laden ihn per Add-Type. Zusätzlich zu pen-sim.ps1 und screenshot.ps1 gibt es app-control.ps1 (Tasten, Maus, UI Automation) und selftest.ps1 (fährt die Checkpoints, auch gegen dist/).
 - Begründung: Checkpoint 6 verlangt, den Selbsttest komplett gegen die exe zu wiederholen. Das geht nur verlässlich, wenn er ein Skript ist.
 - Screenshots laufen über PrintWindow (PW_RENDERFULLCONTENT), damit verdeckende Fenster das Bild nicht verfälschen.
 
@@ -96,3 +96,22 @@ Chronologisch. Je Eintrag: Entscheidung, Begründung, verworfene Alternative.
 - Eigene Vorlagen nur dort, wo Aero2 feste helle Farben malt: ComboBox und ScrollBar (App.xaml). Slider und CheckBox bleiben nativ.
 - Titelleiste: `DwmSetWindowAttribute` mit Attribut 20 (DWMWA_USE_IMMERSIVE_DARK_MODE) in OnSourceInitialized jedes Fensters, sonst bliebe sie weiß. Schlägt der Aufruf auf altem Windows fehl, passiert nichts.
 - Toggle hängt an Checked / Unchecked statt Click, damit er auch über UI Automation (Bedienhilfen, Selbsttest) schaltet.
+
+## 2026-09-19 Unabhängiger Code-Review vor der Auslieferung
+
+Ein zweiter, nur lesender Durchgang über den ganzen Code hat diese Fehler gefunden, alle behoben und einzeln committet:
+
+- `InvalidDataException` erbt von SystemException, nicht von IOException. Eine .msp mit neuerer Version hätte die App beim Öffnen beendet statt eine Meldung zu zeigen.
+- Redo eines Moduswechsels zeigte die Seitenliste vom Zeitpunkt des Wechsels. Danach angehängte Seiten samt Strichen verschwanden still. Der Undo-Schritt merkt sich jetzt beide Seitenlisten jeweils beim Verlassen neu.
+- settings.json: Speichern beim Schließen ist abgesichert, negative Fenstergrößen und nicht definierte Enum-Werte führen zu Standardwerten statt zu einem Absturz bei jedem Start. In .NET 8 lässt der Enum-Konverter Zahl-Strings wie "7" durch, deshalb zusätzlich `Enum.IsDefined` (auch in .msp, dort als Fehler).
+- Letzter Ordner wurde bei jeder Änderung auf den Dokumentordner zurückgesetzt. Jetzt nur noch bei Öffnen, Speichern und Export.
+- Fehlgeschlagenes Speichern ließ `<name>.msp.tmp` liegen.
+- InkCanvas hängt sich an das Ereignis seiner DefaultDrawingAttributes. Weil alle Seiten denselben Stift teilen, hielt der Stift jede je erzeugte Seite am Leben. `Load` hängt alte Seiten jetzt ab.
+- Seitentasten-Zustand blieb für die Maus hängen, wenn der Stift über der Toolbar abgehoben wurde. `StylusLeave` setzt ihn zurück.
+
+## 2026-09-19 Selbsttest nimmt dem Benutzer keine Eingabe weg
+
+- Anlass: Beim ersten Versuch von Checkpoint 6 war der Bildschirm erst gesperrt und danach wurde am Rechner gechattet. Ein Lauf hätte Dateipfade und Enter in ein fremdes Fenster tippen können.
+- `selftest.ps1` startet nur, wenn seit `-IdleSeconds` (15 s) niemand Maus oder Tastatur benutzt hat (GetLastInputInfo), und bricht sonst nach `-IdleWaitSeconds` mit Exit-Code 99 ab.
+- `MspNative.KeyChord` und `TypeText` prüfen vor jedem einzelnen Tastendruck, ob ein Fenster der App im Vordergrund ist, und brechen sonst ab. Bereits gedrückte Tasten werden losgelassen. Pen und Maus prüfen wie bisher, dass der Zielpixel zur App gehört.
+- Grenze: Injizierte Eingaben setzen den Leerlauf-Zähler selbst zurück. Ob mitten im Lauf jemand dazukommt, lässt sich darüber nicht erkennen, nur über den Vordergrund-Check.
