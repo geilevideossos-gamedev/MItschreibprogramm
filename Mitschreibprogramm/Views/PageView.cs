@@ -1,5 +1,6 @@
 using System.Windows.Controls;
 using System.Windows.Ink;
+using System.Windows.Input;
 using System.Windows.Media;
 using Mitschreibprogramm.Models;
 
@@ -19,6 +20,10 @@ public sealed class PageView : Grid
             DefaultDrawingAttributes = pen,
             Focusable = false,
         };
+        // Press-and-hold (right-click emulation) delays the start of every pen stroke.
+        Stylus.SetIsPressAndHoldEnabled(Ink, false);
+        Stylus.SetIsFlicksEnabled(Ink, false);
+        Stylus.SetIsTapFeedbackEnabled(Ink, false);
         Children.Add(Ink);
     }
 
