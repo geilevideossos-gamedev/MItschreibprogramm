@@ -27,10 +27,10 @@ public sealed class ZoomPanController
     public event Action? ZoomChanged;
 
     public void ZoomIn() =>
-        ZoomTo(AppConstants.ZoomSteps.FirstOrDefault(step => step > _document.Zoom * 1.001, AppConstants.MaxZoom));
+        ZoomTo(AppConstants.ZoomSteps.FirstOrDefault(step => step > _document.Zoom * (1 + AppConstants.ZoomStepTolerance), AppConstants.MaxZoom));
 
     public void ZoomOut() =>
-        ZoomTo(AppConstants.ZoomSteps.LastOrDefault(step => step < _document.Zoom * 0.999, AppConstants.MinZoom));
+        ZoomTo(AppConstants.ZoomSteps.LastOrDefault(step => step < _document.Zoom * (1 - AppConstants.ZoomStepTolerance), AppConstants.MinZoom));
 
     public void ResetZoom() => ZoomTo(AppConstants.DefaultZoom);
 

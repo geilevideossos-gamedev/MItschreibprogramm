@@ -7,10 +7,13 @@ public static class AppConstants
     // Bounds coordinates read from a file, so a damaged file cannot ask for millions of pages.
     public const double MaxCoordinate = 1_000_000;
 
-    private const double PixelsPerMillimeter = 96.0 / 25.4;
+    public const double PixelsPerInch = 96;
+    private const double PixelsPerMillimeter = PixelsPerInch / 25.4;
 
-    public const double PageWidth = 210 * PixelsPerMillimeter;
-    public const double PageHeight = 297 * PixelsPerMillimeter;
+    public const double PageWidthMillimeters = 210;
+    public const double PageHeightMillimeters = 297;
+    public const double PageWidth = PageWidthMillimeters * PixelsPerMillimeter;
+    public const double PageHeight = PageHeightMillimeters * PixelsPerMillimeter;
     public const double PageGap = 24;
     public const double AutoPageZone = 0.85;
     public const double EndlessEdgeMargin = 200;
@@ -34,5 +37,6 @@ public static class AppConstants
     public const double MaxZoom = 4;
     public const double DefaultZoom = 1;
     public const double WheelZoomFactor = 1.1;
+    public const double ZoomStepTolerance = 0.001;
     public static readonly double[] ZoomSteps = [MinZoom, 0.5, 0.75, DefaultZoom, 1.25, 1.5, 2, 3, MaxZoom];
 }

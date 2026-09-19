@@ -7,10 +7,12 @@ namespace Mitschreibprogramm.Services;
 
 public static class PdfExporter
 {
-    private const double PixelsToPoints = 72.0 / 96.0;
-    private const double A4WidthMillimeters = 210;
-    private const double A4HeightMillimeters = 297;
+    private const double PixelsToPoints = 72.0 / AppConstants.PixelsPerInch;
     private const double MaxWidthStep = 0.25;
+
+    // Mapping used by WPF itself (StrokeNodeIterator.GetNormalizedPressureFactor): pressure 0..1 scales the width by 0.25..1.75.
+    private const double PressureScale = 1.5;
+    private const double PressureOffset = 0.25;
 
     // Always exports the logical colours on white paper, whatever theme the screen shows.
     public static void Export(NoteDocument document, string path, bool includeRuleLines)
@@ -19,8 +21,8 @@ public static class PdfExporter
         foreach (var notePage in PageModeConverter.Convert(document, PageMode.Pages).Pages.DefaultIfEmpty(new NotePage()))
         {
             var page = pdf.AddPage();
-            page.Width = XUnit.FromMillimeter(A4WidthMillimeters);
-            page.Height = XUnit.FromMillimeter(A4HeightMillimeters);
+            page.Width = XUnit.FromMillimeter(AppConstants.PageWidthMillimeters);
+            page.Height = XUnit.FromMillimeter(AppConstants.PageHeightMillimeters);
             using var graphics = XGraphics.FromPdfPage(page);
             graphics.ScaleTransform(PixelsToPoints);
             if (includeRuleLines && document.PageStyle != PageStyle.Blank)
@@ -97,9 +99,8 @@ public static class PdfExporter
         }
     }
 
-    // Mapping used by WPF itself (StrokeNodeIterator.GetNormalizedPressureFactor): pressure 0..1 scales the width by 0.25..1.75.
     private static double WidthAt(NoteStroke stroke, double pressure) =>
-        stroke.PressureEnabled ? stroke.Width * ((1.5 * pressure) + 0.25) : stroke.Width;
+        stroke.PressureEnabled ? stroke.Width * ((PressureScale * pressure) + PressureOffset) : stroke.Width;
 
     private static XColor ToXColor(System.Windows.Media.Color color) => XColor.FromArgb(color.R, color.G, color.B);
 }
