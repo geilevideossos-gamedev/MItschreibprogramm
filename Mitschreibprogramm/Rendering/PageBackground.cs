@@ -33,8 +33,9 @@ public sealed class PageBackground : FrameworkElement
         pen.Freeze();
         var positions = RuleLines.Positions(ActualHeight).ToList();
         var half = AppConstants.RuleLineThickness / 2;
-        // Guidelines snap every line to device pixels, otherwise 1 px lines blur at fractional positions.
-        var guidelines = new GuidelineSet { GuidelinesY = new DoubleCollection(positions.SelectMany(y => new[] { y - half, y + half })) };
+        // One guideline per line snaps its upper edge to a device pixel, so all lines look alike. Snapping both
+        // edges would collapse lines to zero height when zoomed out (both edges land on the same pixel).
+        var guidelines = new GuidelineSet { GuidelinesY = new DoubleCollection(positions.Select(y => y - half)) };
         guidelines.Freeze();
         drawingContext.PushGuidelineSet(guidelines);
         foreach (var y in positions)
