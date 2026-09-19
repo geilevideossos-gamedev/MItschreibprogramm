@@ -10,11 +10,15 @@ namespace Mitschreibprogramm.Views;
 public partial class MainWindow : Window
 {
     private readonly Dictionary<(ModifierKeys, Key), Action> _shortcuts = [];
+    private readonly ZoomPanController _zoomPan;
     private LineColor _lineColor = LineColor.Blue;
 
     public MainWindow()
     {
         InitializeComponent();
+        _zoomPan = new ZoomPanController(Scroller, Document);
+        _zoomPan.ZoomChanged += UpdateStatus;
+        Deactivated += (_, _) => _zoomPan.SetSpaceHeld(false);
         RegisterShortcuts();
 
         foreach (var dot in new[] { ColorBlack, ColorBlue, ColorRed, ColorGreen })
@@ -28,14 +32,30 @@ public partial class MainWindow : Window
         PressureCheck.IsChecked = true;
         ToolPen.IsChecked = true;
         PageStyleBox.SelectedIndex = (int)PageStyle.Lined;
+        UpdateStatus();
     }
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
         base.OnPreviewKeyDown(e);
-        if (_shortcuts.TryGetValue((Keyboard.Modifiers, e.Key), out var action))
+        if (e.Key == Key.Space)
+        {
+            _zoomPan.SetSpaceHeld(true);
+            e.Handled = true;
+        }
+        else if (_shortcuts.TryGetValue((Keyboard.Modifiers, e.Key), out var action))
         {
             action();
+            e.Handled = true;
+        }
+    }
+
+    protected override void OnPreviewKeyUp(KeyEventArgs e)
+    {
+        base.OnPreviewKeyUp(e);
+        if (e.Key == Key.Space)
+        {
+            _zoomPan.SetSpaceHeld(false);
             e.Handled = true;
         }
     }
@@ -54,6 +74,9 @@ public partial class MainWindow : Window
         Add(ModifierKeys.None, () => (ToolEraser.IsChecked == true ? ToolPen : ToolEraser).IsChecked = true, Key.E);
         Add(ModifierKeys.Control, Document.Undo, Key.Z);
         Add(ModifierKeys.Control, Document.Redo, Key.Y);
+        Add(ModifierKeys.Control, _zoomPan.ZoomIn, Key.OemPlus, Key.Add);
+        Add(ModifierKeys.Control, _zoomPan.ZoomOut, Key.OemMinus, Key.Subtract);
+        Add(ModifierKeys.Control, _zoomPan.ResetZoom, Key.D0, Key.NumPad0);
         Add(ModifierKeys.Control, () => PageStyleBox.SelectedIndex = (PageStyleBox.SelectedIndex + 1) % PageStyleBox.Items.Count, Key.L);
     }
 
@@ -89,4 +112,6 @@ public partial class MainWindow : Window
         Document.SetPenWidth(width);
         WidthLabel.Text = $"{width:0.0} px";
     }
+
+    private void UpdateStatus() => ZoomText.Text = $"Zoom {Document.Zoom:P0}";
 }

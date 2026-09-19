@@ -59,6 +59,13 @@
                 </StackPanel>
             </WrapPanel>
         </Border>
+        <StatusBar DockPanel.Dock="Bottom" Background="{DynamicResource ChromeBrush}"
+                   Foreground="{DynamicResource ChromeTextBrush}" BorderBrush="{DynamicResource ChromeBorderBrush}"
+                   BorderThickness="0,1,0,0">
+            <StatusBarItem>
+                <TextBlock x:Name="ZoomText"/>
+            </StatusBarItem>
+        </StatusBar>
         <ScrollViewer x:Name="Scroller" Focusable="False" HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Auto">
             <v:DocumentView x:Name="Document" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="24"/>

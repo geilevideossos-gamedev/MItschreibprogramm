@@ -17,4 +17,10 @@ public static class AppConstants
     public const double ThinStrokeWidth = 1.5;
     public const double MediumStrokeWidth = 3;
     public const double ThickStrokeWidth = 6;
+
+    public const double MinZoom = 0.25;
+    public const double MaxZoom = 4;
+    public const double DefaultZoom = 1;
+    public const double WheelZoomFactor = 1.1;
+    public static readonly double[] ZoomSteps = [MinZoom, 0.5, 0.75, DefaultZoom, 1.25, 1.5, 2, 3, MaxZoom];
 }

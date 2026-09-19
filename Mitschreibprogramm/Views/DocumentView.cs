@@ -1,6 +1,7 @@
 using System.Windows.Controls;
 using System.Windows.Ink;
 using System.Windows.Input;
+using System.Windows.Media;
 using Mitschreibprogramm.Models;
 using Mitschreibprogramm.Rendering;
 using Mitschreibprogramm.Services;
@@ -14,8 +15,10 @@ public sealed class DocumentView : StackPanel
     private readonly UndoHistory _history = new();
     private PageStyle _pageStyle;
     private LineColor _lineColor;
+    private double _zoom = AppConstants.DefaultZoom;
     private bool _eraser;
     private bool _barrelHeld;
+    private bool _panning;
 
     public DocumentView()
     {
@@ -36,6 +39,16 @@ public sealed class DocumentView : StackPanel
 
     public IReadOnlyList<PageView> Pages => _pages;
 
+    public double Zoom
+    {
+        get => _zoom;
+        set
+        {
+            _zoom = value;
+            LayoutTransform = new ScaleTransform(value, value);
+        }
+    }
+
     public void SetPenColor(PenColor color) => _pen.Color = Palette.Pen(color);
 
     public void SetPenWidth(double width)
@@ -49,6 +62,12 @@ public sealed class DocumentView : StackPanel
     public void SetEraser(bool eraser)
     {
         _eraser = eraser;
+        UpdateEditingMode();
+    }
+
+    public void SetPanning(bool panning)
+    {
+        _panning = panning;
         UpdateEditingMode();
     }
 
@@ -119,10 +138,12 @@ public sealed class DocumentView : StackPanel
 
     private void UpdateEditingMode()
     {
-        var mode = _eraser || _barrelHeld ? InkCanvasEditingMode.EraseByStroke : InkCanvasEditingMode.Ink;
+        var erasing = _eraser || _barrelHeld;
         foreach (var page in _pages)
         {
-            page.Ink.EditingMode = mode;
+            page.Ink.EditingMode = _panning ? InkCanvasEditingMode.None
+                : erasing ? InkCanvasEditingMode.EraseByStroke : InkCanvasEditingMode.Ink;
+            page.Ink.EditingModeInverted = _panning ? InkCanvasEditingMode.None : InkCanvasEditingMode.EraseByStroke;
         }
     }
 }

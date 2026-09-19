@@ -53,6 +53,6 @@ public sealed class StrokeLogger
         var last = points[^1];
         var attributes = stroke.DrawingAttributes;
         var pageNumber = _document.Pages.ToList().IndexOf(page) + 1;
-        DebugLog.Write($"stroke mode={mode} device={_device} barrel={_barrel} page={pageNumber} points={points.Count} pmin={points.Min(p => p.PressureFactor):0.###} pmax={points.Max(p => p.PressureFactor):0.###} width={attributes.Width} pressure={!attributes.IgnorePressure} first=({first.X:0.#},{first.Y:0.#}) last=({last.X:0.#},{last.Y:0.#})");
+        DebugLog.Write($"stroke mode={mode} device={_device} barrel={_barrel} page={pageNumber} zoom={_document.Zoom:0.###} points={points.Count} pmin={points.Min(p => p.PressureFactor):0.###} pmax={points.Max(p => p.PressureFactor):0.###} width={attributes.Width} pressure={!attributes.IgnorePressure} first=({first.X:0.#},{first.Y:0.#}) last=({last.X:0.#},{last.Y:0.#})");
     }
 }
