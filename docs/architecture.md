@@ -27,6 +27,8 @@
 - `MainWindow`: Toolbar (Border + WrapPanel), Statusleiste, ScrollViewer. Verdrahtet Controls mit `DocumentView`, hält die Shortcut-Tabelle (`Dictionary<(ModifierKeys, Key), Action>`).
 - `DocumentView` (StackPanel): hält die `PageView`-Liste, Seitenmodus, das gemeinsame `DrawingAttributes`-Objekt, Radierer-/Pan-Zustand, Undo-Verlauf und den Zoom (LayoutTransform). `Load(NoteDocument)` / `ToDocument()` wandeln zwischen Ansicht und Datenklassen, `SetMode` konvertiert, `AddPage` hängt an, Auto-Seite und Endlos-Wachstum hängen an StrokeCollected.
 - `PageView` (Grid): eine Seite = `PageBackground` + transparenter `InkCanvas`, auf Seitengröße geclippt. `GrowToFit` vergrößert die Endlos-Fläche.
+- `FileSession`: aktueller Dateipfad, Dirty-Flag, Neu / Öffnen / Speichern / Speichern unter mit den Windows-Dateidialogen, Nachfrage bei ungespeicherten Änderungen. Meldet `StateChanged` (Titel) und `DocumentLoaded` (Toolbar abgleichen).
+- `UnsavedChangesDialog` / `UnsavedChoice`: Dialog Speichern / Verwerfen / Abbrechen.
 - `SideButtonWatcher`: verfolgt die Seitentaste des Stifts (Barrel) über die Preview-Stylus-Events.
 - `ZoomPanController`: Mausrad, Ctrl/Shift+Mausrad, mittlere Maustaste, Leertaste+Ziehen, Zoom um den Zeiger.
 - `StrokeLogger`: nur mit MSP_DEBUG_LOG erzeugt, schreibt pro Strich eine Logzeile.
@@ -43,6 +45,7 @@
 ## Datenfluss
 
 - Toolbar oder Shortcut setzt den Zustand an `DocumentView`, die ihn auf alle Seiten anwendet.
+- `DocumentView.Changed` meldet jede Dokumentänderung (Strich, Radieren, Undo/Redo, Seite, Stil, Modus), `FileSession` setzt damit das Dirty-Flag.
 - InkCanvas sammelt Striche selbst (Maus und Stylus). `DocumentView` hängt sich an StrokeCollected / StrokeErasing für Undo.
 - Editiermodus je Seite: Pan aktiv = None, Radierer oder Seitentaste = EraseByStroke, sonst Ink. EditingModeInverted = EraseByStroke.
 

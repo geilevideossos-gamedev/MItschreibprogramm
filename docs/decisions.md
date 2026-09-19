@@ -69,3 +69,9 @@ Chronologisch. Je Eintrag: Entscheidung, Begründung, verworfene Alternative.
 - Undo: Der Moduswechsel ist ein eigener Undo-Schritt, der die alten `PageView`-Objekte behält. Ältere Schritte zeigen weiter auf gültige Objekte, der Verlauf reicht wie gefordert bis zum letzten Öffnen oder Neu. Verworfen: Verlauf beim Moduswechsel leeren.
 - Neue Seiten (Button, Ctrl+Enter, Auto-Seite) sind keine Undo-Schritte, Undo bleibt strichbasiert.
 - Endlos wächst nach einem Strich, der näher als 200 px an den rechten oder unteren Rand kommt, in Schritten von einer halben A4-Breite bzw. -Höhe.
+
+## 2026-09-19 Datei-Befehle
+
+- Entscheidung: Eigener kleiner Dialog `UnsavedChangesDialog` statt MessageBox. Begründung: Die Buttons sollen Speichern / Verwerfen / Abbrechen heißen, MessageBox kann nur Ja / Nein / Abbrechen.
+- Undo bis zum gespeicherten Stand löscht den Stern nicht (kein Vergleich mit dem Stand auf der Platte). Einfachste Variante, im Zweifel wird einmal zu viel nachgefragt.
+- Speichern schreibt in eine .tmp-Datei und verschiebt sie über das Ziel, damit ein Absturz keine halbe Notiz hinterlässt.

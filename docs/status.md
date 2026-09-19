@@ -6,7 +6,7 @@ Stand: 2026-09-19
 
 - Schritt 1 bis 4 fertig und committet: Skeleton, Pen (Druck, Radierer über Toolbar / E / Seitentaste / invertiert, Glättung), Debug-Log, Hintergrundstile mit Linienfarbe, Undo/Redo, Zoom und Pan, Seitenmodell (Seiten / Endlos, Konvertierung, Auto-Seite, Seitenzähler).
 - xUnit-Projekt Mitschreibprogramm.Tests steht (Konvertierung, .msp Round-Trip).
-- Schritt 5 läuft: Dateiformat .msp und `SettingsService` fertig und getestet. Es fehlen: Datei-Befehle mit Dialogen, Settings im Fenster verdrahten.
+- Schritt 5 läuft: Dateiformat .msp, `SettingsService` und Datei-Befehle (Neu / Öffnen / Speichern / Speichern unter, Titel mit `*`, Schließen-Dialog) fertig. Es fehlt: Settings im Fenster verdrahten (laden, anwenden, beim Schließen speichern).
 - Selbsttest-Werkzeuge in tools/: pen-sim.ps1, screenshot.ps1, app-control.ps1, selftest.ps1 (gemeinsamer Win32-Code in MspNative.cs).
 - Checkpoint 1 bis 3 per Selbsttest bestanden (Details in testing.md).
 - Wichtigster Befund: WPFs Standard-Stylus-Stack nimmt den synthetischen Pen als Stylus mit Druck an. Kein Pointer-Stack-Switch nötig.

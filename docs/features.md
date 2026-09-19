@@ -12,7 +12,7 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F04 | Stiftdruck moduliert die Breite um die Basisbreite (IgnorePressure = false). Checkbox "Druck" zum Abschalten. Maus = konstante Breite | done |
 | F05 | Radierer ganzer Strich (EraseByStroke) über Toolbar-Button, Taste E (bleibt an bis P oder E) und untere Seitentaste gehalten (nur solange gedrückt). Invertierter Stift wirkt ebenfalls als Radierer | done |
 | F06 | Glättung an (FitToCurve) | done |
-| F07 | Undo / Redo strichbasiert, Ctrl+Z / Ctrl+Y, Verlauf bis zum letzten Öffnen oder Neu | wip |
+| F07 | Undo / Redo strichbasiert, Ctrl+Z / Ctrl+Y, Verlauf bis zum letzten Öffnen oder Neu | done |
 
 ## Seite und Hintergrund
 
@@ -43,9 +43,9 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | ID | Feature | Status |
 |----|---------|--------|
 | F17 | Format `.msp`, JSON, UTF-8: version, pageMode, pageStyle, lineColor, pages[] mit strokes[] (color, width, pressureEnabled, points [x, y, pressure]), Koordinaten in Seitenpixeln bei 100 % | done |
-| F18 | Neu Ctrl+N, Öffnen Ctrl+O, Speichern Ctrl+S, Speichern unter Ctrl+Shift+S. Titelleiste zeigt Dateiname und `*` bei ungespeicherten Änderungen | todo |
-| F19 | Schließen mit Änderungen: Dialog Speichern / Verwerfen / Abbrechen | todo |
-| F20 | Standard-Speicherort: zuletzt verwendeter Ordner. Kein Cloud-Code in der App | todo |
+| F18 | Neu Ctrl+N, Öffnen Ctrl+O, Speichern Ctrl+S, Speichern unter Ctrl+Shift+S. Titelleiste zeigt Dateiname und `*` bei ungespeicherten Änderungen | done |
+| F19 | Schließen mit Änderungen: Dialog Speichern / Verwerfen / Abbrechen | done |
+| F20 | Standard-Speicherort: zuletzt verwendeter Ordner. Kein Cloud-Code in der App | wip |
 | F21 | Settings in %AppData%/Mitschreibprogramm/settings.json: Farbe, Breite, Druck, Seitenstil, Linienfarbe, Seitenmodus, Dark Mode, Fenstergröße und -position, letzter Ordner | wip |
 
 ## PDF-Export
