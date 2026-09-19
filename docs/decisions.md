@@ -83,7 +83,7 @@ Chronologisch. Je Eintrag: Entscheidung, Begründung, verworfene Alternative.
 - Striche: Punkte kommen aus `Stroke.GetBezierStylusPoints()`, also dieselbe geglättete Kurve wie auf dem Bildschirm. Ohne Druck ein Linienzug mit konstanter Breite. Mit Druck ein Linienstück pro Abschnitt mit eigener Breite (runde Enden), Breite = Basis x (1,5 x Druck + 0,25) wie in WPF.
 - Fallstrick: Die Bezier-Glättung macht aus einer geraden Linie zwei Punkte. Ein Mittelwert pro Abschnitt würde den Druckverlauf verlieren (im Checkpoint 5 gefunden). Deshalb teilt `PdfExporter.PressureSegments` jeden Abschnitt so, dass die Breite pro Teilstück höchstens 0,25 px springt.
 - Verworfen: Umriss aus `Stroke.GetGeometry()` füllen (exakt, aber sehr große PDFs bei Druckstrichen).
-- Hilfslinien: Bildschirmfarbe (mit Alpha) wird auf Weiß vorgemischt (`Palette.RuleLineOnPaper`), keine Transparenz im PDF. Gestrichelt über `XPen.DashPattern`, eine Linie pro DrawLine.
+- Hilfslinien: Bildschirmfarbe (mit Alpha) wird auf Weiß vorgemischt (`Palette.RuleLineOnPaper`), keine Transparenz im PDF. Gestrichelt über `XPen.DashPattern`, eine Linie pro DrawLine. (Überholt seit dem Eintrag "Seitenstil Kariert ersetzt Strichliert": es gibt kein DashPattern mehr, das Gitter sind durchgezogene Linien.)
 - Endlos: `PageModeConverter` schneidet in A4-Kacheln, derselbe Code wie beim Moduswechsel.
 - PDFsharp-Fallen: `PdfDocumentOpenMode.ReadOnly` ist obsolet (Tests nutzen `Import`), `XGraphicsPath.StartFigure` wirkt im Core-Build nicht (deshalb DrawLine / DrawLines statt Pfaden).
 
@@ -135,3 +135,5 @@ Ein zweiter, nur lesender Durchgang über den ganzen Code hat diese Fehler gefun
 - Alte Dateien: .msp und settings.json mit `"dashed"` laden als kariert (`PageStyleJsonConverter`), geschrieben wird nur noch `"squared"`. Die Formatversion bleibt 1, weil sich sonst nichts ändert. Verworfen: `dashed` als zweiten Enum-Namen behalten (welcher Name beim Schreiben gewinnt, wäre Zufall).
 - Geometrie in `RuleLines`: Zeilen starten pro A4-Höhe neu wie bei Liniert (297 mm ist kein Vielfaches von 5 mm, die unterste Zelle jeder Seite ist 2 mm hoch). Spalten laufen auf der Endlos-Fläche durch, weil 210 mm ein Vielfaches von 5 mm ist. Eine Linie genau auf dem rechten Seitenrand wird nicht gezeichnet.
 - `RuleLines` liegt jetzt in Models (reine Seitengeometrie ohne WPF), damit die xUnit-Tests sie prüfen dürfen. Die Strich-Konstanten `RuleDashLength` / `RuleDashGap` sind entfallen.
+- Am Bildschirm ist der Linienstift halbtransparent. Zeilen und Spalten einzeln gezeichnet hätten jede Kreuzung doppelt überblendet (dunklere Punkte, im Review gefunden). `PageBackground` zeichnet deshalb alle Linien als eine `StreamGeometry` in einem Aufruf. Verworfen: `PushOpacity` um deckende Linien (braucht pro Seite eine Zwischenfläche in Zoomgröße).
+- Der Konverter vergleicht Stilnamen ohne Rücksicht auf Groß- und Kleinschreibung, wie es der Standard-Enum-Konverter vorher tat.
