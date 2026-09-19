@@ -46,7 +46,7 @@ JSON, UTF-8 ohne BOM, kompakt in einer Zeile. Code: `Services/MspFileService`, D
 
 ## settings.json
 
-Ort: `%AppData%/Mitschreibprogramm/settings.json`, JSON eingerückt. Code: `Services/SettingsService`, Datenklasse `Models/AppSettings`. Fehlt die Datei oder ist sie kaputt, gelten die Standardwerte.
+Ort: `%AppData%/Mitschreibprogramm/settings.json`, JSON eingerückt. Code: `Services/SettingsService`, Datenklasse `Models/AppSettings`. Fehlt die Datei oder ist sie kaputt, gelten die Standardwerte. Enums stehen in beiden Formaten als Text, Zahlen und unbekannte Werte gelten als kaputt (.msp: Fehlermeldung beim Öffnen).
 
 | Feld | Standard | Bedeutung |
 |------|----------|-----------|

@@ -36,4 +36,5 @@ Stand: 2026-09-19
 
 ## Bekannte Bugs
 
-- keine offenen. Behoben: Hilfslinien verschwanden bandweise bei Zoom unter 100 % (fix 2026-09-19, siehe decisions.md).
+- keine offenen.
+- Behoben am 2026-09-19: Hilfslinien verschwanden bandweise bei Zoom unter 100 %. Gerader Druckstrich kam im PDF mit konstanter Breite an. Dark-Mode-Toggle reagierte nicht auf UI Automation. Kaputte .msp (null-Listen, Riesenkoordinaten, Enum als Zahl) konnte abstürzen. Gehaltene Taste ließ Umschalter (E, Strg+D, Strg+L) flackern.
