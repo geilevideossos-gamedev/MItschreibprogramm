@@ -82,6 +82,12 @@ public partial class MainWindow : Window
             }
         }
 
+        Add(ModifierKeys.None, () => ColorBlack.IsChecked = true, Key.D1, Key.NumPad1);
+        Add(ModifierKeys.None, () => ColorBlue.IsChecked = true, Key.D2, Key.NumPad2);
+        Add(ModifierKeys.None, () => ColorRed.IsChecked = true, Key.D3, Key.NumPad3);
+        Add(ModifierKeys.None, () => ColorGreen.IsChecked = true, Key.D4, Key.NumPad4);
+        Add(ModifierKeys.None, () => WidthSlider.Value += AppConstants.StrokeWidthStep, Key.OemPlus, Key.Add);
+        Add(ModifierKeys.None, () => WidthSlider.Value -= AppConstants.StrokeWidthStep, Key.OemMinus, Key.Subtract);
         Add(ModifierKeys.None, () => ToolPen.IsChecked = true, Key.P);
         Add(ModifierKeys.None, () => (ToolEraser.IsChecked == true ? ToolPen : ToolEraser).IsChecked = true, Key.E);
         Add(ModifierKeys.Control, _files.New, Key.N);
