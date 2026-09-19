@@ -10,6 +10,7 @@ namespace Mitschreibprogramm.Views;
 public sealed class FileSession
 {
     private const string FileFilter = "Mitschrift (*.msp)|*.msp";
+    private const string PdfFilter = "PDF (*.pdf)|*.pdf";
     private const string UntitledName = "Unbenannt";
 
     private readonly Window _owner;
@@ -82,6 +83,37 @@ public sealed class FileSession
         return dialog.ShowDialog(_owner) == true && Write(dialog.FileName);
     }
 
+    public void ExportPdf()
+    {
+        if (ExportDialog.Ask(_owner) is not { } includeRuleLines)
+        {
+            return;
+        }
+
+        var dialog = new SaveFileDialog
+        {
+            Filter = PdfFilter,
+            DefaultExt = ".pdf",
+            AddExtension = true,
+            InitialDirectory = StartFolder(),
+            FileName = Path.ChangeExtension(DisplayName, ".pdf"),
+        };
+        if (dialog.ShowDialog(_owner) != true)
+        {
+            return;
+        }
+
+        try
+        {
+            PdfExporter.Export(_document.ToDocument(), dialog.FileName, includeRuleLines);
+            _settings.LastFolder = Path.GetDirectoryName(dialog.FileName);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            ShowError($"Das PDF konnte nicht geschrieben werden.\n\n{e.Message}");
+        }
+    }
+
     public bool ConfirmDiscard()
     {
         if (!IsDirty)
@@ -97,7 +129,7 @@ public sealed class FileSession
         };
     }
 
-    public string StartFolder() => Directory.Exists(_settings.LastFolder) ? _settings.LastFolder : string.Empty;
+    private string StartFolder() => Directory.Exists(_settings.LastFolder) ? _settings.LastFolder : string.Empty;
 
     private void Show(NoteDocument document, string? path)
     {

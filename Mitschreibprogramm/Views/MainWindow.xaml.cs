@@ -108,6 +108,7 @@ public partial class MainWindow : Window
         Add(ModifierKeys.Control, _files.Open, Key.O);
         Add(ModifierKeys.Control, () => _files.Save(), Key.S);
         Add(ModifierKeys.Control | ModifierKeys.Shift, () => _files.SaveAs(), Key.S);
+        Add(ModifierKeys.Control, _files.ExportPdf, Key.E);
         Add(ModifierKeys.Control, Document.Undo, Key.Z);
         Add(ModifierKeys.Control, Document.Redo, Key.Y);
         Add(ModifierKeys.Control, _zoomPan.ZoomIn, Key.OemPlus, Key.Add);
@@ -142,6 +143,8 @@ public partial class MainWindow : Window
     private void OnSaveClick(object sender, RoutedEventArgs e) => _files.Save();
 
     private void OnSaveAsClick(object sender, RoutedEventArgs e) => _files.SaveAs();
+
+    private void OnExportClick(object sender, RoutedEventArgs e) => _files.ExportPdf();
 
     private void OnPageStyleChanged(object sender, SelectionChangedEventArgs e)
     {

@@ -32,5 +32,14 @@ public static class Palette
         return Color.FromArgb(RuleLineAlpha, line.R, line.G, line.B);
     }
 
+    // PDF export: the translucent screen colour blended onto the white page, as one opaque colour.
+    public static Color RuleLineOnPaper(LineColor color)
+    {
+        var line = RuleLine(color);
+        var paper = Page();
+        byte Blend(byte ink, byte background) => (byte)Math.Round(background + ((ink - background) * (line.A / 255.0)));
+        return Color.FromRgb(Blend(line.R, paper.R), Blend(line.G, paper.G), Blend(line.B, paper.B));
+    }
+
     private static Color Parse(string hex) => (Color)ColorConverter.ConvertFromString(hex);
 }

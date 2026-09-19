@@ -74,6 +74,11 @@
                             ToolTip="Zwischen Seiten (A4) und Endlos-Fläche umschalten" Click="OnPageModeClick"/>
                     <Button x:Name="AddPageButton" Style="{StaticResource FlatButton}" Content="+ Seite"
                             ToolTip="Neue Seite (Strg+Enter)" Click="OnAddPageClick"/>
+                    <Border Style="{StaticResource ToolSeparator}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="ExportPdfButton" Style="{StaticResource FlatButton}" Content="PDF-Export"
+                            ToolTip="Als PDF exportieren (Strg+E)" Click="OnExportClick"/>
                 </StackPanel>
             </WrapPanel>
         </Border>
