@@ -44,10 +44,10 @@ Die Toolbar von links nach rechts:
 - **Breite:** Regler von 1 bis 12 px in halben Schritten, daneben die aktuelle Breite und die Voreinstellungen dünn (1,5), mittel (3), dick (6).
 - **Druck:** mit Haken macht fester Druck den Strich breiter (etwa ein Viertel bis eindreiviertel der eingestellten Breite). Ohne Haken ist der Strich überall gleich breit. Die Maus schreibt immer gleich breit.
 - **Stift / Radierer:** der Radierer löscht immer ganze Striche. Drei Wege: Button, Taste E, oder die untere Seitentaste am Stift gedrückt halten.
-- **Seitenstil:** Blanko, Liniert, Strichliert (Linienabstand 8 mm). **Linien: Blau / Schwarz** schaltet die Linienfarbe um. Die Linien sind nur Hintergrund und lassen sich nicht wegradieren.
+- **Seitenstil:** Blanko, Liniert (Linienabstand 8 mm), Kariert (Karo-Gitter mit 5 mm, wie im Rechenheft). **Linien: Blau / Schwarz** schaltet die Linienfarbe um. Die Linien sind nur Hintergrund und lassen sich nicht wegradieren.
 - **Modus: Seiten / Endlos.** "Seiten" sind A4-Blätter untereinander, **+ Seite** hängt eines an. Wer in den unteren 15 % des letzten Blatts schreibt, bekommt automatisch ein neues. "Endlos" ist eine einzige Fläche, die nach unten und rechts mitwächst. Umschalten geht jederzeit: Seiten werden untereinander zusammengelegt, die Endlos-Fläche wird in A4-Blätter geschnitten (ein Strich landet auf dem Blatt, auf dem er beginnt).
 - **Dunkel:** Dark Mode. Die Seite wird dunkelgrau, Schwarz wird weiß angezeigt. Gespeichert und exportiert wird trotzdem Schwarz auf Weiß.
-- **PDF-Export:** A4-Seiten mit scharfen Vektorstrichen, auf Wunsch mit den Hintergrundlinien. Eine Endlos-Fläche wird dafür in A4-Blätter geschnitten.
+- **PDF-Export:** A4-Seiten mit scharfen Vektorstrichen, auf Wunsch mit den Hintergrundlinien (Linien oder Karo-Gitter). Eine Endlos-Fläche wird dafür in A4-Blätter geschnitten.
 
 Die Statusleiste unten zeigt Zoom, "Seite x von y" und die Datei.
 
@@ -62,7 +62,7 @@ Die Statusleiste unten zeigt Zoom, "Seite x von y" und die Datei.
 | E | Radierer an, noch einmal E oder P: wieder Stift |
 | + / - | Strich breiter / schmaler |
 | Strg+Z / Strg+Y | Rückgängig / Wiederholen |
-| Strg+L | Seitenstil durchschalten (Blanko, Liniert, Strichliert) |
+| Strg+L | Seitenstil durchschalten (Blanko, Liniert, Kariert) |
 | Strg+Enter | neue Seite (nur im Modus Seiten) |
 | Strg+D | Dark Mode |
 | Strg+Plus / Strg+Minus / Strg+0 | größer / kleiner / 100 % |
