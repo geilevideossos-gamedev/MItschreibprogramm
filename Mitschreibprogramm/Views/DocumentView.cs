@@ -34,6 +34,8 @@ public sealed class DocumentView : StackPanel
 
     public event Action? PagesChanged;
 
+    public event Action? Changed;
+
     public IReadOnlyList<PageView> Pages => _pages;
 
     public PageMode Mode { get; private set; }
@@ -76,12 +78,19 @@ public sealed class DocumentView : StackPanel
 
     public void SetPageStyle(PageStyle style, LineColor lineColor)
     {
+        if (style == PageStyle && lineColor == LineColor)
+        {
+            return;
+        }
+
         PageStyle = style;
         LineColor = lineColor;
         foreach (var page in _pages)
         {
             page.Paper.Update(style, lineColor);
         }
+
+        Changed?.Invoke();
     }
 
     public void Load(NoteDocument document)
@@ -113,6 +122,7 @@ public sealed class DocumentView : StackPanel
         var pages = BuildPages(PageModeConverter.Convert(ToDocument(), mode));
         _history.Push(new UndoStep(() => Show(previousMode, previousPages), () => Show(mode, pages)));
         Show(mode, pages);
+        Changed?.Invoke();
     }
 
     public void AddPage()
@@ -185,12 +195,19 @@ public sealed class DocumentView : StackPanel
         Children.Add(page);
         UpdateEditingMode();
         PagesChanged?.Invoke();
+        Changed?.Invoke();
         return page;
     }
 
     private void OnHistoryApplied(string kind, bool applied)
     {
-        if (applied && DebugLog.IsEnabled)
+        if (!applied)
+        {
+            return;
+        }
+
+        Changed?.Invoke();
+        if (DebugLog.IsEnabled)
         {
             DebugLog.Write($"{kind} strokes={_pages.Sum(page => page.Ink.Strokes.Count)}");
         }
@@ -209,6 +226,8 @@ public sealed class DocumentView : StackPanel
         {
             AppendPage();
         }
+
+        Changed?.Invoke();
     }
 
     // Raised before the stroke leaves the collection, so its z-order position is still known.
@@ -216,6 +235,7 @@ public sealed class DocumentView : StackPanel
     {
         var index = strokes.IndexOf(stroke);
         _history.Push(new UndoStep(() => strokes.Insert(index, stroke), () => strokes.Remove(stroke)));
+        Changed?.Invoke();
     }
 
     private void UpdateEditingMode()

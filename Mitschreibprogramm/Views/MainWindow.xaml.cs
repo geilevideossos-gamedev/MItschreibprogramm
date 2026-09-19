@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,8 +11,9 @@ namespace Mitschreibprogramm.Views;
 public partial class MainWindow : Window
 {
     private readonly Dictionary<(ModifierKeys, Key), Action> _shortcuts = [];
+    private readonly AppSettings _settings = new();
     private readonly ZoomPanController _zoomPan;
-    private LineColor _lineColor = LineColor.Blue;
+    private readonly FileSession _files;
 
     public MainWindow()
     {
@@ -20,6 +22,9 @@ public partial class MainWindow : Window
         _zoomPan.ZoomChanged += UpdateStatus;
         Deactivated += (_, _) => _zoomPan.SetSpaceHeld(false);
         Document.PagesChanged += OnPagesChanged;
+        _files = new FileSession(this, Document, _settings);
+        _files.StateChanged += UpdateTitle;
+        _files.DocumentLoaded += OnDocumentLoaded;
         RegisterShortcuts();
 
         foreach (var dot in new[] { ColorBlack, ColorBlue, ColorRed, ColorGreen })
@@ -32,8 +37,14 @@ public partial class MainWindow : Window
         ColorBlack.IsChecked = true;
         PressureCheck.IsChecked = true;
         ToolPen.IsChecked = true;
-        PageStyleBox.SelectedIndex = (int)PageStyle.Lined;
-        OnPagesChanged();
+        _files.New();
+        UpdateTitle();
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        base.OnClosing(e);
+        e.Cancel = !_files.ConfirmDiscard();
     }
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -73,6 +84,10 @@ public partial class MainWindow : Window
 
         Add(ModifierKeys.None, () => ToolPen.IsChecked = true, Key.P);
         Add(ModifierKeys.None, () => (ToolEraser.IsChecked == true ? ToolPen : ToolEraser).IsChecked = true, Key.E);
+        Add(ModifierKeys.Control, _files.New, Key.N);
+        Add(ModifierKeys.Control, _files.Open, Key.O);
+        Add(ModifierKeys.Control, () => _files.Save(), Key.S);
+        Add(ModifierKeys.Control | ModifierKeys.Shift, () => _files.SaveAs(), Key.S);
         Add(ModifierKeys.Control, Document.Undo, Key.Z);
         Add(ModifierKeys.Control, Document.Redo, Key.Y);
         Add(ModifierKeys.Control, _zoomPan.ZoomIn, Key.OemPlus, Key.Add);
@@ -94,11 +109,23 @@ public partial class MainWindow : Window
     private void OnToolChecked(object sender, RoutedEventArgs e) =>
         Document.SetEraser(ToolEraser.IsChecked == true);
 
-    private void OnPageStyleChanged(object sender, SelectionChangedEventArgs e) => ApplyPageStyle();
+    private void OnNewClick(object sender, RoutedEventArgs e) => _files.New();
+
+    private void OnOpenClick(object sender, RoutedEventArgs e) => _files.Open();
+
+    private void OnSaveClick(object sender, RoutedEventArgs e) => _files.Save();
+
+    private void OnSaveAsClick(object sender, RoutedEventArgs e) => _files.SaveAs();
+
+    private void OnPageStyleChanged(object sender, SelectionChangedEventArgs e)
+    {
+        _settings.PageStyle = (PageStyle)((ComboBoxItem)PageStyleBox.SelectedItem).Tag;
+        ApplyPageStyle();
+    }
 
     private void OnLineColorClick(object sender, RoutedEventArgs e)
     {
-        _lineColor = _lineColor == LineColor.Blue ? LineColor.Black : LineColor.Blue;
+        _settings.LineColor = _settings.LineColor == LineColor.Blue ? LineColor.Black : LineColor.Blue;
         ApplyPageStyle();
     }
 
@@ -112,6 +139,7 @@ public partial class MainWindow : Window
     private void OnPagesChanged()
     {
         var pages = Document.Mode == PageMode.Pages;
+        _settings.PageMode = Document.Mode;
         PageModeButton.Content = pages ? "Modus: Seiten" : "Modus: Endlos";
         AddPageButton.IsEnabled = pages;
         UpdateStatus();
@@ -119,9 +147,21 @@ public partial class MainWindow : Window
 
     private void ApplyPageStyle()
     {
-        var style = (PageStyle)((ComboBoxItem)PageStyleBox.SelectedItem).Tag;
-        Document.SetPageStyle(style, _lineColor);
-        LineColorButton.Content = _lineColor == LineColor.Blue ? "Linien: Blau" : "Linien: Schwarz";
+        Document.SetPageStyle(_settings.PageStyle, _settings.LineColor);
+        LineColorButton.Content = _settings.LineColor == LineColor.Blue ? "Linien: Blau" : "Linien: Schwarz";
+    }
+
+    private void OnDocumentLoaded()
+    {
+        _settings.LineColor = Document.LineColor;
+        PageStyleBox.SelectedIndex = (int)Document.PageStyle;
+        ApplyPageStyle();
+    }
+
+    private void UpdateTitle()
+    {
+        Title = $"{_files.DisplayName}{(_files.IsDirty ? "*" : string.Empty)} - Mitschreibprogramm";
+        FileText.Text = _files.FilePath ?? _files.DisplayName;
     }
 
     private void ApplyPenWidth(double width)
