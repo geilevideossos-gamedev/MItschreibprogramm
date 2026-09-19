@@ -34,7 +34,7 @@ function Checkpoint7 {
 
     Ctl -Keys "ctrl+s"
     Start-Sleep -Milliseconds 1200
-    & "$toolsDir/screenshot.ps1" -Screen -Out (Join-Path $outDir "cp7-dark-savedialog.png") | Out-Null
+    & "$toolsDir/screenshot.ps1" -Dialog -Out (Join-Path $outDir "cp7-dark-savedialog.png") | Out-Null
     Ctl -Text $file
     Ctl -Keys "enter"
     Start-Sleep -Milliseconds 1200
