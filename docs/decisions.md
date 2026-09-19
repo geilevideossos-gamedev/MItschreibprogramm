@@ -53,3 +53,9 @@ Chronologisch. Je Eintrag: Entscheidung, Begründung, verworfene Alternative.
 - Entscheidung: P/Invoke-Code liegt einmal in `tools/MspNative.cs`, die Skripte laden ihn per Add-Type. Zusätzlich zu pen-sim.ps1 und screenshot.ps1 gibt es app-control.ps1 (Tasten, Maus, UI Automation) und selftest.ps1 (fährt die Checkpoints, auch gegen dist/).
 - Begründung: Checkpoint 6 verlangt, den Selbsttest komplett gegen die exe zu wiederholen. Das geht nur verlässlich, wenn er ein Skript ist.
 - Screenshots laufen über PrintWindow (PW_RENDERFULLCONTENT), damit verdeckende Fenster das Bild nicht verfälschen.
+
+## 2026-09-19 Hilfslinien mit einer Guideline pro Linie
+
+- Entscheidung: `PageBackground` setzt pro Linie nur eine Guideline (Oberkante), nicht zwei.
+- Begründung: Mit zwei Guidelines rasten bei Zoom unter 100 % beide Kanten auf denselben Gerätepixel ein, die Linie wird 0 Pixel hoch und verschwindet bandweise (im Checkpoint-3-Screenshot bei 50 % gefunden). Eine Guideline hält alle Linien gleich und immer sichtbar.
+- Verworfen: gar keine Guidelines (Linien wirken bei 125 % Skalierung ungleich dick).

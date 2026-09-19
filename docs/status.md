@@ -32,4 +32,4 @@ Stand: 2026-09-19
 
 ## Bekannte Bugs
 
-- keine
+- keine offenen. Behoben: Hilfslinien verschwanden bandweise bei Zoom unter 100 % (fix 2026-09-19, siehe decisions.md).
