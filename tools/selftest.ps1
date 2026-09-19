@@ -17,10 +17,18 @@ $logPath = Join-Path $outDir "debug.log"
 $invariant = [System.Globalization.CultureInfo]::InvariantCulture
 $script:failures = 0
 $script:logOffset = 0
+$script:windowEvents = @()
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
+# On a failure the window events since the last check are printed: a foreign window taking the foreground
+# aborts a running stroke or pan, and that is the first thing to rule out.
 function Check([bool]$condition, [string]$message) {
-    if ($condition) { Write-Output "  PASS  $message" } else { Write-Output "  FAIL  $message"; $script:failures++ }
+    if ($condition) { Write-Output "  PASS  $message" } else {
+        Write-Output "  FAIL  $message"
+        $script:failures++
+        foreach ($event in $script:windowEvents) { Write-Output "        $event" }
+    }
+    $script:windowEvents = @()
 }
 function Pen { & "$PSScriptRoot/pen-sim.ps1" @args | Out-Null; Start-Sleep -Milliseconds 350 }
 function Ctl { & "$PSScriptRoot/app-control.ps1" @args; Start-Sleep -Milliseconds 250 }
@@ -49,7 +57,9 @@ function Stop-App {
 function Read-Log {
     Start-Sleep -Milliseconds 300
     $lines = @(if (Test-Path $logPath) { Get-Content $logPath })
-    $new = @($lines | Select-Object -Skip $script:logOffset)
+    $fresh = @($lines | Select-Object -Skip $script:logOffset)
+    $script:windowEvents += @($fresh | Where-Object { $_ -match "^\S+ window " })
+    $new = @($fresh | Where-Object { $_ -notmatch "^\S+ window " })
     $script:logOffset = $lines.Count
     foreach ($line in $new) {
         $entry = @{ raw = $line; kind = ($line -split " ")[1] }
@@ -57,8 +67,9 @@ function Read-Log {
         $entry
     }
 }
-function Number([string]$value) { [double]::Parse($value, $invariant) }
-function PointOf([string]$value) { @($value.Trim("(", ")").Split(",") | ForEach-Object { Number $_ }) }
+# A missing log entry yields NaN, so the affected checks fail instead of stopping the whole run.
+function Number([string]$value) { if ($value) { [double]::Parse($value, $invariant) } else { [double]::NaN } }
+function PointOf([string]$value) { if ($value) { @($value.Trim("(", ")").Split(",") | ForEach-Object { Number $_ }) } else { @([double]::NaN, [double]::NaN) } }
 
 # Draws a short stroke at a client position and derives where page 0,0 sits in client coordinates.
 function Get-PageOrigin([double]$clientX, [double]$clientY) {
