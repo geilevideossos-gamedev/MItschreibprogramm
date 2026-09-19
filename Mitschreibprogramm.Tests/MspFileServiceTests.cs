@@ -75,6 +75,17 @@ public sealed class MspFileServiceTests : IDisposable
     }
 
     [Fact]
+    public void Save_LeavesNoTemporaryFileBehindWhenTheTargetCannotBeReplaced()
+    {
+        var target = Path.Combine(_folder, "folder.msp");
+        Directory.CreateDirectory(target);
+
+        Assert.ThrowsAny<Exception>(() => MspFileService.Save(new NoteDocument(), target));
+
+        Assert.False(File.Exists(target + ".tmp"));
+    }
+
+    [Fact]
     public void Load_RepairsPointsWithoutPressureAndClampsWidth()
     {
         var path = Path.Combine(_folder, "lenient.msp");

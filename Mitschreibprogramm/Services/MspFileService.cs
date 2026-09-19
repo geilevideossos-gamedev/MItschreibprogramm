@@ -13,8 +13,16 @@ public static class MspFileService
     {
         // Written next to the target and moved over it, so a crash never leaves a half-written note behind.
         var temporary = path + ".tmp";
-        File.WriteAllText(temporary, JsonSerializer.Serialize(document, JsonFormat.Compact), new UTF8Encoding(false));
-        File.Move(temporary, path, overwrite: true);
+        try
+        {
+            File.WriteAllText(temporary, JsonSerializer.Serialize(document, JsonFormat.Compact), new UTF8Encoding(false));
+            File.Move(temporary, path, overwrite: true);
+        }
+        catch
+        {
+            File.Delete(temporary);
+            throw;
+        }
     }
 
     public static NoteDocument Load(string path)
