@@ -16,7 +16,7 @@ Stand: 2026-09-19
 
 ## Nächster Schritt
 
-- Checkpoint 6: `./build.sh`, dann `powershell -ExecutionPolicy Bypass -File tools/selftest.ps1 -Exe dist/Mitschreibprogramm.exe` auf entsperrtem Desktop, an dem gerade niemand arbeitet. Danach Schritt 9 (Abschluss).
+- Checkpoint 6, Teil 2: `powershell -ExecutionPolicy Bypass -File tools/selftest.ps1 -Exe dist/Mitschreibprogramm.exe -Checkpoint "4,5,7"`. Teil 1 (1 bis 3) ist gegen die finale exe bestanden. Ausgangslage war: `./build.sh`, dann `powershell -ExecutionPolicy Bypass -File tools/selftest.ps1 -Exe dist/Mitschreibprogramm.exe` auf entsperrtem Desktop, an dem gerade niemand arbeitet. Danach Schritt 9 (Abschluss).
 
 ## Schrittplan
 
