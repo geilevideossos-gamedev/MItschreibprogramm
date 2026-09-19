@@ -151,6 +151,18 @@ public sealed class MspFileServiceTests : IDisposable
         Assert.Contains("\"pageStyle\":\"squared\"", File.ReadAllText(path));
     }
 
+    [Theory]
+    [InlineData("Lined", PageStyle.Lined)]
+    [InlineData("SQUARED", PageStyle.Squared)]
+    [InlineData("Dashed", PageStyle.Squared)]
+    public void Load_ReadsPageStyleNamesInAnyCase(string written, PageStyle expected)
+    {
+        var path = Path.Combine(_folder, "case.msp");
+        File.WriteAllText(path, $$"""{"version":1,"pageStyle":"{{written}}","pages":[]}""");
+
+        Assert.Equal(expected, MspFileService.Load(path).PageStyle);
+    }
+
     [Fact]
     public void Load_RejectsNewerFormatVersion()
     {

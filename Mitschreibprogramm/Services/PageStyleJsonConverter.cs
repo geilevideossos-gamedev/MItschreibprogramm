@@ -12,14 +12,14 @@ public sealed class PageStyleJsonConverter : JsonConverter<PageStyle>
     public override PageStyle Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var text = reader.TokenType == JsonTokenType.String ? reader.GetString() : null;
-        if (text == LegacyDashed)
+        if (string.Equals(text, LegacyDashed, StringComparison.OrdinalIgnoreCase))
         {
             return PageStyle.Squared;
         }
 
         foreach (var style in Enum.GetValues<PageStyle>())
         {
-            if (text == Name(style))
+            if (string.Equals(text, Name(style), StringComparison.OrdinalIgnoreCase))
             {
                 return style;
             }
