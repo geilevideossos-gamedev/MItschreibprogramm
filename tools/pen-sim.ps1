@@ -17,7 +17,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-if (-not ("MspNative" -as [type])) { Add-Type -Path (Join-Path $PSScriptRoot "MspNative.cs") -ReferencedAssemblies System.Drawing }
+if (-not ("MspNative" -as [type])) { Add-Type -Path (Get-ChildItem $PSScriptRoot -Filter "MspNative.*.cs").FullName -ReferencedAssemblies System.Drawing }
 
 $invariant = [System.Globalization.CultureInfo]::InvariantCulture
 $start = $From.Split(",") | ForEach-Object { [double]::Parse($_, $invariant) }

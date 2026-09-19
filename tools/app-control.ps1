@@ -24,7 +24,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-if (-not ("MspNative" -as [type])) { Add-Type -Path (Join-Path $PSScriptRoot "MspNative.cs") -ReferencedAssemblies System.Drawing }
+if (-not ("MspNative" -as [type])) { Add-Type -Path (Get-ChildItem $PSScriptRoot -Filter "MspNative.*.cs").FullName -ReferencedAssemblies System.Drawing }
 Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
 
 $virtualKeys = @{ ctrl = 0x11; shift = 0x10; alt = 0x12; enter = 0x0D; space = 0x20; esc = 0x1B; tab = 0x09; plus = 0xBB; minus = 0xBD; f4 = 0x73 }
