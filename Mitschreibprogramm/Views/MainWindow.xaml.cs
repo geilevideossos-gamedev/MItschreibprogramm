@@ -237,7 +237,7 @@ public partial class MainWindow : Window
 
     private void RestoreWindowPlacement()
     {
-        if (_settings is { WindowLeft: { } left, WindowTop: { } top, WindowWidth: { } width, WindowHeight: { } height })
+        if (_settings is { WindowLeft: { } left, WindowTop: { } top, WindowWidth: > 0 and { } width, WindowHeight: > 0 and { } height })
         {
             var visible = new Rect(left, top, width, height);
             visible.Intersect(new Rect(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenTop,

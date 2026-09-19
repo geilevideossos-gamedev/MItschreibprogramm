@@ -72,6 +72,29 @@ public sealed class SettingsServiceTests : IDisposable
     }
 
     [Fact]
+    public void Load_ReturnsDefaultsWhenAnEnumValueIsNotDefined()
+    {
+        var path = Path.Combine(_folder, "enum.json");
+        File.WriteAllText(path, """{"penColor":"7","darkMode":true}""");
+
+        var loaded = new SettingsService(path).Load();
+
+        Assert.Equal(PenColor.Black, loaded.PenColor);
+        Assert.False(loaded.DarkMode);
+    }
+
+    [Fact]
+    public void Save_DoesNotThrowWhenTheFileCannotBeWritten()
+    {
+        var blocked = Path.Combine(_folder, "blocked.json");
+        Directory.CreateDirectory(blocked);
+
+        new SettingsService(blocked).Save(new AppSettings());
+
+        Assert.True(Directory.Exists(blocked));
+    }
+
+    [Fact]
     public void Load_ClampsStrokeWidthIntoTheAllowedRange()
     {
         var path = Path.Combine(_folder, "width.json");
