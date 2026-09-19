@@ -26,15 +26,24 @@ public static class MspFileService
             throw new InvalidDataException($"Die Datei hat Formatversion {document.Version}, dieses Programm kennt nur Version {AppConstants.FileFormatVersion}.");
         }
 
-        foreach (var stroke in document.Pages.SelectMany(page => page.Strokes))
+        document.Pages = (document.Pages ?? []).Where(page => page is not null).ToList();
+        foreach (var page in document.Pages)
         {
-            stroke.Width = Math.Clamp(stroke.Width, AppConstants.MinStrokeWidth, AppConstants.MaxStrokeWidth);
-            stroke.Points = stroke.Points.Where(point => point.Length >= 2).Select(Normalize).ToList();
+            page.Strokes = (page.Strokes ?? []).Where(stroke => stroke is not null).ToList();
+            foreach (var stroke in page.Strokes)
+            {
+                stroke.Width = Math.Clamp(stroke.Width, AppConstants.MinStrokeWidth, AppConstants.MaxStrokeWidth);
+                stroke.Points = (stroke.Points ?? []).Where(point => point is { Length: >= 2 }).Select(Normalize).ToList();
+            }
         }
 
         return document;
     }
 
     private static double[] Normalize(double[] point) =>
-        [point[0], point[1], Math.Clamp(point.Length > 2 ? point[2] : DefaultPressure, 0, 1)];
+    [
+        Math.Clamp(point[0], -AppConstants.MaxCoordinate, AppConstants.MaxCoordinate),
+        Math.Clamp(point[1], -AppConstants.MaxCoordinate, AppConstants.MaxCoordinate),
+        Math.Clamp(point.Length > 2 ? point[2] : DefaultPressure, 0, 1),
+    ];
 }

@@ -89,6 +89,30 @@ public sealed class MspFileServiceTests : IDisposable
     }
 
     [Fact]
+    public void Load_SurvivesNullCollectionsAndBoundsCoordinates()
+    {
+        var path = Path.Combine(_folder, "nulls.msp");
+        File.WriteAllText(path, """{"version":1,"pages":[null,{"strokes":null},{"strokes":[null,{"color":"red","width":2,"points":null},{"color":"red","width":2,"points":[null,[5e12,-5e12,0.5]]}]}]}""");
+
+        var document = MspFileService.Load(path);
+
+        Assert.Equal(2, document.Pages.Count);
+        Assert.Empty(document.Pages[0].Strokes);
+        Assert.Equal(2, document.Pages[1].Strokes.Count);
+        Assert.Empty(document.Pages[1].Strokes[0].Points);
+        Assert.Equal([AppConstants.MaxCoordinate, -AppConstants.MaxCoordinate, 0.5], Assert.Single(document.Pages[1].Strokes[1].Points));
+    }
+
+    [Fact]
+    public void Load_TreatsMissingPagesAsEmptyDocument()
+    {
+        var path = Path.Combine(_folder, "nopages.msp");
+        File.WriteAllText(path, """{"version":1,"pages":null}""");
+
+        Assert.Empty(MspFileService.Load(path).Pages);
+    }
+
+    [Fact]
     public void Load_RejectsNewerFormatVersion()
     {
         var path = Path.Combine(_folder, "future.msp");

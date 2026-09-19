@@ -4,6 +4,9 @@ public static class AppConstants
 {
     public const int FileFormatVersion = 1;
 
+    // Bounds coordinates read from a file, so a damaged file cannot ask for millions of pages.
+    public const double MaxCoordinate = 1_000_000;
+
     private const double PixelsPerMillimeter = 96.0 / 25.4;
 
     public const double PageWidth = 210 * PixelsPerMillimeter;
