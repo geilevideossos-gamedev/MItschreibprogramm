@@ -6,6 +6,7 @@ Stand: 2026-09-19
 
 - Schritt 1 bis 4 fertig und committet: Skeleton, Pen (Druck, Radierer über Toolbar / E / Seitentaste / invertiert, Glättung), Debug-Log, Hintergrundstile mit Linienfarbe, Undo/Redo, Zoom und Pan, Seitenmodell (Seiten / Endlos, Konvertierung, Auto-Seite, Seitenzähler).
 - xUnit-Projekt Mitschreibprogramm.Tests steht (Konvertierung, .msp Round-Trip).
+- Schritt 8 läuft: app.manifest, build.sh und Publish nach dist/ fertig (141 MB, eine Datei). Es fehlen README und Checkpoint 6.
 - Schritt 7 fertig: Dark Mode (Button, Ctrl+D, gespeichert), alle Shortcuts, Statusleiste mit Zoom, Seite und Datei.
 - Schritt 6 fertig: PDF-Export mit PDFsharp 6.2.4 über Ctrl+E und Button.
 - Schritt 5 fertig: Dateiformat .msp, Datei-Befehle mit Dialogen, Titel mit `*`, Settings (laden, anwenden, beim Schließen speichern, Fensterlage). Shortcuts 1-4 und Plus / Minus sind ebenfalls drin.
@@ -32,7 +33,6 @@ Stand: 2026-09-19
 ## Offene Punkte
 
 - Context7 war in der Session vom 2026-09-19 nicht erreichbar (DNS). API-Fakten stammen aus Primärquellen (dotnet/wpf Quelltext, learn.microsoft.com, nuget.org) und sind in pen-input.md / decisions.md mit Quelle notiert.
-- app.manifest für PerMonitorV2 fehlt noch (kommt mit Schritt 8, siehe decisions.md).
 
 ## Bekannte Bugs
 

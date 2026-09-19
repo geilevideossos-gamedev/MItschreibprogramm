@@ -89,8 +89,8 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F39 | `dotnet publish` (win-x64, self-contained, single file) ergibt dist/Mitschreibprogramm.exe, kein Trimming | todo |
-| F40 | build.sh für Git Bash, Befehl auch in docs/build.md | todo |
+| F39 | `dotnet publish` (win-x64, self-contained, single file) ergibt dist/Mitschreibprogramm.exe, kein Trimming | done |
+| F40 | build.sh für Git Bash, Befehl auch in docs/build.md | done |
 | F41 | README.md auf Deutsch mit allen geforderten Abschnitten | todo |
 
 ## Selbsttest
