@@ -1,23 +1,30 @@
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Mitschreibprogramm.Models;
 using Mitschreibprogramm.Rendering;
+using Mitschreibprogramm.Services;
 
 namespace Mitschreibprogramm.Views;
 
 public partial class MainWindow : Window
 {
     private readonly Dictionary<(ModifierKeys, Key), Action> _shortcuts = [];
-    private readonly AppSettings _settings = new();
+    private readonly SettingsService _settingsService = new(
+        DebugLog.Folder is { } folder ? Path.Combine(folder, "settings.json") : SettingsService.DefaultPath);
+
+    private readonly AppSettings _settings;
     private readonly ZoomPanController _zoomPan;
     private readonly FileSession _files;
 
     public MainWindow()
     {
+        _settings = _settingsService.Load();
         InitializeComponent();
+        RestoreWindowPlacement();
         _zoomPan = new ZoomPanController(Scroller, Document);
         _zoomPan.ZoomChanged += UpdateStatus;
         Deactivated += (_, _) => _zoomPan.SetSpaceHeld(false);
@@ -33,9 +40,11 @@ public partial class MainWindow : Window
         }
 
         WidthSlider.ValueChanged += (_, e) => ApplyPenWidth(e.NewValue);
-        WidthSlider.Value = AppConstants.MediumStrokeWidth;
-        ColorBlack.IsChecked = true;
-        PressureCheck.IsChecked = true;
+        WidthSlider.Value = _settings.StrokeWidth;
+        ApplyPenWidth(WidthSlider.Value);
+        new[] { ColorBlack, ColorBlue, ColorRed, ColorGreen }[(int)_settings.PenColor].IsChecked = true;
+        PressureCheck.IsChecked = _settings.PressureEnabled;
+        Document.SetPressureEnabled(_settings.PressureEnabled);
         ToolPen.IsChecked = true;
         _files.New();
         UpdateTitle();
@@ -45,6 +54,11 @@ public partial class MainWindow : Window
     {
         base.OnClosing(e);
         e.Cancel = !_files.ConfirmDiscard();
+        if (!e.Cancel)
+        {
+            StoreWindowPlacement();
+            _settingsService.Save(_settings);
+        }
     }
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -103,14 +117,20 @@ public partial class MainWindow : Window
         Add(ModifierKeys.Control, () => PageStyleBox.SelectedIndex = (PageStyleBox.SelectedIndex + 1) % PageStyleBox.Items.Count, Key.L);
     }
 
-    private void OnColorChecked(object sender, RoutedEventArgs e) =>
-        Document.SetPenColor((PenColor)((RadioButton)sender).Tag);
+    private void OnColorChecked(object sender, RoutedEventArgs e)
+    {
+        _settings.PenColor = (PenColor)((RadioButton)sender).Tag;
+        Document.SetPenColor(_settings.PenColor);
+    }
 
     private void OnPresetClick(object sender, RoutedEventArgs e) =>
         WidthSlider.Value = (double)((Button)sender).Tag;
 
-    private void OnPressureToggled(object sender, RoutedEventArgs e) =>
-        Document.SetPressureEnabled(PressureCheck.IsChecked == true);
+    private void OnPressureToggled(object sender, RoutedEventArgs e)
+    {
+        _settings.PressureEnabled = PressureCheck.IsChecked == true;
+        Document.SetPressureEnabled(_settings.PressureEnabled);
+    }
 
     private void OnToolChecked(object sender, RoutedEventArgs e) =>
         Document.SetEraser(ToolEraser.IsChecked == true);
@@ -172,8 +192,37 @@ public partial class MainWindow : Window
 
     private void ApplyPenWidth(double width)
     {
+        _settings.StrokeWidth = width;
         Document.SetPenWidth(width);
         WidthLabel.Text = $"{width:0.0} px";
+    }
+
+    private void RestoreWindowPlacement()
+    {
+        if (_settings is { WindowLeft: { } left, WindowTop: { } top, WindowWidth: { } width, WindowHeight: { } height })
+        {
+            var visible = new Rect(left, top, width, height);
+            visible.Intersect(new Rect(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenTop,
+                SystemParameters.VirtualScreenWidth, SystemParameters.VirtualScreenHeight));
+            if (visible.Width >= AppConstants.MinVisibleWindowPart && visible.Height >= AppConstants.MinVisibleWindowPart)
+            {
+                WindowStartupLocation = WindowStartupLocation.Manual;
+                (Left, Top, Width, Height) = (left, top, width, height);
+            }
+        }
+
+        if (_settings.WindowMaximized)
+        {
+            WindowState = WindowState.Maximized;
+        }
+    }
+
+    private void StoreWindowPlacement()
+    {
+        var bounds = WindowState == WindowState.Normal ? new Rect(Left, Top, Width, Height) : RestoreBounds;
+        (_settings.WindowLeft, _settings.WindowTop, _settings.WindowWidth, _settings.WindowHeight) =
+            (bounds.Left, bounds.Top, bounds.Width, bounds.Height);
+        _settings.WindowMaximized = WindowState == WindowState.Maximized;
     }
 
     private void UpdateStatus()

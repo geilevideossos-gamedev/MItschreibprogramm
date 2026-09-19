@@ -25,6 +25,8 @@ public static class AppConstants
     public const double MediumStrokeWidth = 3;
     public const double ThickStrokeWidth = 6;
 
+    public const double MinVisibleWindowPart = 100;
+
     public const double MinZoom = 0.25;
     public const double MaxZoom = 4;
     public const double DefaultZoom = 1;

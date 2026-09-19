@@ -8,6 +8,9 @@ public static class DebugLog
 
     public static bool IsEnabled => !string.IsNullOrEmpty(LogPath);
 
+    // Self-tests keep their settings.json next to the log, so they never touch the real settings.
+    public static string? Folder => IsEnabled ? Path.GetDirectoryName(Path.GetFullPath(LogPath!)) : null;
+
     public static void Write(FormattableString line)
     {
         if (!IsEnabled)
