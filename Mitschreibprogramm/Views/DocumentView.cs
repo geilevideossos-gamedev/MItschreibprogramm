@@ -3,6 +3,7 @@ using System.Windows.Ink;
 using System.Windows.Input;
 using Mitschreibprogramm.Models;
 using Mitschreibprogramm.Rendering;
+using Mitschreibprogramm.Services;
 
 namespace Mitschreibprogramm.Views;
 
@@ -22,7 +23,15 @@ public sealed class DocumentView : StackPanel
         PreviewStylusButtonUp += (_, e) => SyncBarrel(e.StylusDevice);
         PreviewStylusDown += (_, e) => SyncBarrel(e.StylusDevice);
         PreviewStylusOutOfRange += (_, _) => SetBarrelHeld(false);
+        if (DebugLog.IsEnabled)
+        {
+            _ = new StrokeLogger(this);
+        }
     }
+
+    public event Action<PageView>? PageAdded;
+
+    public IReadOnlyList<PageView> Pages => _pages;
 
     public void SetPenColor(PenColor color) => _pen.Color = Palette.Pen(color);
 
@@ -46,6 +55,7 @@ public sealed class DocumentView : StackPanel
         _pages.Add(page);
         Children.Add(page);
         UpdateEditingMode();
+        PageAdded?.Invoke(page);
     }
 
     // The driver reports a held side button as barrel button; an inverted pen is handled by InkCanvas itself
