@@ -1,15 +1,45 @@
 # Architektur
 
-(wird in Schritt 1 gefüllt)
-
 ## Projektstruktur
 
 - `Mitschreibprogramm/`: WPF-App, net8.0-windows. Ordner Models/, Views/, Services/, Rendering/.
-- `Mitschreibprogramm.Tests/`: xUnit, nur Models/Services.
-- `tools/`: pen-sim.ps1, screenshot.ps1 (Selbsttest).
+- `Mitschreibprogramm.Tests/`: xUnit, nur Models/Services (kommt mit Schritt 4).
+- `tools/`: Selbsttest (pen-sim.ps1, screenshot.ps1, app-control.ps1, selftest.ps1, MspNative.cs).
 - `docs/`, `build.sh`, `dist/` (Build-Ausgabe, nicht im Repo).
+
+## Klassen
+
+### Models
+
+- `AppConstants`: alle Maße und Grenzen (A4 in Pixeln bei 96 DPI, Linienabstand 8 mm, Strichbreiten, Zoomgrenzen und -stufen).
+- Enums `PenColor`, `PageStyle`, `LineColor`.
+
+### Rendering
+
+- `Palette`: einzige Stelle mit Farb-Hexwerten (Stiftfarben, Seite, Hilfslinien mit Alpha).
+- `RuleLines`: Y-Positionen der Hilfslinien, pro A4-Höhe neu gestartet. Wird vom Bildschirm-Hintergrund und später vom PDF-Export benutzt.
+- `PageBackground`: FrameworkElement, zeichnet Seite und Linien in OnRender (GuidelineSet für scharfe 1-px-Linien). Kein Strich, nicht radierbar.
+
+### Views
+
+- `MainWindow`: Toolbar (Border + WrapPanel), Statusleiste, ScrollViewer. Verdrahtet Controls mit `DocumentView`, hält die Shortcut-Tabelle (`Dictionary<(ModifierKeys, Key), Action>`).
+- `DocumentView` (StackPanel): hält die `PageView`-Liste, das gemeinsame `DrawingAttributes`-Objekt, Radierer-/Pan-Zustand, Seitentasten-Erkennung, Undo-Verlauf und den Zoom (LayoutTransform).
+- `PageView` (Grid): eine Seite = `PageBackground` + transparenter `InkCanvas`, auf Seitengröße geclippt.
+- `ZoomPanController`: Mausrad, Ctrl/Shift+Mausrad, mittlere Maustaste, Leertaste+Ziehen, Zoom um den Zeiger.
+- `StrokeLogger`: nur mit MSP_DEBUG_LOG erzeugt, schreibt pro Strich eine Logzeile.
+
+### Services
+
+- `UndoHistory` / `UndoStep`: zwei Stapel aus Undo-/Redo-Aktionspaaren.
+- `DebugLog`: hängt Zeilen an die Datei aus MSP_DEBUG_LOG an, kulturinvariant.
+
+## Datenfluss
+
+- Toolbar oder Shortcut setzt den Zustand an `DocumentView`, die ihn auf alle Seiten anwendet.
+- InkCanvas sammelt Striche selbst (Maus und Stylus). `DocumentView` hängt sich an StrokeCollected / StrokeErasing für Undo.
+- Editiermodus je Seite: Pan aktiv = None, Radierer oder Seitentaste = EraseByStroke, sonst Ink. EditingModeInverted = EraseByStroke.
 
 ## NuGet-Pakete
 
-- App: PDFsharp (Version wird in Schritt 6 über Context7 festgelegt). Sonst keine.
-- Tests: xUnit, xunit.runner.visualstudio, Microsoft.NET.Test.Sdk.
+- App: PDFsharp 6.2.4 (Core-Build, MIT), kommt mit Schritt 6. Sonst keine.
+- Tests: xunit, xunit.runner.visualstudio, Microsoft.NET.Test.Sdk.

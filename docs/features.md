@@ -6,21 +6,21 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F01 | Basis WPF InkCanvas. Pen über Windows Ink / Stylus-Events, Maus funktioniert immer | todo |
-| F02 | Genau vier Farben: Schwarz, Blau, Rot, Grün. Hex-Werte an einer Stelle als Konstanten | todo |
-| F03 | Strichbreite: Slider 1 bis 12 px in 0,5er-Schritten, Presets dünn (1,5), mittel (3), dick (6), aktuelle Breite sichtbar | todo |
-| F04 | Stiftdruck moduliert die Breite um die Basisbreite (IgnorePressure = false). Checkbox "Druck" zum Abschalten. Maus = konstante Breite | todo |
-| F05 | Radierer ganzer Strich (EraseByStroke) über Toolbar-Button, Taste E (bleibt an bis P oder E) und untere Seitentaste gehalten (nur solange gedrückt). Invertierter Stift wirkt ebenfalls als Radierer | todo |
-| F06 | Glättung an (FitToCurve) | todo |
-| F07 | Undo / Redo strichbasiert, Ctrl+Z / Ctrl+Y, Verlauf bis zum letzten Öffnen oder Neu | todo |
+| F01 | Basis WPF InkCanvas. Pen über Windows Ink / Stylus-Events, Maus funktioniert immer | done |
+| F02 | Genau vier Farben: Schwarz, Blau, Rot, Grün. Hex-Werte an einer Stelle als Konstanten | done |
+| F03 | Strichbreite: Slider 1 bis 12 px in 0,5er-Schritten, Presets dünn (1,5), mittel (3), dick (6), aktuelle Breite sichtbar | done |
+| F04 | Stiftdruck moduliert die Breite um die Basisbreite (IgnorePressure = false). Checkbox "Druck" zum Abschalten. Maus = konstante Breite | done |
+| F05 | Radierer ganzer Strich (EraseByStroke) über Toolbar-Button, Taste E (bleibt an bis P oder E) und untere Seitentaste gehalten (nur solange gedrückt). Invertierter Stift wirkt ebenfalls als Radierer | done |
+| F06 | Glättung an (FitToCurve) | done |
+| F07 | Undo / Redo strichbasiert, Ctrl+Z / Ctrl+Y, Verlauf bis zum letzten Öffnen oder Neu | wip |
 
 ## Seite und Hintergrund
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F08 | Hintergrundstil Blanko, Liniert, Strichliert (gestrichelt). Linienabstand 8 mm als Konstante | todo |
-| F09 | Linienfarbe Schwarz oder Blau, jeweils dezent (Alpha), umschaltbar | todo |
-| F10 | Hintergrund wird gezeichnet, ist kein Strich, nicht radierbar | todo |
+| F08 | Hintergrundstil Blanko, Liniert, Strichliert (gestrichelt). Linienabstand 8 mm als Konstante | done |
+| F09 | Linienfarbe Schwarz oder Blau, jeweils dezent (Alpha), umschaltbar | done |
+| F10 | Hintergrund wird gezeichnet, ist kein Strich, nicht radierbar | done |
 
 ## Seitenmodell
 
@@ -34,9 +34,9 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F14 | Zoom 25 % bis 400 %: Ctrl+Mausrad, Ctrl+Plus, Ctrl+Minus, Ctrl+0 = 100 %. Zoom um die Mausposition. Zoomstufe in der Statusleiste | todo |
-| F15 | Pan: Mausrad vertikal, Shift+Mausrad horizontal, mittlere Maustaste ziehen, Leertaste halten + ziehen | todo |
-| F16 | Zoom über Transform, kein Rasterisieren, Striche in jeder Stufe scharf | todo |
+| F14 | Zoom 25 % bis 400 %: Ctrl+Mausrad, Ctrl+Plus, Ctrl+Minus, Ctrl+0 = 100 %. Zoom um die Mausposition. Zoomstufe in der Statusleiste | done |
+| F15 | Pan: Mausrad vertikal, Shift+Mausrad horizontal, mittlere Maustaste ziehen, Leertaste halten + ziehen | done |
+| F16 | Zoom über Transform, kein Rasterisieren, Striche in jeder Stufe scharf | done |
 
 ## Datei
 
@@ -70,9 +70,9 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | ID | Feature | Status |
 |----|---------|--------|
 | F29 | 1 / 2 / 3 / 4 = Schwarz / Blau / Rot / Grün | todo |
-| F30 | P = Stift, E = Radierer | todo |
+| F30 | P = Stift, E = Radierer | done |
 | F31 | Plus / Minus (ohne Ctrl) = Breite auf / ab | todo |
-| F32 | Ctrl+L = Seitenstil durchschalten (Blanko, Liniert, Strichliert) | todo |
+| F32 | Ctrl+L = Seitenstil durchschalten (Blanko, Liniert, Strichliert) | done |
 | F33 | Ctrl+Enter = neue Seite (nur Seitenmodus) | todo |
 | F34 | Ctrl+D = Dark Mode | todo |
 | F35 | Ctrl+Z / Ctrl+Y, Ctrl+N / O / S / Shift+S / E, Ctrl+Plus / Minus / 0. Einzeltasten bleiben Einzeltasten (ExpressKeys) | todo |
@@ -81,8 +81,8 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F36 | Ein Fenster, schlanke Toolbar: Datei-Buttons, vier Farbkreise, Breiten-Slider mit Anzeige, drei Presets, Druck-Checkbox, Stift/Radierer, Seitenstil-Dropdown, Linienfarbe-Toggle, Seitenmodus-Toggle, Dark-Mode-Toggle, Export | todo |
-| F37 | Statusleiste: Zoom, Seite x von y, Dateiname | todo |
+| F36 | Ein Fenster, schlanke Toolbar: Datei-Buttons, vier Farbkreise, Breiten-Slider mit Anzeige, drei Presets, Druck-Checkbox, Stift/Radierer, Seitenstil-Dropdown, Linienfarbe-Toggle, Seitenmodus-Toggle, Dark-Mode-Toggle, Export | wip |
+| F37 | Statusleiste: Zoom, Seite x von y, Dateiname | wip |
 | F38 | Native WPF-Controls, minimale Styles, kein Ribbon, keine Menüleiste außer Datei | todo |
 
 ## Build und Auslieferung
@@ -97,7 +97,7 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F42 | tools/pen-sim.ps1: synthetischer Pen (Position, Druck, BARREL, INVERTED, ERASER) über InjectSyntheticPointerInput | todo |
-| F43 | Debug-Log hinter MSP_DEBUG_LOG: eine Zeile pro fertigem Strich (Punkte, min/max Druck, Breite, Modus, Seite, Zoom) | todo |
-| F44 | tools/screenshot.ps1: App-Fenster als PNG nach tmp/ | todo |
+| F42 | tools/pen-sim.ps1: synthetischer Pen (Position, Druck, BARREL, INVERTED, ERASER) über InjectSyntheticPointerInput | done |
+| F43 | Debug-Log hinter MSP_DEBUG_LOG: eine Zeile pro fertigem Strich (Punkte, min/max Druck, Breite, Modus, Seite, Zoom) | done |
+| F44 | tools/screenshot.ps1: App-Fenster als PNG nach tmp/ | done |
 | F45 | xUnit-Projekt Mitschreibprogramm.Tests: .msp Round-Trip, Seiten zu Endlos und zurück, PDF-Seitenzahl, Settings | todo |
