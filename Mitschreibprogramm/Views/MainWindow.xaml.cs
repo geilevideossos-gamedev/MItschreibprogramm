@@ -12,6 +12,9 @@ namespace Mitschreibprogramm.Views;
 
 public partial class MainWindow : Window
 {
+    // A held key may repeat width, zoom and undo steps, but must not flicker toggles such as E or Ctrl+D.
+    private static readonly HashSet<Key> RepeatableKeys = [Key.OemPlus, Key.Add, Key.OemMinus, Key.Subtract, Key.Z, Key.Y];
+
     private readonly Dictionary<(ModifierKeys, Key), Action> _shortcuts = [];
     private readonly SettingsService _settingsService = new(
         DebugLog.Folder is { } folder ? Path.Combine(folder, "settings.json") : SettingsService.DefaultPath);
@@ -74,7 +77,11 @@ public partial class MainWindow : Window
         }
         else if (_shortcuts.TryGetValue((Keyboard.Modifiers, e.Key), out var action))
         {
-            action();
+            if (!e.IsRepeat || RepeatableKeys.Contains(e.Key))
+            {
+                action();
+            }
+
             e.Handled = true;
         }
     }
