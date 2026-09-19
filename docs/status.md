@@ -5,7 +5,8 @@ Stand: 2026-09-19
 ## Aktuell
 
 - Schritt 1 bis 4 fertig und committet: Skeleton, Pen (Druck, Radierer über Toolbar / E / Seitentaste / invertiert, Glättung), Debug-Log, Hintergrundstile mit Linienfarbe, Undo/Redo, Zoom und Pan, Seitenmodell (Seiten / Endlos, Konvertierung, Auto-Seite, Seitenzähler).
-- xUnit-Projekt Mitschreibprogramm.Tests steht (7 Tests für die Konvertierung).
+- xUnit-Projekt Mitschreibprogramm.Tests steht (Konvertierung, .msp Round-Trip).
+- Schritt 5 läuft: Dateiformat .msp fertig (`MspFileService`), Dialoge und Settings folgen.
 - Selbsttest-Werkzeuge in tools/: pen-sim.ps1, screenshot.ps1, app-control.ps1, selftest.ps1 (gemeinsamer Win32-Code in MspNative.cs).
 - Checkpoint 1 bis 3 per Selbsttest bestanden (Details in testing.md).
 - Wichtigster Befund: WPFs Standard-Stylus-Stack nimmt den synthetischen Pen als Stylus mit Druck an. Kein Pointer-Stack-Switch nötig.
