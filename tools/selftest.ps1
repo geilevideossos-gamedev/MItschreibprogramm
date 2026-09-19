@@ -158,9 +158,10 @@ function Get-PageBrightness($origin, [double]$x, [double]$y) {
     $rgb[0] + $rgb[1] + $rgb[2]
 }
 
-# Counts vertical background lines in a screenshot: pixels that differ from the paper colour along a horizontal scan
-# through the middle 60 % of the window, which lies inside the page. The lowest of three scan rows is taken, so a
-# row that happens to run along a horizontal line does not count. Ruled paper gives about 0, the 5 mm grid about 38.
+# Counts vertical background lines in a screenshot: runs of pixels that differ from the paper colour along a
+# horizontal scan through the middle 60 % of the window, which lies inside the page. A scan row that happens to run
+# along a horizontal line sees no paper at all and counts 0, so the median of three rows 10 px apart is taken (the
+# grid pitch is about 24 px, at most one row can be hit). Ruled paper gives about 0, the 5 mm grid about 38.
 function Get-VerticalLineCount([string]$name) {
     Add-Type -AssemblyName System.Drawing
     $image = [System.Drawing.Bitmap]::FromFile((Join-Path $outDir "$name.png"))
@@ -177,7 +178,24 @@ function Get-VerticalLineCount([string]$name) {
             }
             $lines
         }
-        return ($counts | Measure-Object -Minimum).Minimum
+        return @($counts | Sort-Object)[1]
+    } finally { $image.Dispose() }
+}
+
+# Share of pixels in the middle of a screenshot that are clearly darker than the background lines themselves.
+# A grid whose crossings are blended twice shows up here; the screenshot must not contain ink strokes.
+function Get-DarkerThanLinesShare([string]$name) {
+    Add-Type -AssemblyName System.Drawing
+    $image = [System.Drawing.Bitmap]::FromFile((Join-Path $outDir "$name.png"))
+    try {
+        $sums = @(for ($y = [int]($image.Height * 0.35); $y -lt [int]($image.Height * 0.65); $y += 1) {
+            for ($x = [int]($image.Width * 0.3); $x -lt [int]($image.Width * 0.7); $x += 1) { $p = $image.GetPixel($x, $y); $p.R + $p.G + $p.B }
+        })
+        $groups = @($sums | Group-Object | Sort-Object Count -Descending)
+        $paper = [int]$groups[0].Name
+        $line = [int](@($groups | Where-Object { [Math]::Abs([int]$_.Name - $paper) -gt 40 })[0].Name)
+        $darker = @($sums | Where-Object { ($paper - $_) -gt (($paper - $line) * 1.3) }).Count
+        return $darker / $sums.Count
     } finally { $image.Dispose() }
 }
 

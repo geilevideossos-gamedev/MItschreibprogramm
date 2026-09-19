@@ -13,6 +13,8 @@ function Checkpoint2 {
     $gridBlack = Get-VerticalLineCount "cp2-squared-black"
     $gridBlue = Get-VerticalLineCount "cp2-squared-blue"
     Check ($ruled -le 2 -and $gridBlack -ge 30 -and $gridBlack -le 45 -and $gridBlue -ge 30 -and $gridBlue -le 45) "Kariert zeigt senkrechte Gitterlinien in beiden Linienfarben, Liniert keine (liniert $ruled, kariert schwarz $gridBlack, blau $gridBlue)"
+    $crossings = Get-DarkerThanLinesShare "cp2-squared-black"
+    Check ($crossings -lt 0.0005) "Gitterkreuzungen sind nicht dunkler als die Linien (Anteil dunklerer Pixel $([Math]::Round($crossings * 100, 3)) %)"
     Ctl -Click LineColorButton
     Ctl -Keys "ctrl+l"
     Shot "cp2-blank"
