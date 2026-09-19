@@ -69,9 +69,9 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F29 | 1 / 2 / 3 / 4 = Schwarz / Blau / Rot / Grün | todo |
+| F29 | 1 / 2 / 3 / 4 = Schwarz / Blau / Rot / Grün | done |
 | F30 | P = Stift, E = Radierer | done |
-| F31 | Plus / Minus (ohne Ctrl) = Breite auf / ab | todo |
+| F31 | Plus / Minus (ohne Ctrl) = Breite auf / ab | done |
 | F32 | Ctrl+L = Seitenstil durchschalten (Blanko, Liniert, Strichliert) | done |
 | F33 | Ctrl+Enter = neue Seite (nur Seitenmodus) | done |
 | F34 | Ctrl+D = Dark Mode | todo |
