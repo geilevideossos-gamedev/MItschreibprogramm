@@ -42,14 +42,14 @@ public static class PdfExporter
     private static void DrawRuleLines(XGraphics graphics, NoteDocument document)
     {
         var pen = new XPen(ToXColor(Palette.RuleLineOnPaper(document.LineColor)), AppConstants.RuleLineThickness) { LineCap = XLineCap.Flat };
-        if (document.PageStyle == PageStyle.Dashed)
-        {
-            pen.DashPattern = [AppConstants.RuleDashLength, AppConstants.RuleDashGap];
-        }
-
-        foreach (var y in RuleLines.Positions(AppConstants.PageHeight))
+        foreach (var y in RuleLines.Rows(AppConstants.PageHeight, document.PageStyle))
         {
             graphics.DrawLine(pen, 0, y, AppConstants.PageWidth, y);
+        }
+
+        foreach (var x in RuleLines.Columns(AppConstants.PageWidth, document.PageStyle))
+        {
+            graphics.DrawLine(pen, x, 0, x, AppConstants.PageHeight);
         }
     }
 

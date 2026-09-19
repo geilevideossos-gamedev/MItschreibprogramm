@@ -70,12 +70,21 @@ public sealed class PdfExporterTests : IDisposable
     [Fact]
     public void RuleLines_AreOnlyDrawnWhenRequested()
     {
-        var document = new NoteDocument { PageStyle = PageStyle.Dashed, Pages = [Page(Stroke(10, 10, 300, 200))] };
+        var document = new NoteDocument { PageStyle = PageStyle.Squared, Pages = [Page(Stroke(10, 10, 300, 200))] };
 
         var withLines = new FileInfo(Export(document, includeRuleLines: true)).Length;
         var withoutLines = new FileInfo(Export(document, includeRuleLines: false)).Length;
 
         Assert.True(withLines > withoutLines);
+    }
+
+    [Fact]
+    public void SquaredGrid_DrawsMoreLinesThanRuledPaper()
+    {
+        long Size(PageStyle style) => new FileInfo(Export(new NoteDocument { PageStyle = style, Pages = [new NotePage()] }, includeRuleLines: true)).Length;
+
+        Assert.True(Size(PageStyle.Squared) > Size(PageStyle.Lined));
+        Assert.True(Size(PageStyle.Lined) > Size(PageStyle.Blank));
     }
 
     [Fact]

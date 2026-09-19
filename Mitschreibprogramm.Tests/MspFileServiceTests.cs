@@ -18,7 +18,7 @@ public sealed class MspFileServiceTests : IDisposable
         var document = new NoteDocument
         {
             PageMode = PageMode.Endless,
-            PageStyle = PageStyle.Dashed,
+            PageStyle = PageStyle.Squared,
             LineColor = LineColor.Blue,
             Pages =
             [
@@ -39,7 +39,7 @@ public sealed class MspFileServiceTests : IDisposable
 
         Assert.Equal(AppConstants.FileFormatVersion, loaded.Version);
         Assert.Equal(PageMode.Endless, loaded.PageMode);
-        Assert.Equal(PageStyle.Dashed, loaded.PageStyle);
+        Assert.Equal(PageStyle.Squared, loaded.PageStyle);
         Assert.Equal(LineColor.Blue, loaded.LineColor);
         Assert.Equal(2, loaded.Pages.Count);
         Assert.Empty(loaded.Pages[1].Strokes);
@@ -132,10 +132,23 @@ public sealed class MspFileServiceTests : IDisposable
         Assert.Throws<InvalidDataException>(() => MspFileService.Load(numericText));
         var unknown = Path.Combine(_folder, "unknown.msp");
         File.WriteAllText(numeric, """{"version":1,"pageStyle":7,"pages":[]}""");
-        File.WriteAllText(unknown, """{"version":1,"pageStyle":"squared","pages":[]}""");
+        File.WriteAllText(unknown, """{"version":1,"pageStyle":"dotted","pages":[]}""");
 
         Assert.Throws<System.Text.Json.JsonException>(() => MspFileService.Load(numeric));
         Assert.Throws<System.Text.Json.JsonException>(() => MspFileService.Load(unknown));
+    }
+
+    [Fact]
+    public void Load_ReadsTheFormerDashedStyleAsSquaredAndSavesTheNewName()
+    {
+        var path = Path.Combine(_folder, "legacy.msp");
+        File.WriteAllText(path, """{"version":1,"pageStyle":"dashed","pages":[]}""");
+
+        var document = MspFileService.Load(path);
+        MspFileService.Save(document, path);
+
+        Assert.Equal(PageStyle.Squared, document.PageStyle);
+        Assert.Contains("\"pageStyle\":\"squared\"", File.ReadAllText(path));
     }
 
     [Fact]

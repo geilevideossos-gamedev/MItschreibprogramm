@@ -19,7 +19,7 @@ public sealed class SettingsServiceTests : IDisposable
             PenColor = PenColor.Green,
             StrokeWidth = 6.5,
             PressureEnabled = false,
-            PageStyle = PageStyle.Dashed,
+            PageStyle = PageStyle.Squared,
             LineColor = LineColor.Black,
             PageMode = PageMode.Endless,
             DarkMode = true,
@@ -37,7 +37,7 @@ public sealed class SettingsServiceTests : IDisposable
         Assert.Equal(PenColor.Green, loaded.PenColor);
         Assert.Equal(6.5, loaded.StrokeWidth);
         Assert.False(loaded.PressureEnabled);
-        Assert.Equal(PageStyle.Dashed, loaded.PageStyle);
+        Assert.Equal(PageStyle.Squared, loaded.PageStyle);
         Assert.Equal(LineColor.Black, loaded.LineColor);
         Assert.Equal(PageMode.Endless, loaded.PageMode);
         Assert.True(loaded.DarkMode);
@@ -92,6 +92,18 @@ public sealed class SettingsServiceTests : IDisposable
         new SettingsService(blocked).Save(new AppSettings());
 
         Assert.True(Directory.Exists(blocked));
+    }
+
+    [Fact]
+    public void Load_ReadsTheFormerDashedStyleAsSquared()
+    {
+        var path = Path.Combine(_folder, "legacy.json");
+        File.WriteAllText(path, """{"pageStyle":"dashed","darkMode":true}""");
+
+        var loaded = new SettingsService(path).Load();
+
+        Assert.Equal(PageStyle.Squared, loaded.PageStyle);
+        Assert.True(loaded.DarkMode);
     }
 
     [Fact]

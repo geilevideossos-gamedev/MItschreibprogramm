@@ -21,28 +21,33 @@ public sealed class PageBackground : FrameworkElement
     protected override void OnRender(DrawingContext drawingContext)
     {
         drawingContext.DrawRectangle(new SolidColorBrush(Palette.Page(_dark)), null, new Rect(RenderSize));
-        if (_style == PageStyle.Blank)
+        var rows = RuleLines.Rows(ActualHeight, _style).ToList();
+        var columns = RuleLines.Columns(ActualWidth, _style).ToList();
+        if (rows.Count == 0 && columns.Count == 0)
         {
             return;
         }
 
         var pen = new Pen(new SolidColorBrush(Palette.RuleLine(_lineColor, _dark)), AppConstants.RuleLineThickness);
-        if (_style == PageStyle.Dashed)
-        {
-            pen.DashStyle = new DashStyle([AppConstants.RuleDashLength, AppConstants.RuleDashGap], 0);
-        }
-
         pen.Freeze();
-        var positions = RuleLines.Positions(ActualHeight).ToList();
         var half = AppConstants.RuleLineThickness / 2;
-        // One guideline per line snaps its upper edge to a device pixel, so all lines look alike. Snapping both
-        // edges would collapse lines to zero height when zoomed out (both edges land on the same pixel).
-        var guidelines = new GuidelineSet { GuidelinesY = new DoubleCollection(positions.Select(y => y - half)) };
+        // One guideline per line snaps one edge to a device pixel, so all lines look alike. Snapping both edges
+        // would collapse lines to zero size when zoomed out (both edges land on the same pixel).
+        var guidelines = new GuidelineSet
+        {
+            GuidelinesX = new DoubleCollection(columns.Select(x => x - half)),
+            GuidelinesY = new DoubleCollection(rows.Select(y => y - half)),
+        };
         guidelines.Freeze();
         drawingContext.PushGuidelineSet(guidelines);
-        foreach (var y in positions)
+        foreach (var y in rows)
         {
             drawingContext.DrawLine(pen, new Point(0, y), new Point(ActualWidth, y));
+        }
+
+        foreach (var x in columns)
+        {
+            drawingContext.DrawLine(pen, new Point(x, 0), new Point(x, ActualHeight));
         }
 
         drawingContext.Pop();

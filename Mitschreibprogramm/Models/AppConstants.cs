@@ -20,9 +20,8 @@ public static class AppConstants
     public const double EndlessGrowStepX = PageWidth / 2;
     public const double EndlessGrowStepY = PageHeight / 2;
     public const double LineSpacing = 8 * PixelsPerMillimeter;
+    public const double GridSpacing = 5 * PixelsPerMillimeter;
     public const double RuleLineThickness = 1;
-    public const double RuleDashLength = 6;
-    public const double RuleDashGap = 4;
 
     public const double MinStrokeWidth = 1;
     public const double MaxStrokeWidth = 12;

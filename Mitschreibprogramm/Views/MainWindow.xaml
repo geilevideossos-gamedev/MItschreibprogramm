@@ -63,7 +63,7 @@
                               ToolTip="Seitenstil (Strg+L)" SelectionChanged="OnPageStyleChanged">
                         <ComboBoxItem Content="Blanko" Tag="{x:Static m:PageStyle.Blank}"/>
                         <ComboBoxItem Content="Liniert" Tag="{x:Static m:PageStyle.Lined}"/>
-                        <ComboBoxItem Content="Strichliert" Tag="{x:Static m:PageStyle.Dashed}"/>
+                        <ComboBoxItem Content="Kariert" Tag="{x:Static m:PageStyle.Squared}"/>
                     </ComboBox>
                     <Button x:Name="LineColorButton" Style="{StaticResource FlatButton}" Margin="4,0,1,0"
                             ToolTip="Linienfarbe umschalten" Click="OnLineColorClick"/>

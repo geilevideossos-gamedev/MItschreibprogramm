@@ -27,13 +27,13 @@ public class PageModeConverterTests
     public void PagesToEndlessAndBack_RestoresEveryPoint()
     {
         var document = PagesDocument(Stroke(10, 20, 30, 1100), Stroke(50, 60, 70, 80), Stroke(5, 1000, 7, 8));
-        document.PageStyle = PageStyle.Dashed;
+        document.PageStyle = PageStyle.Squared;
         document.LineColor = LineColor.Blue;
 
         var back = PageModeConverter.Convert(PageModeConverter.Convert(document, PageMode.Endless), PageMode.Pages);
 
         Assert.Equal(PageMode.Pages, back.PageMode);
-        Assert.Equal(PageStyle.Dashed, back.PageStyle);
+        Assert.Equal(PageStyle.Squared, back.PageStyle);
         Assert.Equal(LineColor.Blue, back.LineColor);
         Assert.Equal(3, back.Pages.Count);
         for (var page = 0; page < 3; page++)
