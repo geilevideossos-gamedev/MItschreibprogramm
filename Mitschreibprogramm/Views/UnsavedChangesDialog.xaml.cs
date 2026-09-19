@@ -1,4 +1,5 @@
 using System.Windows;
+using Mitschreibprogramm.Rendering;
 
 namespace Mitschreibprogramm.Views;
 
@@ -10,6 +11,12 @@ public partial class UnsavedChangesDialog : Window
     {
         InitializeComponent();
         Message.Text = $"\"{fileName}\" hat ungespeicherte Änderungen. Vor dem Fortfahren speichern?";
+    }
+
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        Theme.ApplyTitleBar(this);
     }
 
     public static UnsavedChoice Ask(Window owner, string fileName)

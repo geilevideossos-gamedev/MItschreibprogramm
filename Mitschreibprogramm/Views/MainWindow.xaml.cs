@@ -23,6 +23,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         _settings = _settingsService.Load();
+        Theme.Apply(_settings.DarkMode);
         InitializeComponent();
         RestoreWindowPlacement();
         _zoomPan = new ZoomPanController(Scroller, Document);
@@ -34,11 +35,7 @@ public partial class MainWindow : Window
         _files.DocumentLoaded += OnDocumentLoaded;
         RegisterShortcuts();
 
-        foreach (var dot in new[] { ColorBlack, ColorBlue, ColorRed, ColorGreen })
-        {
-            dot.Background = new SolidColorBrush(Palette.Pen((PenColor)dot.Tag));
-        }
-
+        ApplyDarkMode();
         WidthSlider.ValueChanged += (_, e) => ApplyPenWidth(e.NewValue);
         WidthSlider.Value = _settings.StrokeWidth;
         ApplyPenWidth(WidthSlider.Value);
@@ -48,6 +45,12 @@ public partial class MainWindow : Window
         ToolPen.IsChecked = true;
         _files.New();
         UpdateTitle();
+    }
+
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        Theme.ApplyTitleBar(this);
     }
 
     protected override void OnClosing(CancelEventArgs e)
@@ -115,6 +118,7 @@ public partial class MainWindow : Window
         Add(ModifierKeys.Control, _zoomPan.ZoomOut, Key.OemMinus, Key.Subtract);
         Add(ModifierKeys.Control, _zoomPan.ResetZoom, Key.D0, Key.NumPad0);
         Add(ModifierKeys.Control, Document.AddPage, Key.Enter);
+        Add(ModifierKeys.Control, () => SetDarkMode(!_settings.DarkMode), Key.D);
         Add(ModifierKeys.Control, () => PageStyleBox.SelectedIndex = (PageStyleBox.SelectedIndex + 1) % PageStyleBox.Items.Count, Key.L);
     }
 
@@ -156,6 +160,30 @@ public partial class MainWindow : Window
     {
         _settings.LineColor = _settings.LineColor == LineColor.Blue ? LineColor.Black : LineColor.Blue;
         ApplyPageStyle();
+    }
+
+    private void OnDarkModeToggled(object sender, RoutedEventArgs e) => SetDarkMode(DarkModeButton.IsChecked == true);
+
+    private void SetDarkMode(bool dark)
+    {
+        if (_settings.DarkMode == dark)
+        {
+            return;
+        }
+
+        _settings.DarkMode = dark;
+        Theme.Apply(dark);
+        ApplyDarkMode();
+    }
+
+    private void ApplyDarkMode()
+    {
+        DarkModeButton.IsChecked = _settings.DarkMode;
+        Document.SetDarkMode(_settings.DarkMode);
+        foreach (var dot in new[] { ColorBlack, ColorBlue, ColorRed, ColorGreen })
+        {
+            dot.Background = new SolidColorBrush(Palette.PenOnPage((PenColor)dot.Tag, _settings.DarkMode));
+        }
     }
 
     private void OnPageModeClick(object sender, RoutedEventArgs e) =>

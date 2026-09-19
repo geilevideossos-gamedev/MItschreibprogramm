@@ -2,15 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="Views/MainWindow.xaml">
+    <!-- Brush keys (ChromeBrush, HoverBrush, ...) are filled by Rendering/Theme for the light or dark theme. -->
     <Application.Resources>
-        <SolidColorBrush x:Key="ChromeBrush" Color="#F3F3F3"/>
-        <SolidColorBrush x:Key="ChromeTextBrush" Color="#1B1B1B"/>
-        <SolidColorBrush x:Key="ChromeBorderBrush" Color="#D0D0D0"/>
-        <SolidColorBrush x:Key="HoverBrush" Color="#E2E2E2"/>
-        <SolidColorBrush x:Key="CheckedBrush" Color="#D4E4FA"/>
-        <SolidColorBrush x:Key="AccentBrush" Color="#3A78D8"/>
-        <SolidColorBrush x:Key="WorkspaceBrush" Color="#C9CCD1"/>
-
         <Style x:Key="FlatButton" TargetType="ButtonBase">
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Foreground" Value="{DynamicResource ChromeTextBrush}"/>
@@ -42,6 +35,13 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource FlatButton}">
+            <Setter Property="Focusable" Value="True"/>
+            <Setter Property="MinWidth" Value="90"/>
+            <Setter Property="Margin" Value="8,0,0,0"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}"/>
         </Style>
 
         <Style x:Key="ColorDot" TargetType="RadioButton">
@@ -76,6 +76,130 @@
             <Setter Property="Height" Value="22"/>
             <Setter Property="Margin" Value="7,0"/>
             <Setter Property="Background" Value="{DynamicResource ChromeBorderBrush}"/>
+        </Style>
+
+        <ControlTemplate x:Key="ComboToggleTemplate" TargetType="ToggleButton">
+            <Border x:Name="Frame" CornerRadius="3" Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1">
+                <Path HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,7,0"
+                      Data="M 0,0 L 4,4 L 8,0" StrokeThickness="1.5" Stroke="{TemplateBinding Foreground}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="Frame" Property="Background" Value="{DynamicResource HoverBrush}"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- The Aero2 ComboBox ignores Background, so dark mode needs this small template. -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Foreground" Value="{DynamicResource ChromeTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource ChromeBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}"/>
+            <Setter Property="Padding" Value="8,3,24,3"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton Template="{StaticResource ComboToggleTemplate}" Focusable="False" ClickMode="Press"
+                                          Foreground="{TemplateBinding Foreground}" Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            <ContentPresenter IsHitTestVisible="False" Margin="{TemplateBinding Padding}"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            <Popup x:Name="PART_Popup" Placement="Bottom" AllowsTransparency="True" Focusable="False"
+                                   IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}">
+                                <Border MinWidth="{TemplateBinding ActualWidth}" Background="{DynamicResource ChromeBrush}"
+                                        BorderBrush="{DynamicResource ChromeBorderBrush}" BorderThickness="1"
+                                        TextElement.Foreground="{DynamicResource ChromeTextBrush}">
+                                    <ItemsPresenter/>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ScrollPageButton" TargetType="RepeatButton">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Rectangle Fill="Transparent"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ScrollThumb" TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="Bar" Margin="4" CornerRadius="4" Background="{DynamicResource ScrollThumbBrush}"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bar" Property="Background" Value="{DynamicResource ScrollThumbHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="Bar" Property="Background" Value="{DynamicResource ScrollThumbHoverBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- The Aero2 ScrollBar paints fixed light colours, so both themes use this thumb-only template. -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageUpCommand}" Style="{StaticResource ScrollPageButton}"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageDownCommand}" Style="{StaticResource ScrollPageButton}"/>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource ScrollThumb}"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ScrollBar">
+                                <Grid Background="{TemplateBinding Background}">
+                                    <Track x:Name="PART_Track">
+                                        <Track.DecreaseRepeatButton>
+                                            <RepeatButton Command="{x:Static ScrollBar.PageLeftCommand}" Style="{StaticResource ScrollPageButton}"/>
+                                        </Track.DecreaseRepeatButton>
+                                        <Track.IncreaseRepeatButton>
+                                            <RepeatButton Command="{x:Static ScrollBar.PageRightCommand}" Style="{StaticResource ScrollPageButton}"/>
+                                        </Track.IncreaseRepeatButton>
+                                        <Track.Thumb>
+                                            <Thumb Style="{StaticResource ScrollThumb}"/>
+                                        </Track.Thumb>
+                                    </Track>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </Application.Resources>
 </Application>

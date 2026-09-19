@@ -77,6 +77,9 @@
                     <Border Style="{StaticResource ToolSeparator}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
+                    <ToggleButton x:Name="DarkModeButton" Style="{StaticResource FlatButton}" Content="Dunkel"
+                                  ToolTip="Dark Mode (Strg+D)" Checked="OnDarkModeToggled" Unchecked="OnDarkModeToggled"/>
+                    <Border Style="{StaticResource ToolSeparator}"/>
                     <Button x:Name="ExportPdfButton" Style="{StaticResource FlatButton}" Content="PDF-Export"
                             ToolTip="Als PDF exportieren (Strg+E)" Click="OnExportClick"/>
                 </StackPanel>

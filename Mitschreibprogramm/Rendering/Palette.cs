@@ -10,8 +10,11 @@ public static class Palette
     private const string RedHex = "#D0252B";
     private const string GreenHex = "#1E8A3C";
 
-    private const string PageHex = "#FFFFFF";
+    private const string WhiteHex = "#FFFFFF";
+    private const string DarkPageHex = "#2B2B2B";
+    private const string DarkRuleBlueHex = "#8FB0FF";
     private const byte RuleLineAlpha = 0x48;
+    private const byte DarkRuleLineAlpha = 0x60;
 
     public static Color Pen(PenColor color) => Parse(color switch
     {
@@ -21,22 +24,25 @@ public static class Palette
         _ => BlackHex,
     });
 
+    // On the dark page the black pen is drawn white. Files and PDF export keep the logical colour.
+    public static Color PenOnPage(PenColor color, bool dark) => dark && color == PenColor.Black ? Parse(WhiteHex) : Pen(color);
+
     public static PenColor LogicalPen(Color shown) =>
         Enum.GetValues<PenColor>().FirstOrDefault(color => Pen(color) == shown, PenColor.Black);
 
-    public static Color Page() => Parse(PageHex);
+    public static Color Page(bool dark) => Parse(dark ? DarkPageHex : WhiteHex);
 
-    public static Color RuleLine(LineColor color)
+    public static Color RuleLine(LineColor color, bool dark)
     {
-        var line = Parse(color == LineColor.Blue ? BlueHex : BlackHex);
-        return Color.FromArgb(RuleLineAlpha, line.R, line.G, line.B);
+        var line = Parse(color == LineColor.Blue ? (dark ? DarkRuleBlueHex : BlueHex) : (dark ? WhiteHex : BlackHex));
+        return Color.FromArgb(dark ? DarkRuleLineAlpha : RuleLineAlpha, line.R, line.G, line.B);
     }
 
     // PDF export: the translucent screen colour blended onto the white page, as one opaque colour.
     public static Color RuleLineOnPaper(LineColor color)
     {
-        var line = RuleLine(color);
-        var paper = Page();
+        var line = RuleLine(color, dark: false);
+        var paper = Page(dark: false);
         byte Blend(byte ink, byte background) => (byte)Math.Round(background + ((ink - background) * (line.A / 255.0)));
         return Color.FromRgb(Blend(line.R, paper.R), Blend(line.G, paper.G), Blend(line.B, paper.B));
     }

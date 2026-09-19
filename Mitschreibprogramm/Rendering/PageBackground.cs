@@ -8,23 +8,25 @@ public sealed class PageBackground : FrameworkElement
 {
     private PageStyle _style;
     private LineColor _lineColor;
+    private bool _dark;
 
-    public void Update(PageStyle style, LineColor lineColor)
+    public void Update(PageStyle style, LineColor lineColor, bool dark)
     {
         _style = style;
         _lineColor = lineColor;
+        _dark = dark;
         InvalidateVisual();
     }
 
     protected override void OnRender(DrawingContext drawingContext)
     {
-        drawingContext.DrawRectangle(new SolidColorBrush(Palette.Page()), null, new Rect(RenderSize));
+        drawingContext.DrawRectangle(new SolidColorBrush(Palette.Page(_dark)), null, new Rect(RenderSize));
         if (_style == PageStyle.Blank)
         {
             return;
         }
 
-        var pen = new Pen(new SolidColorBrush(Palette.RuleLine(_lineColor)), AppConstants.RuleLineThickness);
+        var pen = new Pen(new SolidColorBrush(Palette.RuleLine(_lineColor, _dark)), AppConstants.RuleLineThickness);
         if (_style == PageStyle.Dashed)
         {
             pen.DashStyle = new DashStyle([AppConstants.RuleDashLength, AppConstants.RuleDashGap], 0);

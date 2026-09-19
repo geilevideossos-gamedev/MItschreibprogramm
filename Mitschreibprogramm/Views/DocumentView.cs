@@ -15,6 +15,8 @@ public sealed class DocumentView : StackPanel
     private readonly UndoHistory _history = new();
     private readonly SideButtonWatcher _sideButton;
     private double _zoom = AppConstants.DefaultZoom;
+    private PenColor _penColor;
+    private bool _dark;
     private bool _eraser;
     private bool _panning;
 
@@ -54,7 +56,18 @@ public sealed class DocumentView : StackPanel
         }
     }
 
-    public void SetPenColor(PenColor color) => _pen.Color = Palette.Pen(color);
+    public void SetPenColor(PenColor color)
+    {
+        _penColor = color;
+        _pen.Color = Palette.PenOnPage(color, _dark);
+    }
+
+    public void SetDarkMode(bool dark)
+    {
+        _dark = dark;
+        SetPenColor(_penColor);
+        ApplyTheme();
+    }
 
     public void SetPenWidth(double width)
     {
@@ -87,7 +100,7 @@ public sealed class DocumentView : StackPanel
         LineColor = lineColor;
         foreach (var page in _pages)
         {
-            page.Paper.Update(style, lineColor);
+            page.Paper.Update(style, lineColor, _dark);
         }
 
         Changed?.Invoke();
@@ -179,10 +192,10 @@ public sealed class DocumentView : StackPanel
         Children.Clear();
         foreach (var page in pages)
         {
-            page.Paper.Update(PageStyle, LineColor);
             Children.Add(page);
         }
 
+        ApplyTheme();
         UpdateEditingMode();
         PagesChanged?.Invoke();
     }
@@ -190,7 +203,7 @@ public sealed class DocumentView : StackPanel
     private PageView AppendPage()
     {
         var page = CreatePage(new NotePage());
-        page.Paper.Update(PageStyle, LineColor);
+        page.Paper.Update(PageStyle, LineColor, _dark);
         _pages.Add(page);
         Children.Add(page);
         UpdateEditingMode();
@@ -206,6 +219,7 @@ public sealed class DocumentView : StackPanel
             return;
         }
 
+        ApplyTheme();
         Changed?.Invoke();
         if (DebugLog.IsEnabled)
         {
@@ -236,6 +250,19 @@ public sealed class DocumentView : StackPanel
         var index = strokes.IndexOf(stroke);
         _history.Push(new UndoStep(() => strokes.Insert(index, stroke), () => strokes.Remove(stroke)));
         Changed?.Invoke();
+    }
+
+    // Also covers strokes and pages that come back through undo and still carry the other theme's colours.
+    private void ApplyTheme()
+    {
+        foreach (var page in _pages)
+        {
+            page.Paper.Update(PageStyle, LineColor, _dark);
+            foreach (var stroke in page.Ink.Strokes)
+            {
+                stroke.DrawingAttributes.Color = Palette.PenOnPage(Palette.LogicalPen(stroke.DrawingAttributes.Color), _dark);
+            }
+        }
     }
 
     private void UpdateEditingMode()
