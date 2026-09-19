@@ -161,6 +161,7 @@ foreach ($part in Get-ChildItem (Join-Path $PSScriptRoot "selftest") -Filter "ch
 
 # The run takes over mouse and keyboard. It only starts on a machine nobody is using right now, and gives up otherwise.
 if (-not ("MspNative" -as [type])) { Add-Type -Path (Get-ChildItem $PSScriptRoot -Filter "MspNative.*.cs").FullName -ReferencedAssemblies System.Drawing }
+[MspNative]::KeepAwake()
 $waited = 0
 while ([MspNative]::IdleSeconds() -lt $IdleSeconds) {
     if ($waited -ge $IdleWaitSeconds) {

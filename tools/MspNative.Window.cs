@@ -46,6 +46,13 @@ public static partial class MspNative
 
     [DllImport("user32.dll")] private static extern bool GetLastInputInfo(ref LASTINPUTINFO info);
 
+    [DllImport("kernel32.dll")] private static extern uint SetThreadExecutionState(uint flags);
+
+    private const uint ES_CONTINUOUS = 0x80000000, ES_SYSTEM_REQUIRED = 0x1, ES_DISPLAY_REQUIRED = 0x2;
+
+    // Keeps the machine and the display awake until the calling process exits; a standby in the middle of a run stalls it.
+    public static void KeepAwake() { SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED); }
+
     // Seconds since the last keyboard or mouse input of any kind (injected input counts as well).
     public static int IdleSeconds()
     {
