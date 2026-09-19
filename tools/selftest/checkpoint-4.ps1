@@ -37,7 +37,7 @@ function Checkpoint4 {
     Pen -From "300,500" -To "700,500"
     Ctl -Keys "alt+f4"
     Start-Sleep -Milliseconds 800
-    & "$PSScriptRoot/screenshot.ps1" -Dialog -Out (Join-Path $outDir "cp4-close-dialog.png") | Out-Null
+    & "$toolsDir/screenshot.ps1" -Dialog -Out (Join-Path $outDir "cp4-close-dialog.png") | Out-Null
     Check ((Ctl -Read Window) -like "Ungespeicherte*") "Schliessen mit Aenderungen zeigt den Dialog"
     Ctl -Click CancelButton
     Check ((Ctl -Read Window) -eq "cp4.msp* - Mitschreibprogramm") "Abbrechen laesst die App offen"

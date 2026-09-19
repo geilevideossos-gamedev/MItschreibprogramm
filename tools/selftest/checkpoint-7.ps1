@@ -34,7 +34,7 @@ function Checkpoint7 {
 
     Ctl -Keys "ctrl+s"
     Start-Sleep -Milliseconds 1200
-    & "$PSScriptRoot/screenshot.ps1" -Screen -Out (Join-Path $outDir "cp7-dark-savedialog.png") | Out-Null
+    & "$toolsDir/screenshot.ps1" -Screen -Out (Join-Path $outDir "cp7-dark-savedialog.png") | Out-Null
     Ctl -Text $file
     Ctl -Keys "enter"
     Start-Sleep -Milliseconds 1200
@@ -42,7 +42,7 @@ function Checkpoint7 {
     Check (($colors -join ",") -eq "black,black,blue,black") "Gespeichert bleibt die logische Farbe ($($colors -join ','))"
     Ctl -Keys "ctrl+e"
     Start-Sleep -Milliseconds 700
-    & "$PSScriptRoot/screenshot.ps1" -Dialog -Out (Join-Path $outDir "cp7-dark-dialog.png") | Out-Null
+    & "$toolsDir/screenshot.ps1" -Dialog -Out (Join-Path $outDir "cp7-dark-dialog.png") | Out-Null
     Ctl -Keys "esc"
     Export-Pdf $pdf
     $pages = @(Convert-PdfToPng $pdf "cp7-page")

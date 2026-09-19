@@ -18,7 +18,7 @@ function Checkpoint5 {
     Get-PageOrigin 500 400 | Out-Null
     Ctl -Keys "ctrl+e"
     Start-Sleep -Milliseconds 700
-    & "$PSScriptRoot/screenshot.ps1" -Dialog -Out (Join-Path $outDir "cp5-export-dialog.png") | Out-Null
+    & "$toolsDir/screenshot.ps1" -Dialog -Out (Join-Path $outDir "cp5-export-dialog.png") | Out-Null
     Check ((Ctl -Read Window) -eq "Als PDF exportieren") "Ctrl+E oeffnet den Export-Dialog"
     Ctl -Keys "esc"
     Export-Pdf $pdf

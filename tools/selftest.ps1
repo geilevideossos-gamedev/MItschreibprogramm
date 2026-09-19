@@ -11,6 +11,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path $PSScriptRoot
+$toolsDir = $PSScriptRoot
 $exePath = if ([System.IO.Path]::IsPathRooted($Exe)) { $Exe } else { Join-Path $root $Exe }
 $outDir = Join-Path $root "tmp/selftest"
 $logPath = Join-Path $outDir "debug.log"
