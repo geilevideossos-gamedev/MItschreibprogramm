@@ -62,7 +62,7 @@ public sealed class FileSession
         {
             Show(MspFileService.Load(dialog.FileName), dialog.FileName);
         }
-        catch (Exception e) when (e is IOException or JsonException or UnauthorizedAccessException)
+        catch (Exception e) when (e is IOException or InvalidDataException or JsonException or UnauthorizedAccessException)
         {
             ShowError($"Die Datei konnte nicht geöffnet werden.\n\n{e.Message}");
         }
