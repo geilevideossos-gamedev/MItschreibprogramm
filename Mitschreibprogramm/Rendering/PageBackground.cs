@@ -39,17 +39,27 @@ public sealed class PageBackground : FrameworkElement
             GuidelinesY = new DoubleCollection(rows.Select(y => y - half)),
         };
         guidelines.Freeze();
+        // All lines go into one geometry: the pen is translucent, and separate DrawLine calls would blend every
+        // crossing of the grid twice and leave a darker dot there.
+        var lines = new StreamGeometry();
+        using (var context = lines.Open())
+        {
+            foreach (var y in rows)
+            {
+                context.BeginFigure(new Point(0, y), isFilled: false, isClosed: false);
+                context.LineTo(new Point(ActualWidth, y), isStroked: true, isSmoothJoin: false);
+            }
+
+            foreach (var x in columns)
+            {
+                context.BeginFigure(new Point(x, 0), isFilled: false, isClosed: false);
+                context.LineTo(new Point(x, ActualHeight), isStroked: true, isSmoothJoin: false);
+            }
+        }
+
+        lines.Freeze();
         drawingContext.PushGuidelineSet(guidelines);
-        foreach (var y in rows)
-        {
-            drawingContext.DrawLine(pen, new Point(0, y), new Point(ActualWidth, y));
-        }
-
-        foreach (var x in columns)
-        {
-            drawingContext.DrawLine(pen, new Point(x, 0), new Point(x, ActualHeight));
-        }
-
+        drawingContext.DrawGeometry(null, pen, lines);
         drawingContext.Pop();
     }
 }
