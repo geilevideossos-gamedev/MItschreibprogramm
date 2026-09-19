@@ -56,6 +56,20 @@ function Read-Log {
 function Number([string]$value) { [double]::Parse($value, $invariant) }
 function PointOf([string]$value) { @($value.Trim("(", ")").Split(",") | ForEach-Object { Number $_ }) }
 
+# Draws a short stroke at a client position and derives where page 0,0 sits in client coordinates.
+function Get-PageOrigin([double]$clientX, [double]$clientY) {
+    Pen -From "$clientX,$clientY" -To "$($clientX + 20),$clientY" -Steps 6
+    $entry = @(Read-Log)[-1]
+    $first = PointOf $entry.first
+    $zoom = Number $entry.zoom
+    @{ X = $clientX - $zoom * $first[0]; Y = $clientY - $zoom * $first[1]; Zoom = $zoom; Page = $entry.page }
+}
+function PagePen($origin, [double]$x1, [double]$y1, [double]$x2, [double]$y2) {
+    $from = "{0},{1}" -f ($origin.X + $origin.Zoom * $x1).ToString($invariant), ($origin.Y + $origin.Zoom * $y1).ToString($invariant)
+    $to = "{0},{1}" -f ($origin.X + $origin.Zoom * $x2).ToString($invariant), ($origin.Y + $origin.Zoom * $y2).ToString($invariant)
+    Pen -From $from -To $to
+}
+
 function Checkpoint1 {
     Write-Output "Checkpoint 1: Pen, Druck, Seitentaste, invertiert, E/P, Maus"
     Start-App
@@ -159,6 +173,55 @@ function Checkpoint2 {
     Stop-App
 }
 
-foreach ($number in $Checkpoint.Split(",")) { & "Checkpoint$($number.Trim())" }
+function Checkpoint3 {
+    Write-Output "Checkpoint 3: Seitenmodell Seiten / Endlos"
+    Start-App
+    Ctl -Keys "ctrl+minus"; Ctl -Keys "ctrl+minus"
+    Check ((Ctl -Read PageText) -eq "Seite 1 von 1") "Start im Seitenmodus mit einer Seite"
+    $origin = Get-PageOrigin 500 200
+    PagePen $origin 100 1040 400 1040
+    $s = @(Read-Log)[-1]
+    Check ($s.page -eq "1" -and (PointOf $s.first)[1] -gt 954) "Strich in den unteren 15 % der letzten Seite ($($s.first))"
+    Check ((Ctl -Read PageText) -eq "Seite 1 von 2") "Auto-Seite: danach gibt es 2 Seiten"
+    Shot "cp3-pages-auto"
+    Ctl -Keys "ctrl+enter"
+    Check ((Ctl -Read PageText) -match "von 3$") "Ctrl+Enter haengt eine Seite an ($(Ctl -Read PageText))"
+    Ctl -Click AddPageButton
+    Check ((Ctl -Read PageText) -match "von 4$") "Button '+ Seite' haengt eine Seite an"
+    $second = Get-PageOrigin 500 400
+    Check ([int]$second.Page -ge 2) "Strich auf einer hinteren Seite wird dieser Seite zugeordnet (page=$($second.Page))"
+    Shot "cp3-pages"
+
+    Ctl -Click PageModeButton
+    Check ((Ctl -Read PageText) -eq "Endlos") "Umschalten auf Endlos"
+    Shot "cp3-endless"
+    Ctl -Keys "ctrl+z"
+    $undo = @(Read-Log)[-1]
+    Check ((Ctl -Read PageText) -match "von 4$" -and $undo.strokes -eq "3") "Ctrl+Z nimmt den Moduswechsel zurueck, alle 3 Striche bleiben"
+    Ctl -Keys "ctrl+y"
+    Check ((Ctl -Read PageText) -eq "Endlos") "Ctrl+Y stellt Endlos wieder her"
+
+    Ctl -Keys "ctrl+0"; Ctl -Keys "ctrl+minus"; Ctl -Keys "ctrl+minus"
+    $surface = Get-PageOrigin 500 300
+    $visibleY = (340 - $surface.Y) / $surface.Zoom
+    PagePen $surface 600 $visibleY 760 $visibleY
+    Read-Log | Out-Null
+    $grown = Get-PageOrigin 500 300
+    $visibleY = (380 - $grown.Y) / $grown.Zoom
+    PagePen $grown 900 $visibleY 1000 $visibleY
+    $wide = @(Read-Log)[-1]
+    Check ((PointOf $wide.first)[0] -gt 890) "Endlos waechst nach rechts: Strich jenseits der A4-Breite moeglich ($($wide.first))"
+    Shot "cp3-endless-grown"
+    Ctl -Click PageModeButton
+    Check ((Ctl -Read PageText) -match "von \d+$") "Zurueck in den Seitenmodus ($(Ctl -Read PageText))"
+    Shot "cp3-back-to-pages"
+    Stop-App
+}
+
+try {
+    foreach ($number in $Checkpoint.Split(",")) { & "Checkpoint$($number.Trim())" }
+} finally {
+    Stop-App
+}
 Write-Output $(if ($script:failures -eq 0) { "SELFTEST OK" } else { "SELFTEST FEHLER: $script:failures" })
 exit $script:failures
