@@ -133,7 +133,18 @@ public sealed class DocumentView : StackPanel
         var previousMode = Mode;
         var previousPages = _pages.ToList();
         var pages = BuildPages(PageModeConverter.Convert(ToDocument(), mode));
-        _history.Push(new UndoStep(() => Show(previousMode, previousPages), () => Show(mode, pages)));
+        // Each side is captured again when it is left, so pages appended in the meantime survive undo and redo.
+        _history.Push(new UndoStep(
+            () =>
+            {
+                pages = _pages.ToList();
+                Show(previousMode, previousPages);
+            },
+            () =>
+            {
+                previousPages = _pages.ToList();
+                Show(mode, pages);
+            }));
         Show(mode, pages);
         Changed?.Invoke();
     }
