@@ -29,6 +29,7 @@
 - `PageView` (Grid): eine Seite = `PageBackground` + transparenter `InkCanvas`, auf Seitengröße geclippt. `GrowToFit` vergrößert die Endlos-Fläche.
 - `FileSession`: aktueller Dateipfad, Dirty-Flag, Neu / Öffnen / Speichern / Speichern unter mit den Windows-Dateidialogen, Nachfrage bei ungespeicherten Änderungen. Meldet `StateChanged` (Titel) und `DocumentLoaded` (Toolbar abgleichen).
 - `UnsavedChangesDialog` / `UnsavedChoice`: Dialog Speichern / Verwerfen / Abbrechen.
+- `ExportDialog`: Checkbox "Hintergrundlinien mit exportieren", danach fragt `FileSession.ExportPdf` den Zielpfad ab.
 - `SideButtonWatcher`: verfolgt die Seitentaste des Stifts (Barrel) über die Preview-Stylus-Events.
 - `ZoomPanController`: Mausrad, Ctrl/Shift+Mausrad, mittlere Maustaste, Leertaste+Ziehen, Zoom um den Zeiger.
 - `StrokeLogger`: nur mit MSP_DEBUG_LOG erzeugt, schreibt pro Strich eine Logzeile.
@@ -40,6 +41,7 @@
 - `StrokeMapper`: WPF-`Stroke` zu `NoteStroke` und zurück (Koordinaten auf 2, Druck auf 3 Nachkommastellen gerundet).
 - `MspFileService`: .msp lesen und schreiben (System.Text.Json, Format in file-format.md). `JsonFormat`: gemeinsame JSON-Optionen (camelCase, Enums als Text).
 - `SettingsService`: settings.json laden (mit Standardwerten bei Fehler) und speichern.
+- `PdfExporter`: `NoteDocument` zu PDF (PDFsharp). `PressureSegments` liefert die Linienstücke eines Druckstrichs.
 - `DebugLog`: hängt Zeilen an die Datei aus MSP_DEBUG_LOG an, kulturinvariant.
 
 ## Datenfluss
@@ -51,5 +53,5 @@
 
 ## NuGet-Pakete
 
-- App: PDFsharp 6.2.4 (Core-Build, MIT), kommt mit Schritt 6. Sonst keine.
+- App: PDFsharp 6.2.4 (Core-Build, MIT). Sonst keine.
 - Tests: xunit, xunit.runner.visualstudio, Microsoft.NET.Test.Sdk.

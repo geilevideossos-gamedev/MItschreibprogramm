@@ -24,7 +24,7 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 | 2 | Hintergrund, Zoom, Pan, Undo/Redo: Screenshot pro Stil und Zoomstufe, Strich bei 200 % injizieren, Koordinaten im Debug-Log prüfen | bestanden 2026-09-19, 13/13 |
 | 3 | Seitenmodell: xUnit für Konvertierung, Screenshot beider Modi, Auto-Seite per injiziertem Strich unten | bestanden 2026-09-19, 11/11, xUnit 7/7 |
 | 4 | Datei: xUnit Round-Trip, Datei mit injizierten Strichen speichern, neu laden, Screenshot vergleichen | bestanden 2026-09-19, 18/18, xUnit 15/15 |
-| 5 | PDF-Export: xUnit Seitenzahl, PDF in Bild wandeln (pdftoppm) und anschauen | offen |
+| 5 | PDF-Export: xUnit Seitenzahl, PDF in Bild wandeln (pdftoppm) und anschauen | bestanden 2026-09-19, 5/5, xUnit 22/22 |
 | 6 | exe aus dist/ starten, Selbsttest komplett gegen die exe wiederholen | offen |
 
 ### Ergebnis Checkpoint 1
@@ -54,6 +54,13 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 - Zwei injizierte Striche, Ctrl+S über den Windows-Dialog, Ctrl+N, Ctrl+O: Screenshot nach dem Laden weicht 0,019 % vom Screenshot vor dem Speichern ab. Koordinaten und Druck in der Datei passen zum Debug-Log.
 - Titel: `Unbenannt`, `Unbenannt*`, `cp4.msp`, `cp4.msp*`. Alt+F4 mit Änderungen zeigt den Dialog, Abbrechen bleibt, Speichern speichert und beendet, Verwerfen beendet ohne zu speichern.
 - settings.json nach dem Schließen: Farbe, Breite, Druck, Stil, Linienfarbe, Modus, letzter Ordner. Neustart stellt Fensterlage und alle Werte wieder her, ein neuer Strich nutzt sie.
+
+### Ergebnis Checkpoint 5
+
+- xUnit: Seitenzahl für Seiten- und Endlos-Dokumente (auch Inhalt rechts der A4-Breite), A4-Maße, leeres Dokument, Hilfslinien nur auf Wunsch, Punkt- und Konstantstriche, Druckverlauf auf geraden Zwei-Punkt-Strichen.
+- Export über Ctrl+E, Export-Dialog und Windows-Dialog schreibt die Datei. Ohne Haken ist sie kleiner und das gerenderte Bild hat weniger Farbe (1,28 % statt 4,49 %).
+- pdftoppm-Bild neben dem Screenshot: vier Farben, Druckverlauf dünn zu dick und dick zu dünn, Linien an derselben Stelle, 2 Seiten.
+- Gefunden und behoben: gerader Druckstrich kam im PDF mit konstanter Breite an.
 
 ## Manuelle Checkliste
 

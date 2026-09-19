@@ -52,11 +52,11 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F22 | Export mit Ctrl+E über PDFsharp (einziges externes Paket) | todo |
-| F23 | A4-Seiten, Striche als Vektorpfade, Druck als Breite sichtbar | todo |
-| F24 | Endlos-Dokument wird für den Export in A4-Höhen geschnitten | todo |
-| F25 | Export-Dialog mit Checkbox "Hintergrundlinien mit exportieren" (Standard an) | todo |
-| F26 | Export immer mit logischen Farben: Schwarz auf Weiß, auch im Dark Mode | todo |
+| F22 | Export mit Ctrl+E über PDFsharp (einziges externes Paket) | done |
+| F23 | A4-Seiten, Striche als Vektorpfade, Druck als Breite sichtbar | done |
+| F24 | Endlos-Dokument wird für den Export in A4-Höhen geschnitten | done |
+| F25 | Export-Dialog mit Checkbox "Hintergrundlinien mit exportieren" (Standard an) | done |
+| F26 | Export immer mit logischen Farben: Schwarz auf Weiß, auch im Dark Mode | wip |
 
 ## Dark Mode
 
@@ -100,4 +100,4 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F42 | tools/pen-sim.ps1: synthetischer Pen (Position, Druck, BARREL, INVERTED, ERASER) über InjectSyntheticPointerInput | done |
 | F43 | Debug-Log hinter MSP_DEBUG_LOG: eine Zeile pro fertigem Strich (Punkte, min/max Druck, Breite, Modus, Seite, Zoom) | done |
 | F44 | tools/screenshot.ps1: App-Fenster als PNG nach tmp/ | done |
-| F45 | xUnit-Projekt Mitschreibprogramm.Tests: .msp Round-Trip, Seiten zu Endlos und zurück, PDF-Seitenzahl, Settings | wip |
+| F45 | xUnit-Projekt Mitschreibprogramm.Tests: .msp Round-Trip, Seiten zu Endlos und zurück, PDF-Seitenzahl, Settings | done |

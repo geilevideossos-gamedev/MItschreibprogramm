@@ -75,3 +75,14 @@ Chronologisch. Je Eintrag: Entscheidung, Begründung, verworfene Alternative.
 - Entscheidung: Eigener kleiner Dialog `UnsavedChangesDialog` statt MessageBox. Begründung: Die Buttons sollen Speichern / Verwerfen / Abbrechen heißen, MessageBox kann nur Ja / Nein / Abbrechen.
 - Undo bis zum gespeicherten Stand löscht den Stern nicht (kein Vergleich mit dem Stand auf der Platte). Einfachste Variante, im Zweifel wird einmal zu viel nachgefragt.
 - Speichern schreibt in eine .tmp-Datei und verschiebt sie über das Ziel, damit ein Absturz keine halbe Notiz hinterlässt.
+
+## 2026-09-19 PDF-Export mit PDFsharp 6.2.4
+
+- Paket: `PDFsharp` 6.2.4 (Core-Build, MIT, net8.0, keine WPF-/GDI-Abhängigkeit). Einziges externes Paket der App. Quelle: nuget.org und docs.pdfsharp.net, Build und Restore laufen ohne Warnung. Verworfen: `PDFsharp-WPF` (erzeugt pro Seite WPF-Objekte, für reine Linien unnötig).
+- Seiten: exakt 210 x 297 mm, Zeichnen in Seitenpixeln über `ScaleTransform(72/96)`.
+- Striche: Punkte kommen aus `Stroke.GetBezierStylusPoints()`, also dieselbe geglättete Kurve wie auf dem Bildschirm. Ohne Druck ein Linienzug mit konstanter Breite. Mit Druck ein Linienstück pro Abschnitt mit eigener Breite (runde Enden), Breite = Basis x (1,5 x Druck + 0,25) wie in WPF.
+- Fallstrick: Die Bezier-Glättung macht aus einer geraden Linie zwei Punkte. Ein Mittelwert pro Abschnitt würde den Druckverlauf verlieren (im Checkpoint 5 gefunden). Deshalb teilt `PdfExporter.PressureSegments` jeden Abschnitt so, dass die Breite pro Teilstück höchstens 0,25 px springt.
+- Verworfen: Umriss aus `Stroke.GetGeometry()` füllen (exakt, aber sehr große PDFs bei Druckstrichen).
+- Hilfslinien: Bildschirmfarbe (mit Alpha) wird auf Weiß vorgemischt (`Palette.RuleLineOnPaper`), keine Transparenz im PDF. Gestrichelt über `XPen.DashPattern`, eine Linie pro DrawLine.
+- Endlos: `PageModeConverter` schneidet in A4-Kacheln, derselbe Code wie beim Moduswechsel.
+- PDFsharp-Fallen: `PdfDocumentOpenMode.ReadOnly` ist obsolet (Tests nutzen `Import`), `XGraphicsPath.StartFigure` wirkt im Core-Build nicht (deshalb DrawLine / DrawLines statt Pfaden).
