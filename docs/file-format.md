@@ -42,7 +42,7 @@ JSON, UTF-8 ohne BOM, kompakt in einer Zeile. Code: `Services/MspFileService`, D
 - Hilfslinien stehen nicht in der Datei, sie ergeben sich aus pageStyle und lineColor.
 - Die Größe der Endlos-Fläche steht nicht in der Datei. Beim Öffnen wächst sie so weit, dass alle Striche plus Rand hineinpassen.
 - Speichern schreibt erst `<name>.msp.tmp` und verschiebt sie dann über das Ziel.
-- Tolerant beim Öffnen: Punkte ohne Druck bekommen 0,5, Punkte mit weniger als zwei Zahlen und Striche ohne Punkte fallen weg, Breite und Druck werden in ihre Grenzen geholt.
+- Tolerant beim Öffnen: Punkte ohne Druck bekommen 0,5, Punkte mit weniger als zwei Zahlen und Striche ohne Punkte fallen weg, Breite und Druck werden in ihre Grenzen geholt. `null` statt einer Liste gilt als leere Liste, `null`-Einträge fallen weg. Koordinaten werden auf plus/minus 1.000.000 begrenzt, damit eine kaputte Datei keine Millionen Seiten erzeugt.
 
 ## settings.json
 

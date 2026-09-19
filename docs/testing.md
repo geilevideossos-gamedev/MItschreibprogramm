@@ -71,11 +71,28 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 
 ## Manuelle Checkliste
 
-(wird mit den Features ergänzt)
+Für einen schnellen Durchgang von Hand (Maus reicht), alles andere deckt `tools/selftest.ps1` ab:
+
+- Starten, mit jeder der vier Farben schreiben, Breite über Regler, Presets und + / - ändern.
+- E, Strich überfahren, P. Strg+Z mehrfach, Strg+Y.
+- Strg+L dreimal, "Linien" umschalten, Strg+D hin und zurück.
+- Strg+Mausrad, Strg+0, mittlere Maustaste ziehen, Leertaste + ziehen.
+- Unten auf der Seite schreiben (neue Seite erscheint), Strg+Enter, Modus auf Endlos und zurück.
+- Speichern, Neu, Öffnen. Etwas ändern, Fenster schließen: Dialog mit Speichern / Verwerfen / Abbrechen.
+- PDF-Export mit und ohne Hintergrundlinien, PDF ansehen.
+- Programm neu starten: Farbe, Breite, Stil, Dark Mode und Fensterlage sind wieder da.
 
 ## Offen mit echtem Pen
 
-- "Windows Ink verwenden" im Wacom-Treiber: kommt der Druck an (Log `device=stylus`, pmin ungleich pmax)?
-- Untere Seitentaste gehalten radiert, mit Treiber-Belegung "Rechtsklick" (Barrel) und mit "Radieren" (invertiert).
-- Seitentaste mitten im Strich gedrückt: der laufende Strich wird verworfen (WPF-Verhalten). Stört das beim Schreiben?
-- Strichbeginn ohne Verzögerung (Press-and-Hold ist für die Schreibfläche abgeschaltet).
+Nur mit dem Wacom Intuos Small prüfbar. features.md bleibt bis dahin auf `done`, danach `getestet`. Zum Prüfen die App mit `MSP_DEBUG_LOG=<pfad>` starten und die Logzeilen mitlesen.
+
+- **Windows Ink im Wacom-Treiber:** Mit Haken "Windows Ink verwenden" muss das Log `device=stylus` und unterschiedliche `pmin` / `pmax` zeigen. Ohne Haken: `device=mouse`, konstante Breite, Seitentaste radiert nicht. Steht so in der README, ist aber nur mit der Simulation belegt.
+- **Echte Seitentasten:** untere Taste mit Treiber-Belegung "Radieren" (erwartet `device=stylus-inverted mode=erase`) und mit "Rechtsklick" (erwartet `barrel=True mode=erase`). Radiert es nur, solange die Taste gehalten wird? Öffnet "Rechtsklick" irgendwo ein Kontextmenü oder stört die Hochstufung zur rechten Maustaste?
+- **Seitentaste mitten im Strich:** WPF verwirft dann den laufenden Strich. Passiert das beim normalen Schreiben aus Versehen (Finger liegt auf der Taste)? Falls ja, Umschalten nur im Hover erlauben.
+- **Druckkurve und Gefühl:** Faktor 0,25 bis 1,75 der Basisbreite. Fühlt sich dünn / mittel / dick richtig an, ist der Einsatzpunkt (leichtes Aufsetzen) brauchbar? Feinabstimmung ginge über die Druckkurve im Wacom-Treiber.
+- **Glättung (FitToCurve):** verändert kleine Schrift beim Abheben sichtbar? Bei der Simulation (gerade Linien) nicht beurteilbar.
+- **Latenz:** Strichbeginn ohne Verzögerung (Press-and-Hold ist für die Schreibfläche aus), nasse Tinte folgt dem Stift flüssig, auch bei 200 % Zoom und auf einer langen Endlos-Fläche.
+- **ExpressKeys:** die vier Tasten mit Strg+Z, E, 1, Strg+Enter belegen. Kommen sie als Tastendruck an, auch während der Stift im Hover über der Seite ist?
+- **Mapping der Fläche:** Tablett auf einen Bildschirm-Teilbereich mappen. Stimmen Stiftspitze und Strich weiter überein (auch bei 125 % Skalierung und auf einem zweiten Monitor mit anderer Skalierung, PerMonitorV2)?
+- **Handballen / Hover:** Hover über der Toolbar und Wechsel zurück auf die Seite, Stift verlässt den Erfassungsbereich mit gedrückter Seitentaste (Radierer darf nicht hängen bleiben).
+- **Pan mit Stift:** Leertaste halten und mit dem Stift ziehen verschiebt die Ansicht, ohne zu zeichnen.
