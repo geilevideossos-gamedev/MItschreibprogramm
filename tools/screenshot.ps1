@@ -10,7 +10,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-Add-Type -Path (Join-Path $PSScriptRoot "MspNative.cs") -ReferencedAssemblies System.Drawing
+if (-not ("MspNative" -as [type])) { Add-Type -Path (Join-Path $PSScriptRoot "MspNative.cs") -ReferencedAssemblies System.Drawing }
 
 $target = if ([System.IO.Path]::IsPathRooted($Out)) { $Out } else { Join-Path (Get-Location) $Out }
 New-Item -ItemType Directory -Force -Path (Split-Path $target) | Out-Null
