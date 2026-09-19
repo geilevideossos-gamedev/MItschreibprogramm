@@ -62,9 +62,14 @@ public sealed class FileSession
         {
             Show(MspFileService.Load(dialog.FileName), dialog.FileName);
         }
-        catch (Exception e) when (e is IOException or InvalidDataException or JsonException or UnauthorizedAccessException)
+        catch (InvalidDataException e)
         {
             ShowError($"Die Datei konnte nicht geöffnet werden.\n\n{e.Message}");
+        }
+        catch (Exception e) when (e is IOException or JsonException or UnauthorizedAccessException)
+        {
+            // Framework messages are English, so only the app's own German reasons are shown.
+            ShowError("Die Datei konnte nicht geöffnet werden. Sie ist beschädigt, gesperrt oder nicht lesbar.");
         }
     }
 
@@ -110,7 +115,7 @@ public sealed class FileSession
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            ShowError($"Das PDF konnte nicht geschrieben werden.\n\n{e.Message}");
+            ShowError("Das PDF konnte nicht geschrieben werden. Ist die Datei in einem anderen Programm geöffnet oder der Ordner schreibgeschützt?");
         }
     }
 
@@ -147,7 +152,7 @@ public sealed class FileSession
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            ShowError($"Die Datei konnte nicht gespeichert werden.\n\n{e.Message}");
+            ShowError("Die Datei konnte nicht gespeichert werden. Ist sie gesperrt oder der Ordner schreibgeschützt?");
             return false;
         }
 

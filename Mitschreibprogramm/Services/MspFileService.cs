@@ -49,7 +49,7 @@ public static class MspFileService
         if (!Enum.IsDefined(document.PageMode) || !Enum.IsDefined(document.PageStyle) || !Enum.IsDefined(document.LineColor)
             || strokes.Any(stroke => !Enum.IsDefined(stroke.Color)))
         {
-            throw new JsonException("Die Datei enthält einen unbekannten Wert für Modus, Stil oder Farbe.");
+            throw new InvalidDataException("Die Datei enthält einen unbekannten Wert für Modus, Stil oder Farbe.");
         }
 
         return document;
