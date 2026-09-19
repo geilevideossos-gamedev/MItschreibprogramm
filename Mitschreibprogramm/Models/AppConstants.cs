@@ -2,10 +2,17 @@ namespace Mitschreibprogramm.Models;
 
 public static class AppConstants
 {
+    public const int FileFormatVersion = 1;
+
     private const double PixelsPerMillimeter = 96.0 / 25.4;
 
     public const double PageWidth = 210 * PixelsPerMillimeter;
     public const double PageHeight = 297 * PixelsPerMillimeter;
+    public const double PageGap = 24;
+    public const double AutoPageZone = 0.85;
+    public const double EndlessEdgeMargin = 200;
+    public const double EndlessGrowStepX = PageWidth / 2;
+    public const double EndlessGrowStepY = PageHeight / 2;
     public const double LineSpacing = 8 * PixelsPerMillimeter;
     public const double RuleLineThickness = 1;
     public const double RuleDashLength = 6;

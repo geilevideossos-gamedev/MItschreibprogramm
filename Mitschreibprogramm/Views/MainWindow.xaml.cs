@@ -19,6 +19,7 @@ public partial class MainWindow : Window
         _zoomPan = new ZoomPanController(Scroller, Document);
         _zoomPan.ZoomChanged += UpdateStatus;
         Deactivated += (_, _) => _zoomPan.SetSpaceHeld(false);
+        Document.PagesChanged += OnPagesChanged;
         RegisterShortcuts();
 
         foreach (var dot in new[] { ColorBlack, ColorBlue, ColorRed, ColorGreen })
@@ -32,7 +33,7 @@ public partial class MainWindow : Window
         PressureCheck.IsChecked = true;
         ToolPen.IsChecked = true;
         PageStyleBox.SelectedIndex = (int)PageStyle.Lined;
-        UpdateStatus();
+        OnPagesChanged();
     }
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -77,6 +78,7 @@ public partial class MainWindow : Window
         Add(ModifierKeys.Control, _zoomPan.ZoomIn, Key.OemPlus, Key.Add);
         Add(ModifierKeys.Control, _zoomPan.ZoomOut, Key.OemMinus, Key.Subtract);
         Add(ModifierKeys.Control, _zoomPan.ResetZoom, Key.D0, Key.NumPad0);
+        Add(ModifierKeys.Control, Document.AddPage, Key.Enter);
         Add(ModifierKeys.Control, () => PageStyleBox.SelectedIndex = (PageStyleBox.SelectedIndex + 1) % PageStyleBox.Items.Count, Key.L);
     }
 
@@ -100,6 +102,21 @@ public partial class MainWindow : Window
         ApplyPageStyle();
     }
 
+    private void OnPageModeClick(object sender, RoutedEventArgs e) =>
+        Document.SetMode(Document.Mode == PageMode.Pages ? PageMode.Endless : PageMode.Pages);
+
+    private void OnAddPageClick(object sender, RoutedEventArgs e) => Document.AddPage();
+
+    private void OnScrollChanged(object sender, ScrollChangedEventArgs e) => UpdateStatus();
+
+    private void OnPagesChanged()
+    {
+        var pages = Document.Mode == PageMode.Pages;
+        PageModeButton.Content = pages ? "Modus: Seiten" : "Modus: Endlos";
+        AddPageButton.IsEnabled = pages;
+        UpdateStatus();
+    }
+
     private void ApplyPageStyle()
     {
         var style = (PageStyle)((ComboBoxItem)PageStyleBox.SelectedItem).Tag;
@@ -113,5 +130,11 @@ public partial class MainWindow : Window
         WidthLabel.Text = $"{width:0.0} px";
     }
 
-    private void UpdateStatus() => ZoomText.Text = $"Zoom {Document.Zoom:P0}";
+    private void UpdateStatus()
+    {
+        ZoomText.Text = $"Zoom {Document.Zoom:P0}";
+        PageText.Text = Document.Mode == PageMode.Pages
+            ? $"Seite {Document.PageNumberAt(Scroller, Scroller.ViewportHeight / 2)} von {Document.Pages.Count}"
+            : "Endlos";
+    }
 }

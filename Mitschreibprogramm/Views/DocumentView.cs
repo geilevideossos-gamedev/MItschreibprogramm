@@ -1,6 +1,6 @@
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Ink;
-using System.Windows.Input;
 using System.Windows.Media;
 using Mitschreibprogramm.Models;
 using Mitschreibprogramm.Rendering;
@@ -13,31 +13,34 @@ public sealed class DocumentView : StackPanel
     private readonly DrawingAttributes _pen = new() { FitToCurve = true };
     private readonly List<PageView> _pages = [];
     private readonly UndoHistory _history = new();
-    private PageStyle _pageStyle;
-    private LineColor _lineColor;
+    private readonly SideButtonWatcher _sideButton;
     private double _zoom = AppConstants.DefaultZoom;
     private bool _eraser;
-    private bool _barrelHeld;
     private bool _panning;
 
     public DocumentView()
     {
-        AddPage();
-        PreviewStylusInRange += (_, e) => SyncBarrel(e.StylusDevice);
-        PreviewStylusInAirMove += (_, e) => SyncBarrel(e.StylusDevice);
-        PreviewStylusButtonDown += (_, e) => SyncBarrel(e.StylusDevice);
-        PreviewStylusButtonUp += (_, e) => SyncBarrel(e.StylusDevice);
-        PreviewStylusDown += (_, e) => SyncBarrel(e.StylusDevice);
-        PreviewStylusOutOfRange += (_, _) => SetBarrelHeld(false);
+        _sideButton = new SideButtonWatcher(this);
+        _sideButton.Changed += UpdateEditingMode;
         if (DebugLog.IsEnabled)
         {
             _ = new StrokeLogger(this);
         }
+
+        Load(new NoteDocument());
     }
 
     public event Action<PageView>? PageAdded;
 
+    public event Action? PagesChanged;
+
     public IReadOnlyList<PageView> Pages => _pages;
+
+    public PageMode Mode { get; private set; }
+
+    public PageStyle PageStyle { get; private set; }
+
+    public LineColor LineColor { get; private set; }
 
     public double Zoom
     {
@@ -73,28 +76,116 @@ public sealed class DocumentView : StackPanel
 
     public void SetPageStyle(PageStyle style, LineColor lineColor)
     {
-        _pageStyle = style;
-        _lineColor = lineColor;
+        PageStyle = style;
+        LineColor = lineColor;
         foreach (var page in _pages)
         {
             page.Paper.Update(style, lineColor);
         }
     }
 
+    public void Load(NoteDocument document)
+    {
+        _history.Clear();
+        PageStyle = document.PageStyle;
+        LineColor = document.LineColor;
+        Show(document.PageMode, BuildPages(document));
+    }
+
+    public NoteDocument ToDocument() => new()
+    {
+        PageMode = Mode,
+        PageStyle = PageStyle,
+        LineColor = LineColor,
+        Pages = _pages.Select(page => new NotePage { Strokes = page.Ink.Strokes.Select(StrokeMapper.ToModel).ToList() }).ToList(),
+    };
+
+    // The old page views stay alive inside the undo step, so earlier steps that point at them remain valid.
+    public void SetMode(PageMode mode)
+    {
+        if (mode == Mode)
+        {
+            return;
+        }
+
+        var previousMode = Mode;
+        var previousPages = _pages.ToList();
+        var pages = BuildPages(PageModeConverter.Convert(ToDocument(), mode));
+        _history.Push(new UndoStep(() => Show(previousMode, previousPages), () => Show(mode, pages)));
+        Show(mode, pages);
+    }
+
+    public void AddPage()
+    {
+        if (Mode != PageMode.Pages)
+        {
+            return;
+        }
+
+        var page = AppendPage();
+        UpdateLayout();
+        page.BringIntoView();
+    }
+
+    public int PageNumberAt(UIElement viewport, double viewportY)
+    {
+        var index = _pages.FindIndex(page => page.TranslatePoint(new Point(0, page.ActualHeight), viewport).Y >= viewportY);
+        return index < 0 ? _pages.Count : index + 1;
+    }
+
     public void Undo() => OnHistoryApplied("undo", _history.Undo());
 
     public void Redo() => OnHistoryApplied("redo", _history.Redo());
 
-    private void AddPage()
+    private List<PageView> BuildPages(NoteDocument document)
+    {
+        var models = document.PageMode == PageMode.Endless
+            ? [new NotePage { Strokes = document.Pages.SelectMany(page => page.Strokes).ToList() }]
+            : document.Pages.DefaultIfEmpty(new NotePage()).ToList();
+        var pages = models.Select(CreatePage).ToList();
+        if (document.PageMode == PageMode.Endless)
+        {
+            pages[0].GrowToFit(pages[0].Ink.Strokes.GetBounds());
+        }
+
+        return pages;
+    }
+
+    private PageView CreatePage(NotePage model)
     {
         var page = new PageView(_pen);
-        page.Paper.Update(_pageStyle, _lineColor);
-        page.Ink.StrokeCollected += (_, e) => OnStrokeCollected(page.Ink.Strokes, e.Stroke);
+        page.Ink.Strokes = new StrokeCollection(model.Strokes.Where(stroke => stroke.Points.Count > 0).Select(StrokeMapper.ToStroke));
+        page.Ink.StrokeCollected += (_, e) => OnStrokeCollected(page, e.Stroke);
         page.Ink.StrokeErasing += (_, e) => OnStrokeErasing(page.Ink.Strokes, e.Stroke);
+        PageAdded?.Invoke(page);
+        return page;
+    }
+
+    private void Show(PageMode mode, List<PageView> pages)
+    {
+        Mode = mode;
+        _pages.Clear();
+        _pages.AddRange(pages);
+        Children.Clear();
+        foreach (var page in pages)
+        {
+            page.Paper.Update(PageStyle, LineColor);
+            Children.Add(page);
+        }
+
+        UpdateEditingMode();
+        PagesChanged?.Invoke();
+    }
+
+    private PageView AppendPage()
+    {
+        var page = CreatePage(new NotePage());
+        page.Paper.Update(PageStyle, LineColor);
         _pages.Add(page);
         Children.Add(page);
         UpdateEditingMode();
-        PageAdded?.Invoke(page);
+        PagesChanged?.Invoke();
+        return page;
     }
 
     private void OnHistoryApplied(string kind, bool applied)
@@ -105,8 +196,20 @@ public sealed class DocumentView : StackPanel
         }
     }
 
-    private void OnStrokeCollected(StrokeCollection strokes, Stroke stroke) =>
+    private void OnStrokeCollected(PageView page, Stroke stroke)
+    {
+        var strokes = page.Ink.Strokes;
         _history.Push(new UndoStep(() => strokes.Remove(stroke), () => strokes.Add(stroke)));
+        var bounds = stroke.GetBounds();
+        if (Mode == PageMode.Endless)
+        {
+            page.GrowToFit(bounds);
+        }
+        else if (page == _pages[^1] && bounds.Bottom > AppConstants.PageHeight * AppConstants.AutoPageZone)
+        {
+            AppendPage();
+        }
+    }
 
     // Raised before the stroke leaves the collection, so its z-order position is still known.
     private void OnStrokeErasing(StrokeCollection strokes, Stroke stroke)
@@ -115,30 +218,9 @@ public sealed class DocumentView : StackPanel
         _history.Push(new UndoStep(() => strokes.Insert(index, stroke), () => strokes.Remove(stroke)));
     }
 
-    // The driver reports a held side button as barrel button; an inverted pen is handled by InkCanvas itself
-    // (EditingModeInverted defaults to EraseByStroke).
-    private void SyncBarrel(StylusDevice device)
-    {
-        var held = device.StylusButtons.Any(button =>
-            button.Guid == StylusPointProperties.BarrelButton.Id &&
-            button.StylusButtonState == StylusButtonState.Down);
-        SetBarrelHeld(held);
-    }
-
-    private void SetBarrelHeld(bool held)
-    {
-        if (_barrelHeld == held)
-        {
-            return;
-        }
-
-        _barrelHeld = held;
-        UpdateEditingMode();
-    }
-
     private void UpdateEditingMode()
     {
-        var erasing = _eraser || _barrelHeld;
+        var erasing = _eraser || _sideButton.IsHeld;
         foreach (var page in _pages)
         {
             page.Ink.EditingMode = _panning ? InkCanvasEditingMode.None

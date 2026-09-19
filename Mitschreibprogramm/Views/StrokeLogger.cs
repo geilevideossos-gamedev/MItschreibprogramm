@@ -32,9 +32,7 @@ public sealed class StrokeLogger
     private void OnStylusDown(object sender, StylusDownEventArgs e)
     {
         _device = e.Inverted ? "stylus-inverted" : "stylus";
-        _barrel = e.StylusDevice.StylusButtons.Any(button =>
-            button.Guid == StylusPointProperties.BarrelButton.Id &&
-            button.StylusButtonState == StylusButtonState.Down);
+        _barrel = SideButtonWatcher.IsBarrelDown(e.StylusDevice);
     }
 
     private void OnMouseDown(object sender, MouseButtonEventArgs e)

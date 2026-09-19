@@ -56,6 +56,13 @@
                     </ComboBox>
                     <Button x:Name="LineColorButton" Style="{StaticResource FlatButton}" Margin="4,0,1,0"
                             ToolTip="Linienfarbe umschalten" Click="OnLineColorClick"/>
+                    <Border Style="{StaticResource ToolSeparator}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="PageModeButton" Style="{StaticResource FlatButton}"
+                            ToolTip="Zwischen Seiten (A4) und Endlos-Fläche umschalten" Click="OnPageModeClick"/>
+                    <Button x:Name="AddPageButton" Style="{StaticResource FlatButton}" Content="+ Seite"
+                            ToolTip="Neue Seite (Strg+Enter)" Click="OnAddPageClick"/>
                 </StackPanel>
             </WrapPanel>
         </Border>
@@ -65,9 +72,13 @@
             <StatusBarItem>
                 <TextBlock x:Name="ZoomText"/>
             </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="PageText"/>
+            </StatusBarItem>
         </StatusBar>
         <ScrollViewer x:Name="Scroller" Focusable="False" HorizontalScrollBarVisibility="Auto"
-                      VerticalScrollBarVisibility="Auto">
+                      VerticalScrollBarVisibility="Auto" ScrollChanged="OnScrollChanged">
             <v:DocumentView x:Name="Document" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="24"/>
         </ScrollViewer>
     </DockPanel>

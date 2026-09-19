@@ -21,6 +21,9 @@ public static class Palette
         _ => BlackHex,
     });
 
+    public static PenColor LogicalPen(Color shown) =>
+        Enum.GetValues<PenColor>().FirstOrDefault(color => Pen(color) == shown, PenColor.Black);
+
     public static Color Page() => Parse(PageHex);
 
     public static Color RuleLine(LineColor color)
