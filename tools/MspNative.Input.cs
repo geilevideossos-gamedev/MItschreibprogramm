@@ -34,15 +34,33 @@ public static partial class MspNative
     // vks: modifier keys first, e.g. { 0x11, 0x5A } for Ctrl+Z. Keys go to the foreground window, so it has to be ours.
     public static void KeyChord(IntPtr hwnd, ushort[] vks)
     {
-        if (ForegroundWindowOf(hwnd) == IntPtr.Zero) throw new InvalidOperationException("App ist nicht im Vordergrund, Tasten werden nicht gesendet.");
-        for (int i = 0; i < vks.Length; i++) Send(KeyInput(vks[i], 0, 0));
-        for (int i = vks.Length - 1; i >= 0; i--) Send(KeyInput(vks[i], 0, KEYEVENTF_KEYUP));
+        int pressed = 0;
+        try
+        {
+            for (int i = 0; i < vks.Length; i++)
+            {
+                RequireForeground(hwnd);
+                Send(KeyInput(vks[i], 0, 0));
+                pressed++;
+            }
+        }
+        finally
+        {
+            for (int i = pressed - 1; i >= 0; i--) Send(KeyInput(vks[i], 0, KEYEVENTF_KEYUP));
+        }
         Thread.Sleep(120);
+    }
+
+    // Checked before every single key: if somebody clicks into another program, no further keystroke may land there.
+    private static void RequireForeground(IntPtr hwnd)
+    {
+        if (ForegroundWindowOf(hwnd) == IntPtr.Zero)
+            throw new InvalidOperationException("Abbruch: App ist nicht (mehr) im Vordergrund, es wird nichts gesendet.");
     }
 
     public static void KeyDown(IntPtr hwnd, ushort vk)
     {
-        if (ForegroundWindowOf(hwnd) == IntPtr.Zero) throw new InvalidOperationException("App ist nicht im Vordergrund, Tasten werden nicht gesendet.");
+        RequireForeground(hwnd);
         Send(KeyInput(vk, 0, 0));
     }
 
@@ -50,9 +68,9 @@ public static partial class MspNative
 
     public static void TypeText(IntPtr hwnd, string text)
     {
-        if (ForegroundWindowOf(hwnd) == IntPtr.Zero) throw new InvalidOperationException("App ist nicht im Vordergrund, Text wird nicht gesendet.");
         foreach (char c in text)
         {
+            RequireForeground(hwnd);
             Send(KeyInput(0, c, KEYEVENTF_UNICODE));
             Send(KeyInput(0, c, KEYEVENTF_UNICODE | KEYEVENTF_KEYUP));
         }

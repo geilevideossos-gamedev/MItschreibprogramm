@@ -1,9 +1,12 @@
 # Runs the self-test checkpoints (docs/testing.md) against an exe: synthetic pen, keys, mouse, debug log, screenshots.
 # Usage: powershell -ExecutionPolicy Bypass -File tools/selftest.ps1 [-Exe dist/Mitschreibprogramm.exe] [-Checkpoint 1,2]
-# Needs an unlocked desktop. Nobody may use mouse or keyboard while it runs. Screenshots land in tmp/selftest/.
+# Needs an unlocked desktop. Nobody may use mouse or keyboard while it runs: it waits for an idle machine before it
+# starts and stops sending keys the moment another program comes to the foreground. Screenshots land in tmp/selftest/.
 param(
     [string]$Exe = "Mitschreibprogramm/bin/Debug/net8.0-windows/Mitschreibprogramm.exe",
-    [string]$Checkpoint = "1,2,3,4,5,7"
+    [string]$Checkpoint = "1,2,3,4,5,7",
+    [int]$IdleSeconds = 15,
+    [int]$IdleWaitSeconds = 120
 )
 
 $ErrorActionPreference = "Stop"
@@ -30,7 +33,7 @@ function Start-App([switch]$KeepSettings) {
     $script:logOffset = 0
     $env:MSP_DEBUG_LOG = $logPath
     try { Start-Process -FilePath $exePath } finally { $env:MSP_DEBUG_LOG = $null }
-    foreach ($attempt in 1..40) {
+    foreach ($attempt in 1..120) {
         Start-Sleep -Milliseconds 250
         if (Get-Process Mitschreibprogramm -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne [IntPtr]::Zero }) { break }
     }
@@ -144,6 +147,18 @@ function Get-PageBrightness($origin, [double]$x, [double]$y) {
 }
 
 foreach ($part in Get-ChildItem (Join-Path $PSScriptRoot "selftest") -Filter "checkpoint-*.ps1") { . $part.FullName }
+
+# The run takes over mouse and keyboard. It only starts on a machine nobody is using right now, and gives up otherwise.
+if (-not ("MspNative" -as [type])) { Add-Type -Path (Get-ChildItem $PSScriptRoot -Filter "MspNative.*.cs").FullName -ReferencedAssemblies System.Drawing }
+$waited = 0
+while ([MspNative]::IdleSeconds() -lt $IdleSeconds) {
+    if ($waited -ge $IdleWaitSeconds) {
+        Write-Output "ABBRUCH: Maus oder Tastatur werden gerade benutzt. Der Selbsttest startet erst nach $IdleSeconds s ohne Eingabe."
+        exit 99
+    }
+    Start-Sleep -Seconds 2
+    $waited += 2
+}
 
 try {
     foreach ($number in $Checkpoint.Split(",")) { & "Checkpoint$($number.Trim())" }

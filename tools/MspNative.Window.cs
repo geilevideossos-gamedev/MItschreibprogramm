@@ -42,6 +42,20 @@ public static partial class MspNative
     [DllImport("user32.dll")] private static extern bool PrintWindow(IntPtr hwnd, IntPtr hdc, uint flags);
     [DllImport("dwmapi.dll")] private static extern int DwmGetWindowAttribute(IntPtr hwnd, int attribute, out RECT value, int size);
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct LASTINPUTINFO { public uint cbSize; public uint dwTime; }
+
+    [DllImport("user32.dll")] private static extern bool GetLastInputInfo(ref LASTINPUTINFO info);
+
+    // Seconds since the last keyboard or mouse input of any kind (injected input counts as well).
+    public static int IdleSeconds()
+    {
+        LASTINPUTINFO info = new LASTINPUTINFO();
+        info.cbSize = (uint)Marshal.SizeOf(typeof(LASTINPUTINFO));
+        GetLastInputInfo(ref info);
+        return (int)(unchecked((uint)Environment.TickCount - info.dwTime) / 1000);
+    }
+
     public static IntPtr FindAppWindow(string processName)
     {
         foreach (Process process in Process.GetProcessesByName(processName))
