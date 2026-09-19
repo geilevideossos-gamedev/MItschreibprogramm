@@ -170,6 +170,18 @@ public static class MspNative
         return ForegroundWindowOf(hwnd) != IntPtr.Zero;
     }
 
+    public static string Bounds(IntPtr hwnd)
+    {
+        IntPtr previous = SetThreadDpiAwarenessContext(PerMonitorAwareV2);
+        try
+        {
+            RECT r;
+            GetWindowRect(hwnd, out r);
+            return r.Left + "," + r.Top + "," + (r.Right - r.Left) + "," + (r.Bottom - r.Top);
+        }
+        finally { SetThreadDpiAwarenessContext(previous); }
+    }
+
     public static void Place(IntPtr hwnd, int x, int y, int width, int height)
     {
         IntPtr previous = SetThreadDpiAwarenessContext(PerMonitorAwareV2);

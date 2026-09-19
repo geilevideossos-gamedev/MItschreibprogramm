@@ -1,12 +1,13 @@
 # Drives the running app for self-tests: window placement, keyboard, mouse, toolbar controls (UI Automation).
 # Coordinates are WPF units (DIPs) relative to the window's client area. Examples:
 #   tools/app-control.ps1 -Place "20,10,1500,1000"         window rectangle in physical pixels
-#   tools/app-control.ps1 -Keys "ctrl+z"                    chord: ctrl, shift, alt, enter, space, esc, tab, plus, minus, letters, digits
+#   tools/app-control.ps1 -Keys "ctrl+z"                    chord: ctrl, shift, alt, enter, space, esc, tab, plus, minus, f4, letters, digits
 #   tools/app-control.ps1 -Text "C:\tmp\test.msp"           types text (file dialogs)
 #   tools/app-control.ps1 -Click PressureCheck              invokes/toggles/selects a control by AutomationId (x:Name)
 #   tools/app-control.ps1 -Wheel "500,400,120" -Hold ctrl   mouse wheel at a point, optional held key
 #   tools/app-control.ps1 -Drag "middle,500,400,500,250"    mouse drag (left or middle), optional -Hold space
-#   tools/app-control.ps1 -Read ZoomText                    prints the Name (text) of a control
+#   tools/app-control.ps1 -Bounds                           prints the window rectangle in physical pixels (does not activate)
+#   tools/app-control.ps1 -Read ZoomText                    prints the Name (text) of a control, "Window" = title of the foreground app window
 param(
     [string]$Place,
     [string]$Keys,
@@ -16,6 +17,7 @@ param(
     [string]$Drag,
     [string]$Hold,
     [string]$Read,
+    [switch]$Bounds,
     [string]$ProcessName = "Mitschreibprogramm"
 )
 
@@ -23,7 +25,7 @@ $ErrorActionPreference = "Stop"
 if (-not ("MspNative" -as [type])) { Add-Type -Path (Join-Path $PSScriptRoot "MspNative.cs") -ReferencedAssemblies System.Drawing }
 Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
 
-$virtualKeys = @{ ctrl = 0x11; shift = 0x10; alt = 0x12; enter = 0x0D; space = 0x20; esc = 0x1B; tab = 0x09; plus = 0xBB; minus = 0xBD }
+$virtualKeys = @{ ctrl = 0x11; shift = 0x10; alt = 0x12; enter = 0x0D; space = 0x20; esc = 0x1B; tab = 0x09; plus = 0xBB; minus = 0xBD; f4 = 0x73 }
 function Get-VirtualKey([string]$name) {
     $key = $name.Trim().ToLowerInvariant()
     if ($virtualKeys.ContainsKey($key)) { return [uint16]$virtualKeys[$key] }
@@ -44,6 +46,10 @@ function Find-Control([IntPtr]$window, [string]$automationId) {
 }
 
 $hwnd = [MspNative]::FindAppWindow($ProcessName)
+if ($Bounds) {
+    Write-Output ([MspNative]::Bounds($hwnd))
+    return
+}
 if ($Place) {
     $r = Get-Numbers $Place
     [MspNative]::Place($hwnd, [int]$r[0], [int]$r[1], [int]$r[2], [int]$r[3])
@@ -59,7 +65,9 @@ if ($Click) {
     else { throw "Control '$Click' unterstuetzt weder Select, Toggle noch Invoke." }
     Start-Sleep -Milliseconds 200
 }
-if ($Read) {
+if ($Read -eq "Window") {
+    Write-Output ([System.Windows.Automation.AutomationElement]::FromHandle([MspNative]::ForegroundWindowOf($hwnd))).Current.Name
+} elseif ($Read) {
     Write-Output (Find-Control ([MspNative]::ForegroundWindowOf($hwnd)) $Read).Current.Name
 }
 
