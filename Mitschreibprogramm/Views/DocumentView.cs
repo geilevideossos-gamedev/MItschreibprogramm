@@ -12,6 +12,7 @@ public sealed class DocumentView : StackPanel
 {
     private readonly DrawingAttributes _pen = new() { FitToCurve = true };
     private readonly List<PageView> _pages = [];
+    private readonly List<PageView> _created = [];
     private readonly UndoHistory _history = new();
     private readonly SideButtonWatcher _sideButton;
     private double _zoom = AppConstants.DefaultZoom;
@@ -109,6 +110,13 @@ public sealed class DocumentView : StackPanel
     public void Load(NoteDocument document)
     {
         _history.Clear();
+        // InkCanvas listens to its DefaultDrawingAttributes; while it holds the shared pen, the pen keeps the page alive.
+        foreach (var page in _created)
+        {
+            page.Ink.DefaultDrawingAttributes = new DrawingAttributes();
+        }
+
+        _created.Clear();
         PageStyle = document.PageStyle;
         LineColor = document.LineColor;
         Show(document.PageMode, BuildPages(document));
@@ -191,6 +199,7 @@ public sealed class DocumentView : StackPanel
         page.Ink.Strokes = new StrokeCollection(model.Strokes.Where(stroke => stroke.Points.Count > 0).Select(StrokeMapper.ToStroke));
         page.Ink.StrokeCollected += (_, e) => OnStrokeCollected(page, e.Stroke);
         page.Ink.StrokeErasing += (_, e) => OnStrokeErasing(page.Ink.Strokes, e.Stroke);
+        _created.Add(page);
         PageAdded?.Invoke(page);
         return page;
     }
