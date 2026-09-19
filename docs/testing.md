@@ -25,7 +25,7 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 | 3 | Seitenmodell: xUnit für Konvertierung, Screenshot beider Modi, Auto-Seite per injiziertem Strich unten | bestanden 2026-09-19, 11/11, xUnit 7/7 |
 | 4 | Datei: xUnit Round-Trip, Datei mit injizierten Strichen speichern, neu laden, Screenshot vergleichen | bestanden 2026-09-19, 18/18, xUnit 15/15 |
 | 5 | PDF-Export: xUnit Seitenzahl, PDF in Bild wandeln (pdftoppm) und anschauen | bestanden 2026-09-19, 5/5, xUnit 22/22 |
-| 6 | exe aus dist/ starten, Selbsttest komplett gegen die exe wiederholen | Teil 1 (Checkpoint 1 bis 3) bestanden 2026-09-19, 31/31. Teil 2 (Checkpoint 4, 5, Dark Mode) gegen die exe noch offen |
+| 6 | exe aus dist/ starten, Selbsttest komplett gegen die exe wiederholen | bestanden 2026-09-19 gegen die finale exe, 65/65 (Teil 1: 31/31, Teil 2: 34/34) |
 
 ### Ergebnis Checkpoint 1
 
@@ -73,7 +73,8 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 
 - Teil 1, `-Checkpoint "1,2,3"`: 31/31 am 2026-09-19 gegen die finale exe (Checkpoint 1: 7/7, Checkpoint 2: 13/13, Checkpoint 3: 11/11), kein `window deactivated` im Log.
 - Vorgeschichte: In drei früheren Läufen gegen die exe blieb je eine injizierte Geste wirkungslos (zweimal ein Pen-Strich nach einem Zoomwechsel, einmal das Ziehen mit der mittleren Maustaste), jedes Mal an anderer Stelle. Alle drei fielen in die Zeit, in der parallel Hintergrund-Agenten dauernd Prozesse starteten. Gegen Debug-Build und eine zweite Release-exe (74 Gesten, auch unter künstlicher CPU-Last) trat es nie auf, ohne Parallelbetrieb auch gegen die exe nicht. Die Ursache ist damit eingegrenzt, aber nicht bewiesen, deshalb steht der Punkt zusätzlich unter "Offen mit echtem Pen".
-- Teil 2, `-Checkpoint "4,5,7"`: noch nicht gegen die exe gelaufen. Ein erster Anlauf brach an einem Pfadfehler der aufgeteilten Testskripte ab (behoben), bis dahin 7/7 in Checkpoint 4.
+- Teil 2, `-Checkpoint "4,5,7"`: 34/34 am 2026-09-19 gegen dieselbe exe (Checkpoint 4: 18/18, Checkpoint 5: 5/5, Dark Mode: 11/11). Ein erster Anlauf war an einem Pfadfehler der aufgeteilten Testskripte gescheitert (behoben, kein App-Fehler).
+- Der Lauf ist in zwei Teile geteilt, weil ein Werkzeugaufruf hier höchstens 10 Minuten dauern darf. Von Hand geht alles in einem: `tools/selftest.ps1 -Exe dist/Mitschreibprogramm.exe`.
 
 ## Manuelle Checkliste
 

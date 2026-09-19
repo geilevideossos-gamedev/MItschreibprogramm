@@ -4,19 +4,18 @@ Stand: 2026-09-19
 
 ## Aktuell
 
-- Schritt 1 bis 4 fertig und committet: Skeleton, Pen (Druck, Radierer über Toolbar / E / Seitentaste / invertiert, Glättung), Debug-Log, Hintergrundstile mit Linienfarbe, Undo/Redo, Zoom und Pan, Seitenmodell (Seiten / Endlos, Konvertierung, Auto-Seite, Seitenzähler).
-- xUnit-Projekt Mitschreibprogramm.Tests: Konvertierung, .msp Round-Trip und tolerantes Laden, PDF-Export, Settings.
-- Schritt 8: app.manifest, build.sh, Publish nach dist/ (141 MB, eine Datei) und README fertig. Unabhängiger Code-Review gelaufen, alle Funde behoben (decisions.md). Es fehlt nur Checkpoint 6.
-- Schritt 7 fertig: Dark Mode (Button, Ctrl+D, gespeichert), alle Shortcuts, Statusleiste mit Zoom, Seite und Datei.
-- Schritt 6 fertig: PDF-Export mit PDFsharp 6.2.4 über Ctrl+E und Button.
-- Schritt 5 fertig: Dateiformat .msp, Datei-Befehle mit Dialogen, Titel mit `*`, Settings (laden, anwenden, beim Schließen speichern, Fensterlage). Shortcuts 1-4 und Plus / Minus sind ebenfalls drin.
+- Alle Schritte 1 bis 9 fertig, alle 45 Features in features.md auf `done`.
+- `dotnet build`: 0 Warnings, 0 Errors. `dotnet test`: 28 Tests grün (Konvertierung, .msp Round-Trip und tolerantes Laden, PDF-Export, Settings).
+- Checkpoint 1 bis 6 per Selbsttest bestanden, Checkpoint 6 gegen die finale dist/Mitschreibprogramm.exe mit 65/65 (Details in testing.md).
+- `./build.sh` erzeugt dist/Mitschreibprogramm.exe (141 MB, einzige Datei). README.md ist geschrieben.
+- Unabhängiger Code-Review und ein Abschluss-Audit (README, docs, Feature-Abdeckung, Projektregeln) sind gelaufen, alle bestätigten Funde behoben (decisions.md).
 - Selbsttest-Werkzeuge in tools/: pen-sim.ps1, screenshot.ps1, app-control.ps1, selftest.ps1 (gemeinsamer Win32-Code in MspNative.*.cs, Checkpoints in tools/selftest/).
-- Checkpoint 1 bis 5 per Selbsttest bestanden (Details in testing.md).
-- Wichtigster Befund: WPFs Standard-Stylus-Stack nimmt den synthetischen Pen als Stylus mit Druck an. Kein Pointer-Stack-Switch nötig.
+- Nichts gepusht. origin/main steht unverändert auf dem GitHub-Commit `Initial commit`.
 
 ## Nächster Schritt
 
-- Checkpoint 6, Teil 2: `powershell -ExecutionPolicy Bypass -File tools/selftest.ps1 -Exe dist/Mitschreibprogramm.exe -Checkpoint "4,5,7"`. Teil 1 (1 bis 3) ist gegen die finale exe bestanden. Ausgangslage war: `./build.sh`, dann `powershell -ExecutionPolicy Bypass -File tools/selftest.ps1 -Exe dist/Mitschreibprogramm.exe` auf entsperrtem Desktop, an dem gerade niemand arbeitet. Danach Schritt 9 (Abschluss).
+- Daniel testet mit dem echten Wacom Intuos nach testing.md, Abschnitt "Offen mit echtem Pen". Was dort bestätigt ist, wandert in features.md von `done` auf `getestet`.
+- Push nur auf ausdrückliche Anweisung: `ALLOW_PUSH=1 git push origin main`.
 
 ## Schrittplan
 
@@ -27,12 +26,14 @@ Stand: 2026-09-19
 5. Datei, Settings, Schließen-Dialog (fertig, Checkpoint 4 bestanden)
 6. PDF-Export (fertig, Checkpoint 5 bestanden)
 7. Dark Mode, Shortcuts, Statusleiste (fertig)
-8. Publish, build.sh, README (Checkpoint 6)
-9. Abschluss: features.md, status.md, testing.md "Offen mit echtem Pen"
+8. Publish, build.sh, README (fertig, Checkpoint 6 bestanden)
+9. Abschluss: features.md, status.md, testing.md "Offen mit echtem Pen" (fertig)
 
 ## Offene Punkte
 
 - Context7 war in der Session vom 2026-09-19 nicht erreichbar (DNS). API-Fakten stammen aus Primärquellen (dotnet/wpf Quelltext, learn.microsoft.com, nuget.org) und sind in pen-input.md / decisions.md mit Quelle notiert.
+
+- Selbsttest: In drei frühen Läufen gegen die exe blieb je eine injizierte Geste wirkungslos, nur während parallel Hintergrundprozesse liefen. Ursache eingegrenzt (fremdes Fenster deaktiviert die App), nicht bewiesen. Ohne Parallelbetrieb 65/65. Steht auch unter "Offen mit echtem Pen".
 
 ## Bekannte Bugs
 
