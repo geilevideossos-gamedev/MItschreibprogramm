@@ -4,21 +4,22 @@ Stand: 2026-09-19
 
 ## Aktuell
 
-- Schritt 1 bis 3 fertig und committet: Skeleton, Pen (Druck, Radierer über Toolbar / E / Seitentaste / invertiert, Glättung), Debug-Log, Hintergrundstile mit Linienfarbe, Undo/Redo, Zoom und Pan.
+- Schritt 1 bis 4 fertig und committet: Skeleton, Pen (Druck, Radierer über Toolbar / E / Seitentaste / invertiert, Glättung), Debug-Log, Hintergrundstile mit Linienfarbe, Undo/Redo, Zoom und Pan, Seitenmodell (Seiten / Endlos, Konvertierung, Auto-Seite, Seitenzähler).
+- xUnit-Projekt Mitschreibprogramm.Tests steht (7 Tests für die Konvertierung).
 - Selbsttest-Werkzeuge in tools/: pen-sim.ps1, screenshot.ps1, app-control.ps1, selftest.ps1 (gemeinsamer Win32-Code in MspNative.cs).
-- Checkpoint 1 und 2 per Selbsttest bestanden (Details in testing.md).
+- Checkpoint 1 bis 3 per Selbsttest bestanden (Details in testing.md).
 - Wichtigster Befund: WPFs Standard-Stylus-Stack nimmt den synthetischen Pen als Stylus mit Druck an. Kein Pointer-Stack-Switch nötig.
 
 ## Nächster Schritt
 
-- Schritt 4: Seitenmodell Seiten / Endlos, Umschalten, neue Seite, Auto-Seite, Seitenzähler. Danach Checkpoint 3 (xUnit für Konvertierung, Screenshots, Auto-Seite per injiziertem Strich).
+- Schritt 5: Dateiformat .msp, Neu / Öffnen / Speichern / Speichern unter, Titelleiste mit `*`, Schließen-Dialog, Settings. Danach Checkpoint 4.
 
 ## Schrittplan
 
 1. Projekt-Skeleton (fertig)
 2. Pen, Radierer, Glättung, Debug-Log, tools/ (fertig, Checkpoint 1 bestanden)
 3. Hintergrund, Zoom, Pan, Undo/Redo (fertig, Checkpoint 2 bestanden)
-4. Seitenmodell Seiten / Endlos (Checkpoint 3)
+4. Seitenmodell Seiten / Endlos (fertig, Checkpoint 3 bestanden)
 5. Datei, Settings, Schließen-Dialog (Checkpoint 4)
 6. PDF-Export (Checkpoint 5)
 7. Dark Mode, Shortcuts, Statusleiste

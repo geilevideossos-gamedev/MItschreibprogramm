@@ -26,9 +26,9 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F11 | Modus "Seiten": A4 (210 x 297 mm bei 96 DPI), Seiten untereinander mit Abstand, Seitenzähler in der Statusleiste, neue Seite per Button und Ctrl+Enter, automatisch neue Seite beim Schreiben in den unteren 15 % der letzten Seite | todo |
-| F12 | Modus "Endlos": eine Fläche, wächst automatisch nach unten und rechts, wenn ein Strich in Randnähe kommt | todo |
-| F13 | Umschalten pro Dokument in der Toolbar. Seiten zu Endlos: Y-Offset = Seitenhöhe mal Index. Endlos zu Seiten: Schnitt in A4-Höhen, Strich gehört zur Seite seines ersten Punkts | todo |
+| F11 | Modus "Seiten": A4 (210 x 297 mm bei 96 DPI), Seiten untereinander mit Abstand, Seitenzähler in der Statusleiste, neue Seite per Button und Ctrl+Enter, automatisch neue Seite beim Schreiben in den unteren 15 % der letzten Seite | done |
+| F12 | Modus "Endlos": eine Fläche, wächst automatisch nach unten und rechts, wenn ein Strich in Randnähe kommt | done |
+| F13 | Umschalten pro Dokument in der Toolbar. Seiten zu Endlos: Y-Offset = Seitenhöhe mal Index. Endlos zu Seiten: Schnitt in A4-Höhen, Strich gehört zur Seite seines ersten Punkts | done |
 
 ## Zoom und Pan
 
@@ -73,7 +73,7 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F30 | P = Stift, E = Radierer | done |
 | F31 | Plus / Minus (ohne Ctrl) = Breite auf / ab | todo |
 | F32 | Ctrl+L = Seitenstil durchschalten (Blanko, Liniert, Strichliert) | done |
-| F33 | Ctrl+Enter = neue Seite (nur Seitenmodus) | todo |
+| F33 | Ctrl+Enter = neue Seite (nur Seitenmodus) | done |
 | F34 | Ctrl+D = Dark Mode | todo |
 | F35 | Ctrl+Z / Ctrl+Y, Ctrl+N / O / S / Shift+S / E, Ctrl+Plus / Minus / 0. Einzeltasten bleiben Einzeltasten (ExpressKeys) | todo |
 
@@ -100,4 +100,4 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F42 | tools/pen-sim.ps1: synthetischer Pen (Position, Druck, BARREL, INVERTED, ERASER) über InjectSyntheticPointerInput | done |
 | F43 | Debug-Log hinter MSP_DEBUG_LOG: eine Zeile pro fertigem Strich (Punkte, min/max Druck, Breite, Modus, Seite, Zoom) | done |
 | F44 | tools/screenshot.ps1: App-Fenster als PNG nach tmp/ | done |
-| F45 | xUnit-Projekt Mitschreibprogramm.Tests: .msp Round-Trip, Seiten zu Endlos und zurück, PDF-Seitenzahl, Settings | todo |
+| F45 | xUnit-Projekt Mitschreibprogramm.Tests: .msp Round-Trip, Seiten zu Endlos und zurück, PDF-Seitenzahl, Settings | wip |

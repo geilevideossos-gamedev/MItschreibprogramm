@@ -3,7 +3,7 @@
 ## Projektstruktur
 
 - `Mitschreibprogramm/`: WPF-App, net8.0-windows. Ordner Models/, Views/, Services/, Rendering/.
-- `Mitschreibprogramm.Tests/`: xUnit, nur Models/Services (kommt mit Schritt 4).
+- `Mitschreibprogramm.Tests/`: xUnit, nur Models/Services.
 - `tools/`: Selbsttest (pen-sim.ps1, screenshot.ps1, app-control.ps1, selftest.ps1, MspNative.cs).
 - `docs/`, `build.sh`, `dist/` (Build-Ausgabe, nicht im Repo).
 
@@ -12,7 +12,8 @@
 ### Models
 
 - `AppConstants`: alle Maße und Grenzen (A4 in Pixeln bei 96 DPI, Linienabstand 8 mm, Strichbreiten, Zoomgrenzen und -stufen).
-- Enums `PenColor`, `PageStyle`, `LineColor`.
+- Enums `PenColor`, `PageStyle`, `LineColor`, `PageMode`.
+- `NoteDocument` / `NotePage` / `NoteStroke`: reine Datenklassen ohne WPF. Punkte als `[x, y, druck]`. Sie sind zugleich das Dateiformat.
 
 ### Rendering
 
@@ -23,14 +24,17 @@
 ### Views
 
 - `MainWindow`: Toolbar (Border + WrapPanel), Statusleiste, ScrollViewer. Verdrahtet Controls mit `DocumentView`, hält die Shortcut-Tabelle (`Dictionary<(ModifierKeys, Key), Action>`).
-- `DocumentView` (StackPanel): hält die `PageView`-Liste, das gemeinsame `DrawingAttributes`-Objekt, Radierer-/Pan-Zustand, Seitentasten-Erkennung, Undo-Verlauf und den Zoom (LayoutTransform).
-- `PageView` (Grid): eine Seite = `PageBackground` + transparenter `InkCanvas`, auf Seitengröße geclippt.
+- `DocumentView` (StackPanel): hält die `PageView`-Liste, Seitenmodus, das gemeinsame `DrawingAttributes`-Objekt, Radierer-/Pan-Zustand, Undo-Verlauf und den Zoom (LayoutTransform). `Load(NoteDocument)` / `ToDocument()` wandeln zwischen Ansicht und Datenklassen, `SetMode` konvertiert, `AddPage` hängt an, Auto-Seite und Endlos-Wachstum hängen an StrokeCollected.
+- `PageView` (Grid): eine Seite = `PageBackground` + transparenter `InkCanvas`, auf Seitengröße geclippt. `GrowToFit` vergrößert die Endlos-Fläche.
+- `SideButtonWatcher`: verfolgt die Seitentaste des Stifts (Barrel) über die Preview-Stylus-Events.
 - `ZoomPanController`: Mausrad, Ctrl/Shift+Mausrad, mittlere Maustaste, Leertaste+Ziehen, Zoom um den Zeiger.
 - `StrokeLogger`: nur mit MSP_DEBUG_LOG erzeugt, schreibt pro Strich eine Logzeile.
 
 ### Services
 
 - `UndoHistory` / `UndoStep`: zwei Stapel aus Undo-/Redo-Aktionspaaren.
+- `PageModeConverter`: Seiten zu Endlos und zurück auf `NoteDocument`.
+- `StrokeMapper`: WPF-`Stroke` zu `NoteStroke` und zurück (Koordinaten auf 2, Druck auf 3 Nachkommastellen gerundet).
 - `DebugLog`: hängt Zeilen an die Datei aus MSP_DEBUG_LOG an, kulturinvariant.
 
 ## Datenfluss

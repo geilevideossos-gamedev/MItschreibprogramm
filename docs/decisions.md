@@ -59,3 +59,13 @@ Chronologisch. Je Eintrag: Entscheidung, Begründung, verworfene Alternative.
 - Entscheidung: `PageBackground` setzt pro Linie nur eine Guideline (Oberkante), nicht zwei.
 - Begründung: Mit zwei Guidelines rasten bei Zoom unter 100 % beide Kanten auf denselben Gerätepixel ein, die Linie wird 0 Pixel hoch und verschwindet bandweise (im Checkpoint-3-Screenshot bei 50 % gefunden). Eine Guideline hält alle Linien gleich und immer sichtbar.
 - Verworfen: gar keine Guidelines (Linien wirken bei 125 % Skalierung ungleich dick).
+
+## 2026-09-19 Seitenmodell und Konvertierung
+
+- Entscheidung: Jede Seite ist ein eigener InkCanvas (`PageView`), Endlos ist eine einzige, wachsende `PageView`. Die Konvertierung läuft auf den reinen Datenklassen (`NoteDocument`), nicht auf WPF-Objekten: `PageModeConverter.Convert`.
+- Seiten zu Endlos: Y-Offset = Seitenhöhe mal Index. Endlos zu Seiten: Kachel = A4, ein Strich gehört zur Kachel seines ersten Punkts und behält alle Punkte (ragt er über den Rand, wird er dort nur abgeschnitten dargestellt).
+- Rechts von der A4-Breite: Spalte 0 ergibt pro Zeile immer eine Seite (leere Zeilen bleiben als leere Seiten, damit Abstände stimmen). Kacheln weiter rechts werden nur zu Seiten, wenn dort etwas steht, und folgen direkt auf ihre Zeile. So geht nichts verloren, was auf der Endlos-Fläche rechts geschrieben wurde. Der PDF-Export nutzt dieselbe Funktion.
+- Verworfen: nur in der Höhe schneiden. Inhalt rechts der A4-Breite wäre im Seitenmodus und im PDF unsichtbar.
+- Undo: Der Moduswechsel ist ein eigener Undo-Schritt, der die alten `PageView`-Objekte behält. Ältere Schritte zeigen weiter auf gültige Objekte, der Verlauf reicht wie gefordert bis zum letzten Öffnen oder Neu. Verworfen: Verlauf beim Moduswechsel leeren.
+- Neue Seiten (Button, Ctrl+Enter, Auto-Seite) sind keine Undo-Schritte, Undo bleibt strichbasiert.
+- Endlos wächst nach einem Strich, der näher als 200 px an den rechten oder unteren Rand kommt, in Schritten von einer halben A4-Breite bzw. -Höhe.
