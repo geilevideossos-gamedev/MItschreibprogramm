@@ -4,8 +4,8 @@ Handschriftliche Notizen unter Windows, gemacht für ein Wacom Intuos Small und 
 
 ## Voraussetzungen
 
-- Windows 10 (ab Version 1809) oder Windows 11, 64 Bit.
-- Wacom-Treiber installiert (getestet wird mit Wacom Intuos Small CTL-4100K-S und Wacom Pen 4K). Mit der Maus funktioniert alles auch, nur ohne Druck.
+- Windows 10 oder Windows 11, 64 Bit.
+- Wacom-Treiber installiert (gebaut für das Wacom Intuos Small CTL-4100K-S mit dem Wacom Pen 4K). Mit der Maus funktioniert alles auch, nur ohne Druck.
 - Sonst nichts. .NET steckt in der exe.
 
 ## Wacom einrichten
@@ -77,7 +77,7 @@ Einzeltasten sind absichtlich Einzeltasten, damit sie auf die ExpressKeys passen
 
 ## Dateiformat
 
-Notizen sind `.msp`-Dateien: lesbares JSON in UTF-8 mit Seitenmodus, Seitenstil, Linienfarbe und pro Seite den Strichen (Farbe, Breite, Druck an/aus, Punkte als `[x, y, druck]` in Seitenpixeln bei 100 %). Die genaue Beschreibung steht in [docs/file-format.md](docs/file-format.md).
+Notizen sind `.msp`-Dateien: JSON als Klartext in UTF-8 mit Seitenmodus, Seitenstil, Linienfarbe und pro Seite den Strichen (Farbe, Breite, Druck an/aus, Punkte als `[x, y, druck]` in Seitenpixeln bei 100 %). Die genaue Beschreibung steht in [docs/file-format.md](docs/file-format.md).
 
 ## Google Drive
 
