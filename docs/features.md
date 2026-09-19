@@ -45,8 +45,8 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F17 | Format `.msp`, JSON, UTF-8: version, pageMode, pageStyle, lineColor, pages[] mit strokes[] (color, width, pressureEnabled, points [x, y, pressure]), Koordinaten in Seitenpixeln bei 100 % | done |
 | F18 | Neu Ctrl+N, Öffnen Ctrl+O, Speichern Ctrl+S, Speichern unter Ctrl+Shift+S. Titelleiste zeigt Dateiname und `*` bei ungespeicherten Änderungen | done |
 | F19 | Schließen mit Änderungen: Dialog Speichern / Verwerfen / Abbrechen | done |
-| F20 | Standard-Speicherort: zuletzt verwendeter Ordner. Kein Cloud-Code in der App | wip |
-| F21 | Settings in %AppData%/Mitschreibprogramm/settings.json: Farbe, Breite, Druck, Seitenstil, Linienfarbe, Seitenmodus, Dark Mode, Fenstergröße und -position, letzter Ordner | wip |
+| F20 | Standard-Speicherort: zuletzt verwendeter Ordner. Kein Cloud-Code in der App | done |
+| F21 | Settings in %AppData%/Mitschreibprogramm/settings.json: Farbe, Breite, Druck, Seitenstil, Linienfarbe, Seitenmodus, Dark Mode, Fenstergröße und -position, letzter Ordner | done |
 
 ## PDF-Export
 

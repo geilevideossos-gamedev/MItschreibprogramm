@@ -23,7 +23,7 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 | 1 | Pen: synthetischer Strich mit steigendem Druck, Seitentaste als Radierer, invertierter Stift. Druckverlauf im Debug-Log, Screenshot | bestanden 2026-09-19, 7/7 |
 | 2 | Hintergrund, Zoom, Pan, Undo/Redo: Screenshot pro Stil und Zoomstufe, Strich bei 200 % injizieren, Koordinaten im Debug-Log prüfen | bestanden 2026-09-19, 13/13 |
 | 3 | Seitenmodell: xUnit für Konvertierung, Screenshot beider Modi, Auto-Seite per injiziertem Strich unten | bestanden 2026-09-19, 11/11, xUnit 7/7 |
-| 4 | Datei: xUnit Round-Trip, Datei mit injizierten Strichen speichern, neu laden, Screenshot vergleichen | offen |
+| 4 | Datei: xUnit Round-Trip, Datei mit injizierten Strichen speichern, neu laden, Screenshot vergleichen | bestanden 2026-09-19, 18/18, xUnit 15/15 |
 | 5 | PDF-Export: xUnit Seitenzahl, PDF in Bild wandeln (pdftoppm) und anschauen | offen |
 | 6 | exe aus dist/ starten, Selbsttest komplett gegen die exe wiederholen | offen |
 
@@ -47,6 +47,13 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 - Moduswechsel per Button, Ctrl+Z nimmt ihn zurück (alle Striche bleiben), Ctrl+Y stellt ihn wieder her.
 - Endlos wächst nach rechts: nach einem Strich bei X 600..760 ist ein Strich bei X 900 möglich. Zurück im Seitenmodus: 5 Seiten (4 Zeilen plus eine Seite für den Inhalt rechts).
 - Gefunden und behoben: Hilfslinien verschwanden bei Zoom unter 100 % bandweise.
+
+### Ergebnis Checkpoint 4
+
+- xUnit: .msp Round-Trip aller Felder, exakte JSON-Form, tolerantes Laden, neuere Version wird abgelehnt. Settings Round-Trip, Standardwerte bei fehlender oder kaputter Datei.
+- Zwei injizierte Striche, Ctrl+S über den Windows-Dialog, Ctrl+N, Ctrl+O: Screenshot nach dem Laden weicht 0,019 % vom Screenshot vor dem Speichern ab. Koordinaten und Druck in der Datei passen zum Debug-Log.
+- Titel: `Unbenannt`, `Unbenannt*`, `cp4.msp`, `cp4.msp*`. Alt+F4 mit Änderungen zeigt den Dialog, Abbrechen bleibt, Speichern speichert und beendet, Verwerfen beendet ohne zu speichern.
+- settings.json nach dem Schließen: Farbe, Breite, Druck, Stil, Linienfarbe, Modus, letzter Ordner. Neustart stellt Fensterlage und alle Werte wieder her, ein neuer Strich nutzt sie.
 
 ## Manuelle Checkliste
 

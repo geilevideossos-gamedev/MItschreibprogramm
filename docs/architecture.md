@@ -24,7 +24,7 @@
 
 ### Views
 
-- `MainWindow`: Toolbar (Border + WrapPanel), Statusleiste, ScrollViewer. Verdrahtet Controls mit `DocumentView`, hält die Shortcut-Tabelle (`Dictionary<(ModifierKeys, Key), Action>`).
+- `MainWindow`: Toolbar (Border + WrapPanel), Statusleiste, ScrollViewer. Verdrahtet Controls mit `DocumentView`, hält die Shortcut-Tabelle (`Dictionary<(ModifierKeys, Key), Action>`) und die `AppSettings` als einzigen Zustand für Werkzeug und Seite. Lädt die Settings im Konstruktor, speichert sie samt Fensterlage in OnClosing.
 - `DocumentView` (StackPanel): hält die `PageView`-Liste, Seitenmodus, das gemeinsame `DrawingAttributes`-Objekt, Radierer-/Pan-Zustand, Undo-Verlauf und den Zoom (LayoutTransform). `Load(NoteDocument)` / `ToDocument()` wandeln zwischen Ansicht und Datenklassen, `SetMode` konvertiert, `AddPage` hängt an, Auto-Seite und Endlos-Wachstum hängen an StrokeCollected.
 - `PageView` (Grid): eine Seite = `PageBackground` + transparenter `InkCanvas`, auf Seitengröße geclippt. `GrowToFit` vergrößert die Endlos-Fläche.
 - `FileSession`: aktueller Dateipfad, Dirty-Flag, Neu / Öffnen / Speichern / Speichern unter mit den Windows-Dateidialogen, Nachfrage bei ungespeicherten Änderungen. Meldet `StateChanged` (Titel) und `DocumentLoaded` (Toolbar abgleichen).
