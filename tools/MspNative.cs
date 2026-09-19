@@ -317,6 +317,24 @@ public static class MspNative
         finally { SetThreadDpiAwarenessContext(previous); }
     }
 
+    // Colour of the screen pixel at a client position, as "r,g,b". The window has to be visible there.
+    public static string ClientPixel(IntPtr hwnd, double x, double y)
+    {
+        IntPtr previous = SetThreadDpiAwarenessContext(PerMonitorAwareV2);
+        try
+        {
+            POINT at = ToScreen(hwnd, x, y);
+            RequireAppAt(hwnd, at);
+            using (Bitmap bitmap = new Bitmap(1, 1))
+            {
+                using (Graphics g = Graphics.FromImage(bitmap)) g.CopyFromScreen(at.X, at.Y, 0, 0, new Size(1, 1));
+                Color c = bitmap.GetPixel(0, 0);
+                return c.R + "," + c.G + "," + c.B;
+            }
+        }
+        finally { SetThreadDpiAwarenessContext(previous); }
+    }
+
     public static string CaptureScreen(string path)
     {
         IntPtr previous = SetThreadDpiAwarenessContext(PerMonitorAwareV2);

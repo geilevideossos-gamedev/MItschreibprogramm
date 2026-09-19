@@ -7,6 +7,7 @@
 #   tools/app-control.ps1 -Wheel "500,400,120" -Hold ctrl   mouse wheel at a point, optional held key
 #   tools/app-control.ps1 -Drag "middle,500,400,500,250"    mouse drag (left or middle), optional -Hold space
 #   tools/app-control.ps1 -Bounds                           prints the window rectangle in physical pixels (does not activate)
+#   tools/app-control.ps1 -Pixel "500,300"                  prints the screen colour at a client position as r,g,b
 #   tools/app-control.ps1 -Read ZoomText                    prints the Name (text) of a control, "Window" = title of the foreground app window
 param(
     [string]$Place,
@@ -17,6 +18,7 @@ param(
     [string]$Drag,
     [string]$Hold,
     [string]$Read,
+    [string]$Pixel,
     [switch]$Bounds,
     [string]$ProcessName = "Mitschreibprogramm"
 )
@@ -64,6 +66,10 @@ if ($Click) {
     elseif ($element.TryGetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern, [ref]$pattern)) { $pattern.Invoke() }
     else { throw "Control '$Click' unterstuetzt weder Select, Toggle noch Invoke." }
     Start-Sleep -Milliseconds 200
+}
+if ($Pixel) {
+    $at = Get-Numbers $Pixel
+    Write-Output ([MspNative]::ClientPixel($hwnd, $at[0], $at[1]))
 }
 if ($Read -eq "Window") {
     Write-Output ([System.Windows.Automation.AutomationElement]::FromHandle([MspNative]::ForegroundWindowOf($hwnd))).Current.Name
