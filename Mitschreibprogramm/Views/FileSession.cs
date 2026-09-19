@@ -106,7 +106,7 @@ public sealed class FileSession
         try
         {
             PdfExporter.Export(_document.ToDocument(), dialog.FileName, includeRuleLines);
-            _settings.LastFolder = Path.GetDirectoryName(dialog.FileName);
+            RememberFolder(dialog.FileName);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
@@ -134,6 +134,7 @@ public sealed class FileSession
     private void Show(NoteDocument document, string? path)
     {
         _document.Load(document);
+        RememberFolder(path);
         SetState(path, dirty: false);
         DocumentLoaded?.Invoke();
     }
@@ -150,17 +151,21 @@ public sealed class FileSession
             return false;
         }
 
+        RememberFolder(path);
         SetState(path, dirty: false);
         return true;
     }
 
-    private void SetState(string? path, bool dirty)
+    private void RememberFolder(string? path)
     {
         if (path is not null)
         {
             _settings.LastFolder = Path.GetDirectoryName(path);
         }
+    }
 
+    private void SetState(string? path, bool dirty)
+    {
         if (path == FilePath && dirty == IsDirty)
         {
             return;
