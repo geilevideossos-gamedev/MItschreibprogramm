@@ -34,6 +34,12 @@ function Checkpoint5 {
         $withLines = Get-InkShare $pages[0].FullName
         $withoutLines = Get-InkShare $plainPages[0].FullName
         Check ($withLines -gt $withoutLines -and $withoutLines -gt 0.0005) "Gerendert: Striche sichtbar, Linien nur in der Variante mit Haken ($([Math]::Round($withLines * 100, 2)) % zu $([Math]::Round($withoutLines * 100, 2)) %)"
+        $squared = Join-Path $outDir "cp5-squared.pdf"
+        Ctl -Keys "ctrl+l"
+        Export-Pdf $squared
+        $squaredPages = @(Convert-PdfToPng $squared "cp5-squared-page")
+        $grid = if ($squaredPages.Count) { Get-InkShare $squaredPages[0].FullName } else { 0 }
+        Check ($squaredPages.Count -eq 2 -and $grid -gt $withLines * 1.5) "PDF mit Kariert: Gitter ist im Export (Farbanteil $([Math]::Round($grid * 100, 2)) % gegen $([Math]::Round($withLines * 100, 2)) % bei Liniert)"
     }
     Stop-App
 }

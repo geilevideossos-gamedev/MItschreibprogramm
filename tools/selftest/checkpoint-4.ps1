@@ -61,7 +61,7 @@ function Checkpoint4 {
     Check (Wait-AppExit) "Verwerfen im Dialog beendet die App ohne zu speichern"
     $saved = Get-Content (Join-Path $outDir "settings.json") -Raw | ConvertFrom-Json
     Check ($saved.penColor -eq "red" -and $saved.strokeWidth -eq 4 -and $saved.pressureEnabled -eq $false) "settings.json: Farbe rot, Breite 4, Druck aus"
-    Check ($saved.pageStyle -eq "dashed" -and $saved.lineColor -eq "black" -and $saved.pageMode -eq "endless") "settings.json: Strichliert, Linien schwarz, Endlos"
+    Check ($saved.pageStyle -eq "squared" -and $saved.lineColor -eq "black" -and $saved.pageMode -eq "endless") "settings.json: Kariert, Linien schwarz, Endlos"
     Start-App -KeepSettings
     Check ((Ctl -Bounds) -eq "20,10,1500,1000") "Fensterlage wird wiederhergestellt ($(Ctl -Bounds))"
     Check ((Ctl -Read WidthLabel) -match "^4[.,]0 px$" -and (Ctl -Read PageText) -eq "Endlos" -and (Ctl -Read LineColorButton) -eq "Linien: Schwarz") "Breite, Modus und Linienfarbe sind nach dem Neustart wieder da"

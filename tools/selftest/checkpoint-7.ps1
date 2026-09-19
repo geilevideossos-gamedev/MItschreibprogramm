@@ -31,6 +31,10 @@ function Checkpoint7 {
     Check ((Get-PageBrightness $origin 300 347) -lt 120) "Redo nach Themenwechsel faerbt den Strich passend zum hellen Modus"
     Ctl -Click DarkModeButton
     Check ((Get-PageBrightness $origin 300 256) -lt 200) "Toolbar-Button schaltet den Dark Mode ein"
+    Ctl -Keys "ctrl+l"
+    Shot "cp7-dark-squared"
+    $darkGrid = Get-VerticalLineCount "cp7-dark-squared"
+    Check ($darkGrid -ge 30 -and $darkGrid -le 45) "Kariert im Dark Mode: helleres Gitter auf dunkler Seite ($darkGrid senkrechte Linien)"
 
     Ctl -Keys "ctrl+s"
     Start-Sleep -Milliseconds 1200

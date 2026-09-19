@@ -158,6 +158,29 @@ function Get-PageBrightness($origin, [double]$x, [double]$y) {
     $rgb[0] + $rgb[1] + $rgb[2]
 }
 
+# Counts vertical background lines in a screenshot: pixels that differ from the paper colour along a horizontal scan
+# through the middle 60 % of the window, which lies inside the page. The lowest of three scan rows is taken, so a
+# row that happens to run along a horizontal line does not count. Ruled paper gives about 0, the 5 mm grid about 38.
+function Get-VerticalLineCount([string]$name) {
+    Add-Type -AssemblyName System.Drawing
+    $image = [System.Drawing.Bitmap]::FromFile((Join-Path $outDir "$name.png"))
+    try {
+        $from = [int]($image.Width * 0.2); $to = [int]($image.Width * 0.8)
+        $counts = foreach ($y in @(0.45, 0.46, 0.47) | ForEach-Object { [int]($image.Height * $_) }) {
+            $sums = @(for ($x = $from; $x -lt $to; $x++) { $p = $image.GetPixel($x, $y); $p.R + $p.G + $p.B })
+            $paper = ($sums | Group-Object | Sort-Object Count -Descending | Select-Object -First 1).Name -as [int]
+            $lines = 0; $inside = $false
+            foreach ($sum in $sums) {
+                $isLine = [Math]::Abs($sum - $paper) -gt 12
+                if ($isLine -and -not $inside) { $lines++ }
+                $inside = $isLine
+            }
+            $lines
+        }
+        return ($counts | Measure-Object -Minimum).Minimum
+    } finally { $image.Dispose() }
+}
+
 foreach ($part in Get-ChildItem (Join-Path $PSScriptRoot "selftest") -Filter "checkpoint-*.ps1") { . $part.FullName }
 
 # The run takes over mouse and keyboard. It only starts on a machine nobody is using right now, and gives up otherwise.

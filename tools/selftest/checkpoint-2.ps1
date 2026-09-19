@@ -6,9 +6,17 @@ function Checkpoint2 {
     Ctl -Click LineColorButton
     Shot "cp2-lined-black"
     Ctl -Keys "ctrl+l"
-    Shot "cp2-dashed"
+    Shot "cp2-squared-black"
+    Ctl -Click LineColorButton
+    Shot "cp2-squared-blue"
+    $ruled = Get-VerticalLineCount "cp2-lined-black"
+    $gridBlack = Get-VerticalLineCount "cp2-squared-black"
+    $gridBlue = Get-VerticalLineCount "cp2-squared-blue"
+    Check ($ruled -le 2 -and $gridBlack -ge 30 -and $gridBlack -le 45 -and $gridBlue -ge 30 -and $gridBlue -le 45) "Kariert zeigt senkrechte Gitterlinien in beiden Linienfarben, Liniert keine (liniert $ruled, kariert schwarz $gridBlack, blau $gridBlue)"
+    Ctl -Click LineColorButton
     Ctl -Keys "ctrl+l"
     Shot "cp2-blank"
+    Check ((Get-VerticalLineCount "cp2-blank") -le 2) "Blanko hat keine Linien"
     Ctl -Keys "ctrl+l"
 
     Pen -From "400,300" -To "700,300"
