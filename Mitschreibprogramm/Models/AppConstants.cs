@@ -6,6 +6,10 @@ public static class AppConstants
 
     public const double PageWidth = 210 * PixelsPerMillimeter;
     public const double PageHeight = 297 * PixelsPerMillimeter;
+    public const double LineSpacing = 8 * PixelsPerMillimeter;
+    public const double RuleLineThickness = 1;
+    public const double RuleDashLength = 6;
+    public const double RuleDashGap = 4;
 
     public const double MinStrokeWidth = 1;
     public const double MaxStrokeWidth = 12;

@@ -11,6 +11,8 @@ public sealed class DocumentView : StackPanel
 {
     private readonly DrawingAttributes _pen = new() { FitToCurve = true };
     private readonly List<PageView> _pages = [];
+    private PageStyle _pageStyle;
+    private LineColor _lineColor;
     private bool _eraser;
     private bool _barrelHeld;
 
@@ -49,9 +51,20 @@ public sealed class DocumentView : StackPanel
         UpdateEditingMode();
     }
 
+    public void SetPageStyle(PageStyle style, LineColor lineColor)
+    {
+        _pageStyle = style;
+        _lineColor = lineColor;
+        foreach (var page in _pages)
+        {
+            page.Paper.Update(style, lineColor);
+        }
+    }
+
     private void AddPage()
     {
         var page = new PageView(_pen);
+        page.Paper.Update(_pageStyle, _lineColor);
         _pages.Add(page);
         Children.Add(page);
         UpdateEditingMode();

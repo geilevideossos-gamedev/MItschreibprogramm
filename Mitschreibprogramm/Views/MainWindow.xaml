@@ -45,6 +45,17 @@
                                  Content="Stift" ToolTip="Stift (P)" Checked="OnToolChecked"/>
                     <RadioButton x:Name="ToolEraser" Style="{StaticResource FlatButton}" GroupName="Tool"
                                  Content="Radierer" ToolTip="Radierer (E)" Checked="OnToolChecked"/>
+                    <Border Style="{StaticResource ToolSeparator}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <ComboBox x:Name="PageStyleBox" Width="100" VerticalAlignment="Center" Focusable="False"
+                              ToolTip="Seitenstil (Strg+L)" SelectionChanged="OnPageStyleChanged">
+                        <ComboBoxItem Content="Blanko" Tag="{x:Static m:PageStyle.Blank}"/>
+                        <ComboBoxItem Content="Liniert" Tag="{x:Static m:PageStyle.Lined}"/>
+                        <ComboBoxItem Content="Strichliert" Tag="{x:Static m:PageStyle.Dashed}"/>
+                    </ComboBox>
+                    <Button x:Name="LineColorButton" Style="{StaticResource FlatButton}" Margin="4,0,1,0"
+                            ToolTip="Linienfarbe umschalten" Click="OnLineColorClick"/>
                 </StackPanel>
             </WrapPanel>
         </Border>

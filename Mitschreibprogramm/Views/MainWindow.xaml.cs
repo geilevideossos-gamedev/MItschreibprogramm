@@ -9,9 +9,14 @@ namespace Mitschreibprogramm.Views;
 
 public partial class MainWindow : Window
 {
+    private readonly Dictionary<(ModifierKeys, Key), Action> _shortcuts = [];
+    private LineColor _lineColor = LineColor.Blue;
+
     public MainWindow()
     {
         InitializeComponent();
+        RegisterShortcuts();
+
         foreach (var dot in new[] { ColorBlack, ColorBlue, ColorRed, ColorGreen })
         {
             dot.Background = new SolidColorBrush(Palette.Pen((PenColor)dot.Tag));
@@ -22,29 +27,32 @@ public partial class MainWindow : Window
         ColorBlack.IsChecked = true;
         PressureCheck.IsChecked = true;
         ToolPen.IsChecked = true;
+        PageStyleBox.SelectedIndex = (int)PageStyle.Lined;
     }
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
         base.OnPreviewKeyDown(e);
-        if (Keyboard.Modifiers != ModifierKeys.None)
+        if (_shortcuts.TryGetValue((Keyboard.Modifiers, e.Key), out var action))
         {
-            return;
+            action();
+            e.Handled = true;
+        }
+    }
+
+    private void RegisterShortcuts()
+    {
+        void Add(ModifierKeys modifiers, Action action, params Key[] keys)
+        {
+            foreach (var key in keys)
+            {
+                _shortcuts[(modifiers, key)] = action;
+            }
         }
 
-        switch (e.Key)
-        {
-            case Key.P:
-                ToolPen.IsChecked = true;
-                break;
-            case Key.E:
-                (ToolEraser.IsChecked == true ? ToolPen : ToolEraser).IsChecked = true;
-                break;
-            default:
-                return;
-        }
-
-        e.Handled = true;
+        Add(ModifierKeys.None, () => ToolPen.IsChecked = true, Key.P);
+        Add(ModifierKeys.None, () => (ToolEraser.IsChecked == true ? ToolPen : ToolEraser).IsChecked = true, Key.E);
+        Add(ModifierKeys.Control, () => PageStyleBox.SelectedIndex = (PageStyleBox.SelectedIndex + 1) % PageStyleBox.Items.Count, Key.L);
     }
 
     private void OnColorChecked(object sender, RoutedEventArgs e) =>
@@ -58,6 +66,21 @@ public partial class MainWindow : Window
 
     private void OnToolChecked(object sender, RoutedEventArgs e) =>
         Document.SetEraser(ToolEraser.IsChecked == true);
+
+    private void OnPageStyleChanged(object sender, SelectionChangedEventArgs e) => ApplyPageStyle();
+
+    private void OnLineColorClick(object sender, RoutedEventArgs e)
+    {
+        _lineColor = _lineColor == LineColor.Blue ? LineColor.Black : LineColor.Blue;
+        ApplyPageStyle();
+    }
+
+    private void ApplyPageStyle()
+    {
+        var style = (PageStyle)((ComboBoxItem)PageStyleBox.SelectedItem).Tag;
+        Document.SetPageStyle(style, _lineColor);
+        LineColorButton.Content = _lineColor == LineColor.Blue ? "Linien: Blau" : "Linien: Schwarz";
+    }
 
     private void ApplyPenWidth(double width)
     {
