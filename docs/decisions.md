@@ -86,3 +86,13 @@ Chronologisch. Je Eintrag: Entscheidung, Begründung, verworfene Alternative.
 - Hilfslinien: Bildschirmfarbe (mit Alpha) wird auf Weiß vorgemischt (`Palette.RuleLineOnPaper`), keine Transparenz im PDF. Gestrichelt über `XPen.DashPattern`, eine Linie pro DrawLine.
 - Endlos: `PageModeConverter` schneidet in A4-Kacheln, derselbe Code wie beim Moduswechsel.
 - PDFsharp-Fallen: `PdfDocumentOpenMode.ReadOnly` ist obsolet (Tests nutzen `Import`), `XGraphicsPath.StartFigure` wirkt im Core-Build nicht (deshalb DrawLine / DrawLines statt Pfaden).
+
+## 2026-09-19 Dark Mode
+
+- .NET 8 hat weder Fluent-Theme noch `ThemeMode` (kommt erst mit .NET 9), also von Hand: Alle UI-Farben sind DynamicResource-Pinsel, `Rendering/Theme.Apply` ersetzt sie im laufenden Betrieb (ersetzen, nicht ändern, weil Pinsel in den Application-Resources eingefroren werden).
+- Farben an zwei Stellen nach Zweck: UI-Farben beider Themen in `Theme`, Stift-, Seiten- und Linienfarben in `Palette`. Jede Farbe steht genau einmal.
+- Schwarz auf dunkler Seite: `Palette.PenOnPage` liefert Weiß, `Palette.LogicalPen` rechnet jede angezeigte Farbe zurück. Beim Umschalten färbt `DocumentView.ApplyTheme` alle Striche um. Dasselbe passiert nach jedem Undo/Redo und Moduswechsel, weil Striche und Seiten aus dem Verlauf noch die Farben des anderen Themas tragen können. Datei und PDF sehen nur die logische Farbe.
+- Verworfen: logische Farbe als Zusatzdaten am Strich speichern (`AddPropertyData`). Bei genau vier Farben reicht das Zurückrechnen.
+- Eigene Vorlagen nur dort, wo Aero2 feste helle Farben malt: ComboBox und ScrollBar (App.xaml). Slider und CheckBox bleiben nativ.
+- Titelleiste: `DwmSetWindowAttribute` mit Attribut 20 (DWMWA_USE_IMMERSIVE_DARK_MODE) in OnSourceInitialized jedes Fensters, sonst bliebe sie weiß. Schlägt der Aufruf auf altem Windows fehl, passiert nichts.
+- Toggle hängt an Checked / Unchecked statt Click, damit er auch über UI Automation (Bedienhilfen, Selbsttest) schaltet.

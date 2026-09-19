@@ -6,6 +6,7 @@ Stand: 2026-09-19
 
 - Schritt 1 bis 4 fertig und committet: Skeleton, Pen (Druck, Radierer über Toolbar / E / Seitentaste / invertiert, Glättung), Debug-Log, Hintergrundstile mit Linienfarbe, Undo/Redo, Zoom und Pan, Seitenmodell (Seiten / Endlos, Konvertierung, Auto-Seite, Seitenzähler).
 - xUnit-Projekt Mitschreibprogramm.Tests steht (Konvertierung, .msp Round-Trip).
+- Schritt 7 fertig: Dark Mode (Button, Ctrl+D, gespeichert), alle Shortcuts, Statusleiste mit Zoom, Seite und Datei.
 - Schritt 6 fertig: PDF-Export mit PDFsharp 6.2.4 über Ctrl+E und Button.
 - Schritt 5 fertig: Dateiformat .msp, Datei-Befehle mit Dialogen, Titel mit `*`, Settings (laden, anwenden, beim Schließen speichern, Fensterlage). Shortcuts 1-4 und Plus / Minus sind ebenfalls drin.
 - Selbsttest-Werkzeuge in tools/: pen-sim.ps1, screenshot.ps1, app-control.ps1, selftest.ps1 (gemeinsamer Win32-Code in MspNative.cs).
@@ -14,7 +15,7 @@ Stand: 2026-09-19
 
 ## Nächster Schritt
 
-- Schritt 7: Dark Mode (Toggle, Ctrl+D, UI dunkel, Seite dunkelgrau, Schwarz wird weiß dargestellt, Export bleibt Schwarz auf Weiß). Danach Schritt 8: Publish, build.sh, README, Checkpoint 6.
+- Schritt 8: app.manifest (PerMonitorV2), Publish nach dist/, build.sh, docs/build.md, README. Danach Checkpoint 6: Selbsttest komplett gegen dist/Mitschreibprogramm.exe.
 
 ## Schrittplan
 
@@ -24,7 +25,7 @@ Stand: 2026-09-19
 4. Seitenmodell Seiten / Endlos (fertig, Checkpoint 3 bestanden)
 5. Datei, Settings, Schließen-Dialog (fertig, Checkpoint 4 bestanden)
 6. PDF-Export (fertig, Checkpoint 5 bestanden)
-7. Dark Mode, Shortcuts, Statusleiste
+7. Dark Mode, Shortcuts, Statusleiste (fertig)
 8. Publish, build.sh, README (Checkpoint 6)
 9. Abschluss: features.md, status.md, testing.md "Offen mit echtem Pen"
 

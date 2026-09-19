@@ -62,6 +62,13 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 - pdftoppm-Bild neben dem Screenshot: vier Farben, Druckverlauf dünn zu dick und dick zu dünn, Linien an derselben Stelle, 2 Seiten.
 - Gefunden und behoben: gerader Druckstrich kam im PDF mit konstanter Breite an.
 
+### Ergebnis Abschnitt 7 (Dark Mode, läuft als `-Checkpoint 7` mit)
+
+- 11/11 am 2026-09-19. Pixelprobe am Bildschirm: schwarzer Strich hell 0, dunkel 765 (weiß), Seite 765 zu 129, Blau unverändert.
+- Neuer Strich im Dark Mode erscheint weiß. Undo, Themenwechsel, Redo: der Strich kommt in der Farbe des aktuellen Themas zurück.
+- Gespeicherte Datei enthält weiter `black`. PDF aus dem Dark Mode ist Schwarz auf Weiß. darkMode steht in settings.json, der Neustart kommt dunkel hoch.
+- Gefunden und behoben: Toggle reagierte nur auf Click, nicht auf UI Automation.
+
 ## Manuelle Checkliste
 
 (wird mit den Features ergänzt)

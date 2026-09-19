@@ -56,14 +56,14 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F23 | A4-Seiten, Striche als Vektorpfade, Druck als Breite sichtbar | done |
 | F24 | Endlos-Dokument wird für den Export in A4-Höhen geschnitten | done |
 | F25 | Export-Dialog mit Checkbox "Hintergrundlinien mit exportieren" (Standard an) | done |
-| F26 | Export immer mit logischen Farben: Schwarz auf Weiß, auch im Dark Mode | wip |
+| F26 | Export immer mit logischen Farben: Schwarz auf Weiß, auch im Dark Mode | done |
 
 ## Dark Mode
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F27 | Toggle in der Toolbar und Ctrl+D, wird gespeichert | todo |
-| F28 | UI dunkel, Seite dunkelgrau, Hintergrundlinien heller. Stift "Schwarz" wird weiß dargestellt, gespeichert und exportiert bleibt Schwarz. Blau, Rot, Grün unverändert | todo |
+| F27 | Toggle in der Toolbar und Ctrl+D, wird gespeichert | done |
+| F28 | UI dunkel, Seite dunkelgrau, Hintergrundlinien heller. Stift "Schwarz" wird weiß dargestellt, gespeichert und exportiert bleibt Schwarz. Blau, Rot, Grün unverändert | done |
 
 ## Shortcuts
 
@@ -74,16 +74,16 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F31 | Plus / Minus (ohne Ctrl) = Breite auf / ab | done |
 | F32 | Ctrl+L = Seitenstil durchschalten (Blanko, Liniert, Strichliert) | done |
 | F33 | Ctrl+Enter = neue Seite (nur Seitenmodus) | done |
-| F34 | Ctrl+D = Dark Mode | todo |
-| F35 | Ctrl+Z / Ctrl+Y, Ctrl+N / O / S / Shift+S / E, Ctrl+Plus / Minus / 0. Einzeltasten bleiben Einzeltasten (ExpressKeys) | todo |
+| F34 | Ctrl+D = Dark Mode | done |
+| F35 | Ctrl+Z / Ctrl+Y, Ctrl+N / O / S / Shift+S / E, Ctrl+Plus / Minus / 0. Einzeltasten bleiben Einzeltasten (ExpressKeys) | done |
 
 ## UI
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F36 | Ein Fenster, schlanke Toolbar: Datei-Buttons, vier Farbkreise, Breiten-Slider mit Anzeige, drei Presets, Druck-Checkbox, Stift/Radierer, Seitenstil-Dropdown, Linienfarbe-Toggle, Seitenmodus-Toggle, Dark-Mode-Toggle, Export | wip |
-| F37 | Statusleiste: Zoom, Seite x von y, Dateiname | wip |
-| F38 | Native WPF-Controls, minimale Styles, kein Ribbon, keine Menüleiste außer Datei | todo |
+| F36 | Ein Fenster, schlanke Toolbar: Datei-Buttons, vier Farbkreise, Breiten-Slider mit Anzeige, drei Presets, Druck-Checkbox, Stift/Radierer, Seitenstil-Dropdown, Linienfarbe-Toggle, Seitenmodus-Toggle, Dark-Mode-Toggle, Export | done |
+| F37 | Statusleiste: Zoom, Seite x von y, Dateiname | done |
+| F38 | Native WPF-Controls, minimale Styles, kein Ribbon, keine Menüleiste außer Datei | done |
 
 ## Build und Auslieferung
 
