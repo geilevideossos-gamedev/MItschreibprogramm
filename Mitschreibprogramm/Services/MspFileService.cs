@@ -45,6 +45,13 @@ public static class MspFileService
             }
         }
 
+        var strokes = document.Pages.SelectMany(page => page.Strokes);
+        if (!Enum.IsDefined(document.PageMode) || !Enum.IsDefined(document.PageStyle) || !Enum.IsDefined(document.LineColor)
+            || strokes.Any(stroke => !Enum.IsDefined(stroke.Color)))
+        {
+            throw new JsonException("Die Datei enthält einen unbekannten Wert für Modus, Stil oder Farbe.");
+        }
+
         return document;
     }
 
