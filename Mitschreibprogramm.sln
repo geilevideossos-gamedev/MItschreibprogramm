@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitschreibprogramm", "Mitschreibprogramm\Mitschreibprogramm.csproj", "{ACC7CD72-9618-4273-ABEF-D31ED69F0E0B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitschreibprogramm.Tests", "Mitschreibprogramm.Tests\Mitschreibprogramm.Tests.csproj", "{70D09099-0AA2-4A0B-9276-0FD763EF6C38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{ACC7CD72-9618-4273-ABEF-D31ED69F0E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ACC7CD72-9618-4273-ABEF-D31ED69F0E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ACC7CD72-9618-4273-ABEF-D31ED69F0E0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70D09099-0AA2-4A0B-9276-0FD763EF6C38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70D09099-0AA2-4A0B-9276-0FD763EF6C38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70D09099-0AA2-4A0B-9276-0FD763EF6C38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70D09099-0AA2-4A0B-9276-0FD763EF6C38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
