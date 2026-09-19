@@ -127,3 +127,11 @@ Ein zweiter, nur lesender Durchgang über den ganzen Code hat diese Fehler gefun
 - Das Debug-Log schreibt zusätzlich `window activated` und `window deactivated`. Der Selbsttest blendet diese Zeilen bei den Zählprüfungen aus und zeigt sie bei jedem FAIL an.
 - Anlass: Beim ersten Anlauf von Checkpoint 6 blieben sporadisch injizierte Gesten wirkungslos (zweimal ein Pen-Strich, einmal ein Ziehen mit der mittleren Maustaste), jedes Mal an anderer Stelle, nur während parallel Hintergrundprozesse liefen. Ein fremdes Fenster im Vordergrund deaktiviert das App-Fenster, WPF bricht dann laufende Gesten ab. Mit den Zeilen ist das im Fehlerfall belegbar statt vermutet.
 - Regel für den Selbsttest: währenddessen nichts anderes auf dem Rechner starten, auch keine Hintergrund-Agenten oder Builds.
+
+## 2026-09-19 Seitenstil Kariert ersetzt Strichliert
+
+- Auftrag von Daniel: Statt gestrichelter Linien ein Karo-Gitter wie im Rechenheft. Durchgezogene dünne waagrechte und senkrechte Linien, Abstand 5 mm (`AppConstants.GridSpacing`). Liniert bleibt bei 8 mm. Linienfarbe Schwarz / Blau und die Dark-Mode-Farben gelten für das Gitter genauso, es nutzt dieselbe Farbe wie die Linien (`Palette.RuleLine`).
+- Name: in UI, docs und README "Kariert". Im Code `PageStyle.Squared` und in den Dateien `"squared"`, weil Identifier und Formatwerte laut CLAUDE.md englisch sind.
+- Alte Dateien: .msp und settings.json mit `"dashed"` laden als kariert (`PageStyleJsonConverter`), geschrieben wird nur noch `"squared"`. Die Formatversion bleibt 1, weil sich sonst nichts ändert. Verworfen: `dashed` als zweiten Enum-Namen behalten (welcher Name beim Schreiben gewinnt, wäre Zufall).
+- Geometrie in `RuleLines`: Zeilen starten pro A4-Höhe neu wie bei Liniert (297 mm ist kein Vielfaches von 5 mm, die unterste Zelle jeder Seite ist 2 mm hoch). Spalten laufen auf der Endlos-Fläche durch, weil 210 mm ein Vielfaches von 5 mm ist. Eine Linie genau auf dem rechten Seitenrand wird nicht gezeichnet.
+- `RuleLines` liegt jetzt in Models (reine Seitengeometrie ohne WPF), damit die xUnit-Tests sie prüfen dürfen. Die Strich-Konstanten `RuleDashLength` / `RuleDashGap` sind entfallen.

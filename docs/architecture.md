@@ -11,7 +11,8 @@
 
 ### Models
 
-- `AppConstants`: alle Maße und Grenzen (A4 in Pixeln bei 96 DPI, Linienabstand 8 mm, Strichbreiten, Zoomgrenzen und -stufen).
+- `AppConstants`: alle Maße und Grenzen (A4 in Pixeln bei 96 DPI, Linienabstand 8 mm, Gitterabstand 5 mm, Strichbreiten, Zoomgrenzen und -stufen).
+- `RuleLines`: Positionen der Hintergrundlinien je Seitenstil. `Rows` (Liniert 8 mm, Kariert 5 mm, pro A4-Höhe neu gestartet) und `Columns` (nur Kariert). Wird vom Bildschirm-Hintergrund und vom PDF-Export benutzt.
 - Enums `PenColor`, `PageStyle`, `LineColor`, `PageMode`.
 - `AppSettings`: alles, was settings.json speichert, mit Standardwerten.
 - `NoteDocument` / `NotePage` / `NoteStroke`: reine Datenklassen ohne WPF. Punkte als `[x, y, druck]`. Sie sind zugleich das Dateiformat.
@@ -20,7 +21,6 @@
 
 - `Palette`: Stift-, Seiten- und Hilfslinienfarben für hell und dunkel, dazu die Umrechnung logische Farbe zu angezeigter Farbe und zurück.
 - `Theme`: UI-Farben beider Themen, tauscht die Pinsel in den Application-Resources und färbt die Titelleiste (DWM).
-- `RuleLines`: Y-Positionen der Hilfslinien, pro A4-Höhe neu gestartet. Wird vom Bildschirm-Hintergrund und vom PDF-Export benutzt.
 - `PageBackground`: FrameworkElement, zeichnet Seite und Linien in OnRender (GuidelineSet für scharfe 1-px-Linien). Kein Strich, nicht radierbar.
 
 ### Views
@@ -40,7 +40,7 @@
 - `UndoHistory` / `UndoStep`: zwei Stapel aus Undo-/Redo-Aktionspaaren.
 - `PageModeConverter`: Seiten zu Endlos und zurück auf `NoteDocument`.
 - `StrokeMapper`: WPF-`Stroke` zu `NoteStroke` und zurück (Koordinaten auf 2, Druck auf 3 Nachkommastellen gerundet).
-- `MspFileService`: .msp lesen und schreiben (System.Text.Json, Format in file-format.md). `JsonFormat`: gemeinsame JSON-Optionen (camelCase, Enums als Text).
+- `MspFileService`: .msp lesen und schreiben (System.Text.Json, Format in file-format.md). `JsonFormat`: gemeinsame JSON-Optionen (camelCase, Enums als Text). `PageStyleJsonConverter`: liest den früheren Stilwert `dashed` als `Squared`.
 - `SettingsService`: settings.json laden (mit Standardwerten bei Fehler) und speichern.
 - `PdfExporter`: `NoteDocument` zu PDF (PDFsharp). `PressureSegments` liefert die Linienstücke eines Druckstrichs.
 - `DebugLog`: hängt Zeilen an die Datei aus MSP_DEBUG_LOG an, kulturinvariant.

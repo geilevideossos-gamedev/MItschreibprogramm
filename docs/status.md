@@ -5,6 +5,7 @@ Stand: 2026-09-19
 ## Aktuell
 
 - Alle Schritte 1 bis 9 fertig, alle 45 Features in features.md auf `done`.
+- Änderung nach dem Abschluss (2026-09-19): Seitenstil Strichliert wurde durch Kariert (5-mm-Gitter) ersetzt, siehe decisions.md. xUnit und gerendertes PDF sind geprüft, die Bildschirm-Screenshots laufen mit dem nächsten Selbsttest.
 - `dotnet build`: 0 Warnings, 0 Errors. `dotnet test`: 28 Tests grün (Konvertierung, .msp Round-Trip und tolerantes Laden, PDF-Export, Settings).
 - Checkpoint 1 bis 6 per Selbsttest bestanden, Checkpoint 6 gegen die finale dist/Mitschreibprogramm.exe mit 65/65 (Details in testing.md).
 - `./build.sh` erzeugt dist/Mitschreibprogramm.exe (141 MB, einzige Datei). README.md ist geschrieben.

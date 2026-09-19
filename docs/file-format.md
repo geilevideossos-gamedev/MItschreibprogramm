@@ -29,7 +29,7 @@ JSON, UTF-8 ohne BOM, kompakt in einer Zeile. Code: `Services/MspFileService`, D
 |------|-------|-----------|
 | version | 1 | Formatversion. Eine höhere Version lehnt das Programm beim Öffnen ab |
 | pageMode | `pages`, `endless` | Seitenmodus. Bei `endless` gibt es genau eine Seite, die ganze Fläche |
-| pageStyle | `blank`, `lined`, `dashed` | Hintergrundstil |
+| pageStyle | `blank`, `lined`, `squared` | Hintergrundstil (Blanko, Liniert 8 mm, Kariert 5 mm). Der frühere Wert `dashed` wird als `squared` gelesen |
 | lineColor | `black`, `blue` | Farbe der Hilfslinien |
 | pages[] | | Seiten in Reihenfolge |
 | strokes[] | | Striche in Zeichenreihenfolge (späterer Strich liegt oben) |
@@ -53,7 +53,7 @@ Ort: `%AppData%/Mitschreibprogramm/settings.json`, JSON eingerückt. Code: `Serv
 | penColor | `black` | letzte Stiftfarbe |
 | strokeWidth | 3 | letzte Breite, wird auf 1 bis 12 begrenzt |
 | pressureEnabled | true | Checkbox Druck |
-| pageStyle | `lined` | Seitenstil für neue Dokumente |
+| pageStyle | `lined` | Seitenstil für neue Dokumente, Werte wie in .msp (auch hier gilt `dashed` als `squared`) |
 | lineColor | `blue` | Linienfarbe für neue Dokumente |
 | pageMode | `pages` | Seitenmodus für neue Dokumente |
 | darkMode | false | Dark Mode |

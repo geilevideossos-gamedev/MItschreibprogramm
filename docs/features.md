@@ -18,7 +18,7 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F08 | Hintergrundstil Blanko, Liniert, Strichliert (gestrichelt). Linienabstand 8 mm als Konstante | done |
+| F08 | Hintergrundstil: Blanko, Liniert, Kariert. Liniert: Linienabstand 8 mm als Konstante. Kariert: Karo-Gitter aus durchgezogenen dünnen waagrechten und senkrechten Linien, Abstand 5 mm als Konstante. (Kariert ersetzt seit 2026-09-19 auf Daniels Wunsch den Stil Strichliert aus der ersten Spezifikation) | done |
 | F09 | Linienfarbe Schwarz oder Blau, jeweils dezent (Alpha), umschaltbar | done |
 | F10 | Hintergrund wird gezeichnet, ist kein Strich, nicht radierbar | done |
 
@@ -72,7 +72,7 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F29 | 1 / 2 / 3 / 4 = Schwarz / Blau / Rot / Grün | done |
 | F30 | P = Stift, E = Radierer | done |
 | F31 | Plus / Minus (ohne Ctrl) = Breite auf / ab | done |
-| F32 | Ctrl+L = Seitenstil durchschalten (Blanko, Liniert, Strichliert) | done |
+| F32 | Ctrl+L = Seitenstil durchschalten (Blanko, Liniert, Kariert) | done |
 | F33 | Ctrl+Enter = neue Seite (nur Seitenmodus) | done |
 | F34 | Ctrl+D = Dark Mode | done |
 | F35 | Ctrl+Z / Ctrl+Y, Ctrl+N / O / S / Shift+S / E, Ctrl+Plus / Minus / 0. Einzeltasten bleiben Einzeltasten, damit sie auf die ExpressKeys gelegt werden können. Alle Shortcuts stehen als Tabelle in der README | done |
