@@ -113,6 +113,18 @@ public sealed class MspFileServiceTests : IDisposable
     }
 
     [Fact]
+    public void Load_RejectsEnumValuesOutsideTheFormat()
+    {
+        var numeric = Path.Combine(_folder, "numeric.msp");
+        var unknown = Path.Combine(_folder, "unknown.msp");
+        File.WriteAllText(numeric, """{"version":1,"pageStyle":7,"pages":[]}""");
+        File.WriteAllText(unknown, """{"version":1,"pageStyle":"squared","pages":[]}""");
+
+        Assert.Throws<System.Text.Json.JsonException>(() => MspFileService.Load(numeric));
+        Assert.Throws<System.Text.Json.JsonException>(() => MspFileService.Load(unknown));
+    }
+
+    [Fact]
     public void Load_RejectsNewerFormatVersion()
     {
         var path = Path.Combine(_folder, "future.msp");

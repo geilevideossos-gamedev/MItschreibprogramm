@@ -13,6 +13,6 @@ public static class JsonFormat
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = indented,
-        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false) },
     };
 }
