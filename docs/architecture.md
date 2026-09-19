@@ -13,6 +13,7 @@
 
 - `AppConstants`: alle Maße und Grenzen (A4 in Pixeln bei 96 DPI, Linienabstand 8 mm, Strichbreiten, Zoomgrenzen und -stufen).
 - Enums `PenColor`, `PageStyle`, `LineColor`, `PageMode`.
+- `AppSettings`: alles, was settings.json speichert, mit Standardwerten.
 - `NoteDocument` / `NotePage` / `NoteStroke`: reine Datenklassen ohne WPF. Punkte als `[x, y, druck]`. Sie sind zugleich das Dateiformat.
 
 ### Rendering
@@ -36,6 +37,7 @@
 - `PageModeConverter`: Seiten zu Endlos und zurück auf `NoteDocument`.
 - `StrokeMapper`: WPF-`Stroke` zu `NoteStroke` und zurück (Koordinaten auf 2, Druck auf 3 Nachkommastellen gerundet).
 - `MspFileService`: .msp lesen und schreiben (System.Text.Json, Format in file-format.md). `JsonFormat`: gemeinsame JSON-Optionen (camelCase, Enums als Text).
+- `SettingsService`: settings.json laden (mit Standardwerten bei Fehler) und speichern.
 - `DebugLog`: hängt Zeilen an die Datei aus MSP_DEBUG_LOG an, kulturinvariant.
 
 ## Datenfluss

@@ -46,4 +46,19 @@ JSON, UTF-8 ohne BOM, kompakt in einer Zeile. Code: `Services/MspFileService`, D
 
 ## settings.json
 
-Ort: %AppData%/Mitschreibprogramm/settings.json. (wird mit den Settings gefüllt)
+Ort: `%AppData%/Mitschreibprogramm/settings.json`, JSON eingerückt. Code: `Services/SettingsService`, Datenklasse `Models/AppSettings`. Fehlt die Datei oder ist sie kaputt, gelten die Standardwerte.
+
+| Feld | Standard | Bedeutung |
+|------|----------|-----------|
+| penColor | `black` | letzte Stiftfarbe |
+| strokeWidth | 3 | letzte Breite, wird auf 1 bis 12 begrenzt |
+| pressureEnabled | true | Checkbox Druck |
+| pageStyle | `lined` | Seitenstil für neue Dokumente |
+| lineColor | `blue` | Linienfarbe für neue Dokumente |
+| pageMode | `pages` | Seitenmodus für neue Dokumente |
+| darkMode | false | Dark Mode |
+| windowLeft, windowTop, windowWidth, windowHeight | null | Fensterlage im Normalzustand (WPF-Einheiten). null = Standardgröße, zentriert |
+| windowMaximized | false | Fenster war maximiert |
+| lastFolder | null | zuletzt benutzter Ordner für Öffnen / Speichern / Export |
+
+Mit gesetztem MSP_DEBUG_LOG liegt settings.json neben der Logdatei statt in %AppData%, damit Selbsttests die echten Einstellungen nicht anfassen.

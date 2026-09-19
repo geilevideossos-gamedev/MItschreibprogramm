@@ -46,7 +46,7 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F18 | Neu Ctrl+N, Öffnen Ctrl+O, Speichern Ctrl+S, Speichern unter Ctrl+Shift+S. Titelleiste zeigt Dateiname und `*` bei ungespeicherten Änderungen | todo |
 | F19 | Schließen mit Änderungen: Dialog Speichern / Verwerfen / Abbrechen | todo |
 | F20 | Standard-Speicherort: zuletzt verwendeter Ordner. Kein Cloud-Code in der App | todo |
-| F21 | Settings in %AppData%/Mitschreibprogramm/settings.json: Farbe, Breite, Druck, Seitenstil, Linienfarbe, Seitenmodus, Dark Mode, Fenstergröße und -position, letzter Ordner | todo |
+| F21 | Settings in %AppData%/Mitschreibprogramm/settings.json: Farbe, Breite, Druck, Seitenstil, Linienfarbe, Seitenmodus, Dark Mode, Fenstergröße und -position, letzter Ordner | wip |
 
 ## PDF-Export
 
