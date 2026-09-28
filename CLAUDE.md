@@ -57,7 +57,7 @@ Scope steht in docs/features.md. Was dort nicht steht, wird nicht gebaut.
   - docs/features.md: vollständige Feature-Liste mit Status (todo / wip / done / getestet)
   - docs/architecture.md: Projektstruktur, Klassen, Datenfluss, NuGet-Pakete
   - docs/pen-input.md: Wacom Intuos, Windows Ink, Druck, Seitentasten, Treiber-Fallstricke
-  - docs/file-format.md: Dateiformat .msp (JSON) und settings.json
+  - docs/file-format.md: Dateiformat .msp (JSON), settings.json und notes/index.json
   - docs/build.md: Build- und Publish-Befehle, exe-Ausgabe
   - docs/testing.md: manuelle Test-Checkliste, Checkpoints
   - docs/decisions.md: Entscheidungen mit Begründung, chronologisch
