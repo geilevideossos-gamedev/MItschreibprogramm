@@ -52,6 +52,8 @@ function Checkpoint4 {
     Ctl -Keys "ctrl+shift+s"
     Start-Sleep -Milliseconds 1200
     $proposed = Ctl -Value 1001
+    # Reading the name box drops its selection, so the typed path replaces the proposal explicitly.
+    Ctl -Keys "ctrl+a"
     Ctl -Text $export
     Ctl -Keys "enter"
     Start-Sleep -Milliseconds 1200
@@ -101,6 +103,7 @@ function Checkpoint4 {
     Ctl -Keys "enter"
     Start-Sleep -Milliseconds 1200
     $proposedPdf = Ctl -Value 1001
+    Ctl -Keys "ctrl+a"
     Ctl -Text $pdf
     Ctl -Keys "enter"
     Start-Sleep -Milliseconds 1500

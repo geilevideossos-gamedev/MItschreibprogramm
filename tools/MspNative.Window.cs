@@ -182,12 +182,15 @@ public static partial class MspNative
     private delegate bool EnumChildProc(IntPtr hwnd, IntPtr lParam);
 
     [DllImport("user32.dll")] private static extern bool EnumChildWindows(IntPtr parent, EnumChildProc callback, IntPtr lParam);
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetWindowTextW(IntPtr hwnd, System.Text.StringBuilder text, int max);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern IntPtr SendMessageW(IntPtr hwnd, uint message, IntPtr wParam, System.Text.StringBuilder lParam);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetClassNameW(IntPtr hwnd, System.Text.StringBuilder text, int max);
     [DllImport("user32.dll")] private static extern int GetDlgCtrlID(IntPtr hwnd);
 
+    private const uint WM_GETTEXT = 0x000D;
+
     // Text of every Edit control inside a Win32 dialog as "id|class|text" lines. The common file dialogs do not expose
-    // their file name box to the managed UI Automation client, so the self-test reads it this way.
+    // their file name box to the managed UI Automation client, so the self-test reads it this way. GetWindowText cannot
+    // read an edit control of another process, WM_GETTEXT can.
     public static string[] EditTexts(IntPtr dialog)
     {
         System.Collections.Generic.List<string> lines = new System.Collections.Generic.List<string>();
@@ -198,7 +201,7 @@ public static partial class MspNative
             if (className.ToString() == "Edit")
             {
                 System.Text.StringBuilder text = new System.Text.StringBuilder(1024);
-                GetWindowTextW(child, text, text.Capacity);
+                SendMessageW(child, WM_GETTEXT, new IntPtr(text.Capacity), text);
                 lines.Add(GetDlgCtrlID(child) + "|" + className + "|" + text);
             }
             return true;

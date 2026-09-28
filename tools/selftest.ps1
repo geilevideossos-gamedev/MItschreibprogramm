@@ -17,6 +17,7 @@ $outDir = Join-Path $root "tmp/selftest"
 $logPath = Join-Path $outDir "debug.log"
 $invariant = [System.Globalization.CultureInfo]::InvariantCulture
 $script:failures = 0
+$script:retries = 0
 $script:logOffset = 0
 $script:windowEvents = @()
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
@@ -31,7 +32,23 @@ function Check([bool]$condition, [string]$message) {
     }
     $script:windowEvents = @()
 }
-function Pen { & "$PSScriptRoot/pen-sim.ps1" @args | Out-Null; Start-Sleep -Milliseconds 350 }
+# Every now and then an injected stroke does not arrive (testing.md, Checkpoint 6). One retry keeps such a flake from
+# failing the whole run; it is reported and counted so it stays visible.
+function Pen {
+    $before = Get-StrokeLineCount
+    & "$PSScriptRoot/pen-sim.ps1" @args | Out-Null
+    Start-Sleep -Milliseconds 350
+    if ((Get-StrokeLineCount) -eq $before) {
+        Start-Sleep -Milliseconds 400
+        if ((Get-StrokeLineCount) -eq $before) {
+            Write-Output "  RETRY pen $($args -join ' ') (Strich kam nicht an)"
+            $script:retries++
+            & "$PSScriptRoot/pen-sim.ps1" @args | Out-Null
+            Start-Sleep -Milliseconds 350
+        }
+    }
+}
+function Get-StrokeLineCount { @(if (Test-Path $logPath) { Get-Content $logPath | Where-Object { $_ -match "^\S+ stroke " } }).Count }
 function Ctl { & "$PSScriptRoot/app-control.ps1" @args; Start-Sleep -Milliseconds 250 }
 function Shot([string]$name) { & "$PSScriptRoot/screenshot.ps1" -Out (Join-Path $outDir "$name.png") | Out-Null }
 
@@ -231,5 +248,6 @@ try {
 } finally {
     Stop-App
 }
-Write-Output $(if ($script:failures -eq 0) { "SELFTEST OK" } else { "SELFTEST FEHLER: $script:failures" })
+$retried = if ($script:retries -gt 0) { " ($script:retries wiederholte Striche)" } else { "" }
+Write-Output $(if ($script:failures -eq 0) { "SELFTEST OK$retried" } else { "SELFTEST FEHLER: $script:failures$retried" })
 exit $script:failures
