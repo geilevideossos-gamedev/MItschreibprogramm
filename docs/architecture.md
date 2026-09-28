@@ -26,11 +26,13 @@
 
 ### Views
 
-- `MainWindow`: Toolbar (Border + WrapPanel), Statusleiste, ScrollViewer. Verdrahtet Controls mit `DocumentView`, hält die Shortcut-Tabelle (`Dictionary<(ModifierKeys, Key), Action>`) und die `AppSettings` als einzigen Zustand für Werkzeug und Seite. Lädt die Settings im Konstruktor, speichert sie samt Fensterlage in OnClosing.
+- `MainWindow`: Toolbar (Border + WrapPanel), links das `NotebookPanel`, Statusleiste, ScrollViewer. Verdrahtet Controls mit `DocumentView` und `NotebookSession`, hält die Shortcut-Tabelle (`Dictionary<(ModifierKeys, Key), Action>`) und die `AppSettings` als einzigen Zustand für Werkzeug, Seite und Seitenleiste. Lädt die Settings im Konstruktor, speichert sie samt Fensterlage in OnClosing, nachdem die Session das Heft gesichert hat.
 - `DocumentView` (StackPanel): hält die `PageView`-Liste, Seitenmodus, das gemeinsame `DrawingAttributes`-Objekt, Radierer-/Pan-Zustand, Undo-Verlauf und den Zoom (LayoutTransform). `Load(NoteDocument)` / `ToDocument()` wandeln zwischen Ansicht und Datenklassen, `SetMode` konvertiert, `AddPage` hängt an, Auto-Seite und Endlos-Wachstum hängen an StrokeCollected.
 - `PageView` (Grid): eine Seite = `PageBackground` + transparenter `InkCanvas`, auf Seitengröße geclippt. `GrowToFit` vergrößert die Endlos-Fläche.
-- `FileSession`: aktueller Dateipfad, Dirty-Flag, Neu / Öffnen / Speichern / Speichern unter mit den Windows-Dateidialogen, Nachfrage bei ungespeicherten Änderungen. Meldet `StateChanged` (Titel) und `DocumentLoaded` (Toolbar abgleichen).
-- `UnsavedChangesDialog` / `UnsavedChoice`: Dialog Speichern / Verwerfen / Abbrechen.
+- `NotebookSession`: hält das offene Heft der `NotebookLibrary` in der `DocumentView`. Start (zuletzt offenes Heft, sonst das neueste, sonst ein neues „Unbenannt“), Wechsel mit Autosave ohne Dialog, Neu, Umbenennen (`RenameDialog`), Löschen (`ConfirmDialog`, beim offenen Heft wird das nächste geöffnet), Autosave-Timer (`AppConstants.AutosaveIntervalSeconds`, setzt aus, solange ein Strich läuft), Scrollposition merken (Dokumentpunkt oben links, `TranslatePoint`) und nach dem Laden mit `DispatcherPriority.Loaded` wiederherstellen, Schließen (`TryClose`: bei Schreibfehler Rückfrage, ob trotzdem beendet wird). Meldet `Changed` (Liste, Titel) und `DocumentLoaded` (Toolbar abgleichen).
+- `NotebookTransfer`: Import einer externen .msp als Kopie in die Bibliothek, Export eines Hefts als .msp oder PDF über die Windows-Dateidialoge, vorgeschlagener Dateiname = Heftname (ungültige Zeichen werden ersetzt). Das offene Heft kommt aus der Ansicht, andere von der Platte.
+- `NotebookPanel` (UserControl): „+ Neues Heft“, ListBox der Hefte (Name, Änderungszeit), das offene Heft ist markiert, Klick öffnet, Doppelklick benennt um, Kontextmenü mit Umbenennen, Löschen, Als PDF exportieren, Als MSP exportieren. Eigene Vorlagen für ListBoxItem und Menü, damit der Dark Mode stimmt. Ein Rechtsklick wählt nicht aus, weil Auswählen öffnen würde. Meldet nur Wünsche (`OpenRequested` usw.), die Session entscheidet.
+- `RenameDialog`, `ConfirmDialog` (Löschen und Beenden trotz Schreibfehler), `ErrorMessage` (Warn-MessageBox und `Try` für Datei-Operationen).
 - `ExportDialog`: Checkbox "Hintergrundlinien mit exportieren", danach fragt `FileSession.ExportPdf` den Zielpfad ab.
 - `SideButtonWatcher`: verfolgt die Seitentaste des Stifts (Barrel) über die Preview-Stylus-Events.
 - `ZoomPanController`: Mausrad, Ctrl/Shift+Mausrad, mittlere Maustaste, Leertaste+Ziehen, Zoom um den Zeiger.
@@ -51,7 +53,7 @@
 ## Datenfluss
 
 - Toolbar oder Shortcut setzt den Zustand an `DocumentView`, die ihn auf alle Seiten anwendet.
-- `DocumentView.Changed` meldet jede Dokumentänderung (Strich, Radieren, Undo/Redo, Seite, Stil, Modus), `FileSession` setzt damit das Dirty-Flag.
+- `DocumentView.Changed` meldet jede Dokumentänderung (Strich, Radieren, Undo/Redo, Seite, Stil, Modus), `NotebookLibrary.MarkChanged` setzt damit das Änderungsflag. Geschrieben wird beim Heftwechsel, beim Schließen und per Timer alle 60 s, jeweils nur mit Änderung; die Scrollposition kommt bei jedem dieser Schritte in den Index.
 - InkCanvas sammelt Striche selbst (Maus und Stylus). `DocumentView` hängt sich an StrokeCollected / StrokeErasing für Undo.
 - Editiermodus je Seite: Pan aktiv = None, Radierer oder Seitentaste = EraseByStroke, sonst Ink. EditingModeInverted = EraseByStroke.
 

@@ -43,10 +43,10 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | ID | Feature | Status |
 |----|---------|--------|
 | F17 | Eigenes Format `.msp`, JSON, UTF-8: version, pageMode, pageStyle, lineColor, pages[] mit strokes[] mit color, width, pressureEnabled, points als [x, y, pressure]. Koordinaten in Seitenpixeln bei 100 %. Genau dokumentiert in docs/file-format.md | done |
-| F18 | Neu Ctrl+N, Öffnen Ctrl+O, Speichern Ctrl+S, Speichern unter Ctrl+Shift+S. Titelleiste zeigt Dateiname und `*` bei ungespeicherten Änderungen | done |
-| F19 | Schließen mit Änderungen: Dialog Speichern / Verwerfen / Abbrechen | done |
-| F20 | Standard-Speicherort: zuletzt verwendeter Ordner. Kein Cloud-Code in der App. Google-Drive-Sync passiert über den Drive-Desktop-Ordner, das kommt nur in die README | done |
-| F21 | Settings in %AppData%/Mitschreibprogramm/settings.json: Farbe, Breite, Druck, Seitenstil, Linienfarbe, Seitenmodus, Dark Mode, Fenstergröße und -position, letzter Ordner | done |
+| F18 | Neu Ctrl+N, Öffnen Ctrl+O, Speichern Ctrl+S, Speichern unter Ctrl+Shift+S. Titelleiste zeigt Dateiname und `*` bei ungespeicherten Änderungen. (Überholt seit 2026-09-28 durch F49, F54, F55: Neu = neues Heft, Öffnen = Import, Speichern unter = Export, Ctrl+S = sofort speichern, Titel zeigt den Heftnamen ohne Stern) | done |
+| F19 | Schließen mit Änderungen: Dialog Speichern / Verwerfen / Abbrechen. (Überholt seit 2026-09-28 durch F53: Schließen speichert automatisch, kein Dialog) | done |
+| F20 | Standard-Speicherort: zuletzt verwendeter Ordner. Kein Cloud-Code in der App. Google-Drive-Sync passiert über den Drive-Desktop-Ordner, das kommt nur in die README. (Seit 2026-09-28 gilt der Ordner für Import und Export) | done |
+| F21 | Settings in %AppData%/Mitschreibprogramm/settings.json: Farbe, Breite, Druck, Seitenstil, Linienfarbe, Seitenmodus, Dark Mode, Fenstergröße und -position, letzter Ordner (seit 2026-09-28 auch: Seitenleiste sichtbar) | done |
 
 ## PDF-Export
 
@@ -82,7 +82,7 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | ID | Feature | Status |
 |----|---------|--------|
 | F36 | Ein Fenster, schlanke Toolbar: Datei-Buttons, vier Farbkreise, Breiten-Slider mit Anzeige, drei Presets, Druck-Checkbox, Stift/Radierer, Seitenstil-Dropdown, Linienfarbe-Toggle, Seitenmodus-Toggle, Dark-Mode-Toggle, Export | done |
-| F37 | Statusleiste: Zoom, Seite x von y, Dateiname | done |
+| F37 | Statusleiste: Zoom, Seite x von y, Dateiname (seit 2026-09-28: Heftname) | done |
 | F38 | Native WPF-Controls, minimale Styles, kein Ribbon, keine Menüleiste außer Datei | done |
 
 ## Build und Auslieferung
@@ -101,3 +101,18 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F43 | Debug-Log: mit MSP_DEBUG_LOG=<pfad> schreibt die App pro fertigem Strich eine Zeile (Punkte, min/max Druck, Breite, Modus, Seite, Zoom). Ohne Variable läuft nichts davon | done |
 | F44 | tools/screenshot.ps1 speichert das App-Fenster als PNG nach tmp/ (Hintergrundstile, Linienfarbe, Zoom, Dark Mode, Seitenmodell, Toolbar) | done |
 | F45 | xUnit-Projekt Mitschreibprogramm.Tests für Models/Services: .msp Round-Trip, Seiten zu Endlos und zurück, PDF-Export erzeugt gültige Datei mit erwarteter Seitenzahl, Settings laden und speichern. Kein UI dort | done |
+
+## Hefte-Bibliothek (Auftrag vom 2026-09-28)
+
+| ID | Feature | Status |
+|----|---------|--------|
+| F46 | Hefte-Bibliothek mit Seitenleiste: ein Heft = ein Fach (Mathe, Englisch, Deutsch, ...), jedes Heft ist ein komplettes mehrseitiges Dokument wie bisher eine .msp-Datei | wip |
+| F47 | Links ein einklappbares Panel (Toggle-Button „Hefte“ in der Toolbar und Ctrl+B) mit der Liste aller Hefte. Sichtbarkeit wird in settings.json gemerkt | wip |
+| F48 | Heft anklicken öffnet es sofort, das aktuelle wird vorher automatisch gespeichert ohne Dialog, man landet auf der Seite, wo man zuletzt war (letzte Scrollposition pro Heft) | wip |
+| F49 | Oben im Panel „+ Neues Heft“ (auch Neu / Ctrl+N), legt ein Heft „Unbenannt“ an und öffnet es | wip |
+| F50 | Doppelklick = Umbenennen. Rechtsklick-Kontextmenü mit Umbenennen, Löschen (mit Rückfrage), Als PDF exportieren, Als MSP exportieren | wip |
+| F51 | Aktives Heft markiert, Sortierung nach zuletzt bearbeitet, neueste oben | wip |
+| F52 | Speicherung: alle Hefte intern als einzelne .msp in %AppData%/Mitschreibprogramm/notes/, Dateiname = id. Anzeigename, Zeitstempel und Scrollposition in index.json (Begründung in decisions.md) | wip |
+| F53 | Autosave beim Heftwechsel, beim Schließen der App und alle 60 Sekunden bei Änderungen. Beim App-Start wird das zuletzt offene Heft geladen | wip |
+| F54 | Öffnen (Ctrl+O) und Speichern unter (Ctrl+Umschalt+S) bleiben als Import / Export für externe .msp-Dateien, Import kopiert in die Bibliothek | wip |
+| F55 | PDF-Export (Ctrl+E und Kontextmenü) exportiert das ganze Heft wie bisher, vorgeschlagener Dateiname = Heftname. Titelleiste zeigt den Heftnamen | wip |

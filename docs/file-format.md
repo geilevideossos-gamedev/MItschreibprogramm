@@ -86,6 +86,7 @@ Ort: `%AppData%/Mitschreibprogramm/settings.json`, JSON eingerückt. Code: `Serv
 | lineColor | `blue` | Linienfarbe für neue Dokumente |
 | pageMode | `pages` | Seitenmodus für neue Dokumente |
 | darkMode | false | Dark Mode |
+| notebookPanelVisible | true | Seitenleiste mit den Heften eingeblendet (Strg+B) |
 | windowLeft, windowTop, windowWidth, windowHeight | null | Fensterlage im Normalzustand (WPF-Einheiten). null = Standardgröße, zentriert |
 | windowMaximized | false | Fenster war maximiert |
 | lastFolder | null | zuletzt benutzter Ordner für Öffnen / Speichern / Export |
