@@ -39,8 +39,8 @@ Einstellungen (Farbe, Breite, Seitenstil, Dark Mode, Fensterlage, letzter Ordner
 
 Die Toolbar von links nach rechts:
 
-- **Hefte.** Ganz links der Schalter für die Seitenleiste (auch Strg+B). Dort steht ein Heft pro Fach: Mathe, Englisch, Deutsch. Ein Klick öffnet ein Heft, das vorherige wird dabei automatisch gespeichert, und man landet an der Stelle, an der man es verlassen hat. **+ Neues Heft** legt ein Heft „Unbenannt“ an, Doppelklick benennt es um, Rechtsklick bietet Umbenennen, Löschen (mit Rückfrage), Als PDF exportieren und Als MSP exportieren. Die Liste ist nach zuletzt bearbeitet sortiert, das offene Heft ist markiert, die Titelleiste zeigt seinen Namen. Gespeichert wird von selbst: beim Heftwechsel, beim Schließen und alle 60 Sekunden, wenn sich etwas geändert hat. Beim Schließen fragt nichts mehr nach.
-- **Neu, Importieren, Exportieren.** Neu legt ein Heft an (Strg+N). Importieren kopiert eine `.msp`-Datei von außerhalb als neues Heft in die Bibliothek, die Datei bleibt liegen (Strg+O). Exportieren schreibt das offene Heft als `.msp`-Datei irgendwohin, zum Weitergeben oder als Backup (Strg+Umschalt+S).
+- **Hefte.** Ganz links der Schalter für die Seitenleiste (auch Strg+B). Dort steht ein Heft pro Fach: Mathe, Englisch, Deutsch. Ein Klick öffnet ein Heft, das vorherige wird dabei automatisch gespeichert, und man landet an der Stelle, an der man es verlassen hat. **+ Neues Heft** legt ein Heft „Unbenannt“ an, Doppelklick benennt es um, Rechtsklick bietet Umbenennen, Löschen (mit Rückfrage, die Datei landet im Papierkorb), Als PDF exportieren und Als MSP exportieren. Die Liste ist nach zuletzt bearbeitet sortiert, das offene Heft ist markiert, die Titelleiste zeigt seinen Namen. Gespeichert wird von selbst: beim Heftwechsel, beim Schließen und alle 60 Sekunden, wenn sich etwas geändert hat. Beim Schließen fragt nichts mehr nach.
+- **Neu, Importieren, MSP-Export.** Neu legt ein Heft an (Strg+N). Importieren kopiert eine `.msp`-Datei von außerhalb als neues Heft in die Bibliothek, die Datei bleibt liegen (Strg+O). MSP-Export schreibt das offene Heft als `.msp`-Datei irgendwohin, zum Weitergeben oder als Backup (Strg+Umschalt+S).
 - **Vier Farbkreise:** Schwarz, Blau, Rot, Grün.
 - **Breite:** Regler von 1 bis 12 px in halben Schritten, daneben die aktuelle Breite und die Voreinstellungen dünn (1,5), mittel (3), dick (6).
 - **Druck:** mit Haken macht fester Druck den Strich breiter (etwa ein Viertel bis eindreiviertel der eingestellten Breite). Ohne Haken ist der Strich überall gleich breit. Die Maus schreibt immer gleich breit.
@@ -83,7 +83,7 @@ Jedes Heft ist eine `.msp`-Datei: JSON als Klartext in UTF-8 mit Seitenmodus, Se
 
 ## Google Drive
 
-Das Programm selbst kennt keine Cloud. Für ein Backup den Ordner `%AppData%\Mitschreibprogramm\notes\` sichern, er enthält alle Hefte. Zum Teilen oder Sichern einzelner Hefte "Google Drive für Desktop" installieren und das Heft mit Exportieren in den Drive-Ordner schreiben (zum Beispiel `G:\Meine Ablage\Mitschriften`), Drive lädt es im Hintergrund hoch; Importieren holt so eine Datei wieder als Heft herein. Das Programm merkt sich den zuletzt benutzten Ordner, beim nächsten Export steht der Dialog also schon dort.
+Das Programm selbst kennt keine Cloud. Für ein Backup den Ordner `%AppData%\Mitschreibprogramm\notes\` sichern, er enthält alle Hefte. Zum Teilen oder Sichern einzelner Hefte "Google Drive für Desktop" installieren und das Heft mit MSP-Export in den Drive-Ordner schreiben (zum Beispiel `G:\Meine Ablage\Mitschriften`), Drive lädt es im Hintergrund hoch; Importieren holt so eine Datei wieder als Heft herein. Das Programm merkt sich den zuletzt benutzten Ordner, beim nächsten Export steht der Dialog also schon dort.
 
 ## Build aus dem Quelltext
 
@@ -103,5 +103,5 @@ Das baut, testet und legt `dist/Mitschreibprogramm.exe` an. Der Befehl dahinter 
 - Gespeichert wird beim Heftwechsel, beim Schließen und alle 60 Sekunden. Nach einem Absturz fehlt also höchstens die letzte Minute. Rückgängig reicht bis zum letzten Heftwechsel.
 - Zoom um den Mauszeiger hält den Punkt waagrecht erst, wenn die Seite breiter als das Fenster ist. Vorher bleibt die Seite zentriert.
 - Ein Strich gehört immer zu genau einem Blatt. Ragt er nach dem Umwandeln von Endlos in Seiten über den Blattrand, wird er dort abgeschnitten dargestellt (die Punkte bleiben erhalten).
-- PDF nur A4 hoch. Ein Fenster, ein offenes Heft. Das Programm nur einmal starten: zwei Instanzen würden sich die Heftliste gegenseitig überschreiben.
+- PDF nur A4 hoch. Ein Fenster, ein offenes Heft. Das Programm läuft nur einmal: ein zweiter Start meldet sich kurz und beendet sich, weil zwei Instanzen sich die Heftliste gegenseitig überschreiben würden.
 - Die exe ist etwa 140 MB groß, weil .NET und WPF darin stecken.

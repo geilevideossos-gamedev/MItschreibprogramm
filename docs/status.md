@@ -4,7 +4,7 @@ Stand: 2026-09-28
 
 ## Aktuell
 
-- Neuer Auftrag vom 2026-09-28: Hefte-Bibliothek mit Seitenleiste (F46 bis F55 in features.md). Implementiert, `dotnet build` 0 Warnings, `dotnet test` 49 Tests grün (11 neue für `NotebookLibrary`: Index laden/speichern, Abgleich mit dem Ordner, Autosave nur nach Änderung, Fehlerfall). Der Selbsttest (Checkpoint 4 neu geschrieben, Checkpoint 7 angepasst) steht noch aus, deshalb `wip`.
+- Neuer Auftrag vom 2026-09-28: Hefte-Bibliothek mit Seitenleiste (F46 bis F55 in features.md). Implementiert, `dotnet build` 0 Warnings, `dotnet test` 52 Tests grün (14 neue für `NotebookLibrary` und `LibraryLock`: Index laden/speichern, Abgleich mit dem Ordner, Autosave nur nach Änderung, Fehlerfälle, Sperre). Ein Design-Review mit fünf Blickwinkeln ist eingearbeitet (decisions.md „Nach dem Design-Review“). Der Selbsttest (Checkpoint 4 neu geschrieben, Checkpoint 7 angepasst) steht noch aus, deshalb `wip`.
 - Was sich für den Benutzer ändert: kein Datei-Dialog mehr im Alltag. Hefte liegen in %AppData%/Mitschreibprogramm/notes/, werden beim Wechsel, beim Schließen und alle 60 s automatisch gespeichert, die Seitenleiste (Strg+B) listet sie nach zuletzt bearbeitet. Öffnen/Speichern unter heißen jetzt Importieren/Exportieren. Kein Schließen-Dialog mehr, kein Stern im Titel.
 - Vorher (2026-09-19): alle 45 Features `done`, Checkpoint 1 bis 6 bestanden, Checkpoint 6 gegen dist/Mitschreibprogramm.exe mit 65/65. README geschrieben. Seitenstil Strichliert durch Kariert ersetzt.
 - `./build.sh` erzeugt dist/Mitschreibprogramm.exe (141 MB, einzige Datei). Die exe in dist/ ist noch der Stand vom 2026-09-19 ohne Bibliothek.
@@ -35,7 +35,7 @@ Stand: 2026-09-28
 
 - Context7 war in der Session vom 2026-09-19 nicht erreichbar (DNS). API-Fakten stammen aus Primärquellen (dotnet/wpf Quelltext, learn.microsoft.com, nuget.org) und sind in pen-input.md / decisions.md mit Quelle notiert.
 - Selbsttest: In drei frühen Läufen gegen die exe blieb je eine injizierte Geste wirkungslos, nur während parallel Hintergrundprozesse liefen. Ursache eingegrenzt (fremdes Fenster deaktiviert die App), nicht bewiesen. Ohne Parallelbetrieb 65/65. Steht auch unter "Offen mit echtem Pen".
-- Zwei Instanzen der App teilen sich eine Bibliothek und überschreiben sich den Index gegenseitig. Steht in der README als Einschränkung, kein Schutz eingebaut.
+- Zweite Instanz wird über notes/.lock abgewiesen (`LibraryLock`). Nicht abgedeckt: zwei Rechner, die denselben Ordner über einen Sync-Dienst teilen.
 
 ## Bekannte Bugs
 
