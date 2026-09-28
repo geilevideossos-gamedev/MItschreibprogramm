@@ -7,14 +7,15 @@
 3. Screenshots: `tools/screenshot.ps1` speichert das App-Fenster als PNG nach tmp/. Bild anschauen.
 4. xUnit: `dotnet test` für Models/Services.
 
-Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt währenddessen Maus oder Tastatur. Vor jedem Injektionslauf kurze Meldung im Chat. Die Skripte holen das Fenster selbst nach vorn und brechen ab, wenn der Zielpixel nicht zur App gehört oder ein fremdes Fenster in den Vordergrund kommt. `selftest.ps1` startet erst nach 15 s ohne Eingabe und gibt sonst mit Exit-Code 99 auf. Bei gesperrtem Bildschirm scheitert schon das Aktivieren des Fensters.
+Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt währenddessen Maus oder Tastatur. Vor jedem Injektionslauf kurze Meldung im Chat. Die Skripte holen das Fenster selbst nach vorn und brechen ab, wenn der Zielpixel nicht zur App gehört oder ein fremdes Fenster in den Vordergrund kommt. `selftest.ps1` startet erst nach 15 s ohne Eingabe und gibt sonst mit Exit-Code 99 auf. Läuft schon eine Instanz der App (zum Beispiel Daniels), startet er gar nicht (Exit-Code 98), weil er jede Instanz beenden würde. Bei gesperrtem Bildschirm scheitert schon das Aktivieren des Fensters.
 
 ## Ablauf
 
 - Alles auf einmal: `powershell -ExecutionPolicy Bypass -File tools/selftest.ps1` (Debug-Build) oder mit `-Exe dist/Mitschreibprogramm.exe`. Einzelne Checkpoints: `-Checkpoint "1,2"`.
 - Ausgabe: PASS/FAIL je Prüfung, am Ende `SELFTEST OK` oder Fehlerzahl (Exit-Code). Screenshots und Log liegen in tmp/selftest/.
 - Einzelschritte von Hand: `tools/app-control.ps1` (Fenster platzieren, Tasten, Maus, Controls per AutomationId), `tools/pen-sim.ps1`, `tools/screenshot.ps1`. Koordinaten sind WPF-Einheiten relativ zum Client-Bereich.
-- Das Testfenster liegt bei 20,10 mit 1500 x 1000 physischen Pixeln. Bei 125 % Skalierung beginnt die Seite dann bei Client-Koordinate ca. 188,59.
+- Das Testfenster liegt bei 20,10 mit 1500 x 1000 physischen Pixeln. Bei 125 % Skalierung beginnt die Seite dann bei Client-Koordinate ca. 188,59. `Start-App` blendet die Seitenleiste dafür über settings.json aus; Checkpoint 4 startet mit `-Panel`, dann liegt die Seite 110 Einheiten weiter rechts und die Striche gehen über `Get-PageOrigin`.
+- Jeder Start ohne `-KeepSettings` beginnt mit leerer Bibliothek (tmp/selftest/notes/ wird gelöscht). Für die Seitenleiste kann app-control.ps1 Listeneinträge per id anklicken (`-Click <id>`, ids aus index.json), doppelt klicken (`-DoubleClick`), rechts klicken (`-RightClick`, Kontextmenü, Menüpunkte danach per `-Click RenameMenuItem` usw.), Listen lesen (`-Items NotebookList`), Sichtbarkeit prüfen (`-Exists`) und den Dateinamen im Windows-Dialog lesen (`-Value 1001`).
 
 ## Checkpoints
 
@@ -23,7 +24,7 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 | 1 | Pen: synthetischer Strich mit steigendem Druck, Seitentaste als Radierer, invertierter Stift. Druckverlauf im Debug-Log, Screenshot | bestanden 2026-09-19, 7/7 |
 | 2 | Hintergrund, Zoom, Pan, Undo/Redo: Screenshot pro Stil und Zoomstufe, Strich bei 200 % injizieren, Koordinaten im Debug-Log prüfen | bestanden 2026-09-19, 13/13 |
 | 3 | Seitenmodell: xUnit für Konvertierung, Screenshot beider Modi, Auto-Seite per injiziertem Strich unten | bestanden 2026-09-19, 11/11, xUnit 7/7 |
-| 4 | Datei: xUnit Round-Trip, Datei mit injizierten Strichen speichern, neu laden, Screenshot vergleichen | bestanden 2026-09-19, 18/18, xUnit 15/15 |
+| 4 | Hefte-Bibliothek (seit 2026-09-28, vorher Datei-Befehle): mehrere Hefte anlegen, Striche injizieren, umbenennen (Doppelklick und Kontextmenü), wechseln, Sortierung, .msp-Export und -Import, PDF aus dem Kontextmenü mit vorgeschlagenem Namen, Löschen mit Rückfrage, Strg+B, schließen und neu starten: Hefte, Striche und Scrollposition wieder da, Screenshot der Seitenleiste. xUnit für Index und Autosave | offen (alte Fassung bestanden 2026-09-19, 18/18) |
 | 5 | PDF-Export: xUnit Seitenzahl, PDF in Bild wandeln (pdftoppm) und anschauen | bestanden 2026-09-19, 5/5, xUnit 22/22 |
 | 6 | exe aus dist/ starten, Selbsttest komplett gegen die exe wiederholen | bestanden 2026-09-19 gegen die finale exe, 65/65 (Teil 1: 31/31, Teil 2: 34/34) |
 
@@ -48,7 +49,7 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 - Endlos wächst nach rechts: nach einem Strich bei X 600..760 ist ein Strich bei X 900 möglich. Zurück im Seitenmodus: 5 Seiten (4 Zeilen plus eine Seite für den Inhalt rechts).
 - Gefunden und behoben: Hilfslinien verschwanden bei Zoom unter 100 % bandweise.
 
-### Ergebnis Checkpoint 4
+### Ergebnis Checkpoint 4 (Datei-Befehle, Fassung bis 2026-09-28)
 
 - xUnit: .msp Round-Trip aller Felder, exakte JSON-Form, tolerantes Laden, neuere Version wird abgelehnt. Settings Round-Trip, Standardwerte bei fehlender oder kaputter Datei.
 - Zwei injizierte Striche, Ctrl+S über den Windows-Dialog, Ctrl+N, Ctrl+O: Screenshot nach dem Laden weicht 0,019 % vom Screenshot vor dem Speichern ab. Koordinaten und Druck in der Datei passen zum Debug-Log.
@@ -85,7 +86,8 @@ Für einen schnellen Durchgang von Hand (Maus reicht), alles andere deckt `tools
 - Strg+L dreimal, "Linien" umschalten, Strg+D hin und zurück.
 - Strg+Mausrad, Strg+0, mittlere Maustaste ziehen, Leertaste + ziehen.
 - Unten auf der Seite schreiben (neue Seite erscheint), Strg+Enter, Modus auf Endlos und zurück.
-- Speichern, Neu, Öffnen. Etwas ändern, Fenster schließen: Dialog mit Speichern / Verwerfen / Abbrechen.
+- Zweites Heft anlegen, im ersten etwas schreiben, hin- und herwechseln (landet an derselben Stelle), umbenennen, Rechtsklick-Menü, Strg+B. Fenster schließen: keine Nachfrage, nach dem Neustart ist alles da.
+- Exportieren, Importieren: die Datei kommt als neues Heft herein.
 - PDF-Export mit und ohne Hintergrundlinien, PDF ansehen.
 - Programm neu starten: Farbe, Breite, Stil, Dark Mode und Fensterlage sind wieder da.
 
