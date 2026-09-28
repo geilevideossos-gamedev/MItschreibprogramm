@@ -16,6 +16,7 @@
 - Enums `PenColor`, `PageStyle`, `LineColor`, `PageMode`.
 - `AppSettings`: alles, was settings.json speichert, mit Standardwerten.
 - `NoteDocument` / `NotePage` / `NoteStroke`: reine Datenklassen ohne WPF. Punkte als `[x, y, druck]`. Sie sind zugleich das Dateiformat.
+- `NotebookIndex` / `NotebookEntry`: Inhalt von notes/index.json (zuletzt offenes Heft, je Heft id, Name, Änderungszeit, Scrollposition).
 
 ### Rendering
 
@@ -40,7 +41,9 @@
 - `UndoHistory` / `UndoStep`: zwei Stapel aus Undo-/Redo-Aktionspaaren.
 - `PageModeConverter`: Seiten zu Endlos und zurück auf `NoteDocument`.
 - `StrokeMapper`: WPF-`Stroke` zu `NoteStroke` und zurück (Koordinaten auf 2, Druck auf 3 Nachkommastellen gerundet).
-- `MspFileService`: .msp lesen und schreiben (System.Text.Json, Format in file-format.md). `JsonFormat`: gemeinsame JSON-Optionen (camelCase, Enums als Text). `PageStyleJsonConverter`: liest den früheren Stilwert `dashed` als `Squared`.
+- `MspFileService`: .msp lesen und schreiben (System.Text.Json, Format in file-format.md). `JsonFormat`: gemeinsame JSON-Optionen (camelCase, Enums als Text). `PageStyleJsonConverter`: liest den früheren Stilwert `dashed` als `Squared`. `AtomicFile`: schreibt `.tmp` und verschiebt sie über das Ziel.
+- `NotebookLibrary`: der Ordner notes/ mit einer .msp je Heft und index.json (file-format.md). Lädt und gleicht den Index mit dem Ordner ab, legt Hefte an (auch per Import), benennt um, löscht, kennt das offene Heft (`LastOpen`) und dessen Änderungsflag (`HasChanges`), `Save` schreibt die Datei nur nach einer Änderung und die Scrollposition immer. Bekommt einen `TimeProvider` für die Zeitstempel, damit die Tests ihn stellen können.
+- `AppPaths`: Ort von settings.json und notes/ (%AppData%, mit MSP_DEBUG_LOG neben dem Log).
 - `SettingsService`: settings.json laden (mit Standardwerten bei Fehler) und speichern.
 - `PdfExporter`: `NoteDocument` zu PDF (PDFsharp). `PressureSegments` liefert die Linienstücke eines Druckstrichs.
 - `DebugLog`: hängt Zeilen an die Datei aus MSP_DEBUG_LOG an, kulturinvariant.

@@ -137,3 +137,15 @@ Ein zweiter, nur lesender Durchgang über den ganzen Code hat diese Fehler gefun
 - `RuleLines` liegt jetzt in Models (reine Seitengeometrie ohne WPF), damit die xUnit-Tests sie prüfen dürfen. Die Strich-Konstanten `RuleDashLength` / `RuleDashGap` sind entfallen.
 - Am Bildschirm ist der Linienstift halbtransparent. Zeilen und Spalten einzeln gezeichnet hätten jede Kreuzung doppelt überblendet (dunklere Punkte, im Review gefunden). `PageBackground` zeichnet deshalb alle Linien als eine `StreamGeometry` in einem Aufruf. Verworfen: `PushOpacity` um deckende Linien (braucht pro Seite eine Zwischenfläche in Zoomgröße).
 - Der Konverter vergleicht Stilnamen ohne Rücksicht auf Groß- und Kleinschreibung, wie es der Standard-Enum-Konverter vorher tat.
+
+## 2026-09-28 Hefte-Bibliothek: Metadaten in index.json, nicht im msp-Header
+
+- Auftrag von Daniel: alle Hefte intern als einzelne .msp in %AppData%/Mitschreibprogramm/notes/, Dateiname = id, dazu Anzeigename, Zeitstempel und Scrollposition in einem Index, "index.json oder msp-header, einfachste robuste Variante".
+- Entscheidung: `notes/index.json` (Format in file-format.md). Das .msp bleibt ein reines Dokument in Version 1: Export und Import laufen ohne Umbau, und Ansichtszustand wie die Scrollposition gehört nicht in die Notiz. Für die Liste braucht es alle Namen und Zeitstempel auf einmal, dafür soll beim Start nicht jede Heftdatei (bei vielen Strichen mehrere MB) geparst werden. Umbenennen und Scrollposition ändern eine kleine Datei statt das ganze Heft neu zu schreiben.
+- Robustheit: Index und Hefte werden atomar geschrieben (`AtomicFile`, wie bisher die .msp). Beim Start wird der Index mit dem Ordner abgeglichen: Einträge ohne Datei fallen weg, Dateien ohne Eintrag werden mit dem Dateinamen als Name aufgenommen. Ein fehlender oder kaputter Index kostet höchstens Namen und Scrollpositionen, nie ein Heft. Der Abgleich schreibt nichts, ein schreibgeschützter Ordner lässt sich noch lesen.
+- Verworfen: Name, Zeitstempel und Scrollposition im Kopf jeder .msp. Dann müsste jede Datei beim Start gelesen werden, und das Dokumentformat trüge Ansichtszustand.
+- `lastOpen` steht im Index und nicht in settings.json, weil es sich auf ids des Index bezieht und der Ordner notes/ so als Ganzes kopierbar bleibt (Backup).
+- Zeitstempel `modified` ändert sich nur bei Inhaltsänderungen (Strich, Radieren, Undo/Redo, Seite, Stil, Modus), nicht beim Umbenennen. Die Zeit kommt aus einem `TimeProvider` (.NET 8), die xUnit-Tests stellen ihn.
+- Scrollposition in Seitenpixeln bei 100 % (Dokumentpunkt oben links im Fenster), nicht als Scroll-Offset: der Offset hängt vom Zoom ab, der beim Start immer 100 % ist. So landet man bei jedem Zoom an derselben Stelle.
+- Das Änderungsflag und `Save` (Datei nur nach Änderung, Scrollposition immer) liegen in `NotebookLibrary` und nicht in der Ansicht, damit xUnit das Autosave-Verhalten ohne WPF prüft.
+

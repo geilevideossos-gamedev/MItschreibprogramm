@@ -44,6 +44,35 @@ JSON, UTF-8 ohne BOM, kompakt in einer Zeile. Code: `Services/MspFileService`, D
 - Speichern schreibt erst `<name>.msp.tmp` und verschiebt sie dann über das Ziel.
 - Tolerant beim Öffnen: Punkte ohne Druck bekommen 0,5, Punkte mit weniger als zwei Zahlen und Striche ohne Punkte fallen weg, Breite und Druck werden in ihre Grenzen geholt. `null` statt einer Liste gilt als leere Liste, `null`-Einträge fallen weg. Koordinaten werden auf plus/minus 1.000.000 begrenzt, damit eine kaputte Datei keine Millionen Seiten erzeugt.
 
+## Hefte-Bibliothek: notes/
+
+Ort: `%AppData%/Mitschreibprogramm/notes/`. Code: `Services/NotebookLibrary`, Datenklassen `Models/NotebookIndex`, `NotebookEntry`.
+
+- Jedes Heft ist eine eigene `.msp`-Datei im Format oben, Dateiname `<id>.msp`. Die id ist eine GUID ohne Bindestriche (32 Hex-Zeichen) und ändert sich nie, auch nicht beim Umbenennen.
+- `index.json` (JSON eingerückt, camelCase) hält, was nicht ins Dokument gehört:
+
+```json
+{
+  "lastOpen": "3f2c9d1e8a4b4c6d9e0f1a2b3c4d5e6f",
+  "notebooks": [
+    { "id": "3f2c9d1e8a4b4c6d9e0f1a2b3c4d5e6f", "name": "Mathe", "modified": "2026-09-28T10:00:00+00:00", "scrollX": 0, "scrollY": 1234.5 }
+  ]
+}
+```
+
+| Feld | Bedeutung |
+|------|-----------|
+| lastOpen | id des zuletzt offenen Hefts, wird beim Start geöffnet. null oder unbekannt: das neueste Heft |
+| id | Dateiname ohne `.msp` |
+| name | Anzeigename, frei wählbar, darf doppelt vorkommen |
+| modified | Zeitpunkt der letzten Inhaltsänderung (UTC, ISO 8601). Umbenennen ändert ihn nicht. Sortierschlüssel der Seitenleiste, neueste oben |
+| scrollX, scrollY | Seitenpixel bei 100 % des Dokumentpunkts, der beim Verlassen oben links im Fenster stand. Unabhängig vom Zoom |
+
+- Beide Dateien werden wie die .msp erst als `.tmp` geschrieben und dann über das Ziel verschoben (`Services/AtomicFile`).
+- Beim Start wird der Index mit dem Ordner abgeglichen: Einträge ohne Datei fallen weg, `.msp`-Dateien ohne Eintrag werden aufgenommen (name = Dateiname ohne Endung, modified = Änderungszeit der Datei). Fehlt der Index oder ist er kaputt, entsteht er so aus dem Ordner neu. Verloren gehen dann höchstens Namen und Scrollpositionen, nie ein Heft.
+- Autosave: das Heft wird beim Heftwechsel, beim Schließen und alle 60 s geschrieben, wenn es seit dem letzten Schreiben eine Änderung gab. Scrollposition und lastOpen kommen bei jedem dieser Schritte in den Index.
+- Mit gesetztem MSP_DEBUG_LOG liegt `notes/` neben der Logdatei statt in %AppData% (siehe settings.json).
+
 ## settings.json
 
 Ort: `%AppData%/Mitschreibprogramm/settings.json`, JSON eingerückt. Code: `Services/SettingsService`, Datenklasse `Models/AppSettings`. Fehlt die Datei oder ist sie kaputt, gelten die Standardwerte. Enums stehen in beiden Formaten als Text, Zahlen und unbekannte Werte gelten als kaputt (.msp: Fehlermeldung beim Öffnen).
@@ -61,4 +90,4 @@ Ort: `%AppData%/Mitschreibprogramm/settings.json`, JSON eingerückt. Code: `Serv
 | windowMaximized | false | Fenster war maximiert |
 | lastFolder | null | zuletzt benutzter Ordner für Öffnen / Speichern / Export |
 
-Mit gesetztem MSP_DEBUG_LOG liegt settings.json neben der Logdatei statt in %AppData%, damit Selbsttests die echten Einstellungen nicht anfassen.
+Mit gesetztem MSP_DEBUG_LOG liegen settings.json und der Ordner notes/ neben der Logdatei statt in %AppData% (`Services/AppPaths`), damit Selbsttests weder die echten Einstellungen noch die echten Hefte anfassen.
