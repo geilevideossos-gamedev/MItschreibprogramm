@@ -10,13 +10,13 @@ Stand: 2026-09-28
 - `./build.sh` hat dist/Mitschreibprogramm.exe (141 MB) aus diesem Stand gebaut. Der Selbsttest lief gegen den Debug-Build; die exe hat denselben App-Code.
 - Vorher (2026-09-19): alle 45 Features `done`, Checkpoint 1 bis 6 bestanden, Seitenstil Strichliert durch Kariert ersetzt.
 - Selbsttest-Werkzeuge in tools/: pen-sim.ps1, screenshot.ps1, app-control.ps1 (neu: -RightClick, -DoubleClick, -Exists, -Items, -Value), selftest.ps1 (startet nicht, solange eine Instanz läuft; wiederholt einen verlorenen Strich einmal), Checkpoints in tools/selftest/.
-- Nichts gepusht. origin/main steht unverändert auf dem GitHub-Commit `Initial commit`. Die lokale Historie wurde einmal neu geschrieben, damit jeder Commit baut (decisions.md).
+- Am 2026-09-28 auf Daniels Freigabe gepusht: origin/main steht auf dem Stand dieses Commits (94 Commits seit `Initial commit`). Die lokale Historie wurde vorher einmal neu geschrieben, damit jeder Commit baut (decisions.md).
 
 ## Nächster Schritt
 
 - Daniel testet mit dem echten Wacom Intuos nach testing.md, Abschnitt "Offen mit echtem Pen" (mit MSP_DEBUG_LOG liegt die Bibliothek neben dem Log). Was dort bestätigt ist, wandert in features.md von `done` auf `getestet`.
 - Offen zur Entscheidung: die Änderungszeit unter dem Heftnamen (nicht in der Spezifikation, eine Zeile in NotebookPanel.xaml) behalten oder streichen.
-- Push nur auf ausdrückliche Anweisung: `ALLOW_PUSH=1 git push origin main`.
+- Weitere Pushes nur auf ausdrückliche Anweisung: `ALLOW_PUSH=1 git push origin main`.
 
 ## Schrittplan
 
