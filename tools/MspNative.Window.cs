@@ -179,6 +179,33 @@ public static partial class MspNative
 
     public static int ProcessIdOf(IntPtr hwnd) { return (int)ProcessOf(hwnd); }
 
+    private delegate bool EnumChildProc(IntPtr hwnd, IntPtr lParam);
+
+    [DllImport("user32.dll")] private static extern bool EnumChildWindows(IntPtr parent, EnumChildProc callback, IntPtr lParam);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetWindowTextW(IntPtr hwnd, System.Text.StringBuilder text, int max);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetClassNameW(IntPtr hwnd, System.Text.StringBuilder text, int max);
+    [DllImport("user32.dll")] private static extern int GetDlgCtrlID(IntPtr hwnd);
+
+    // Text of every Edit control inside a Win32 dialog as "id|class|text" lines. The common file dialogs do not expose
+    // their file name box to the managed UI Automation client, so the self-test reads it this way.
+    public static string[] EditTexts(IntPtr dialog)
+    {
+        System.Collections.Generic.List<string> lines = new System.Collections.Generic.List<string>();
+        EnumChildWindows(dialog, delegate(IntPtr child, IntPtr lParam)
+        {
+            System.Text.StringBuilder className = new System.Text.StringBuilder(64);
+            GetClassNameW(child, className, className.Capacity);
+            if (className.ToString() == "Edit")
+            {
+                System.Text.StringBuilder text = new System.Text.StringBuilder(1024);
+                GetWindowTextW(child, text, text.Capacity);
+                lines.Add(GetDlgCtrlID(child) + "|" + className + "|" + text);
+            }
+            return true;
+        }, IntPtr.Zero);
+        return lines.ToArray();
+    }
+
     private static uint ProcessOf(IntPtr hwnd)
     {
         uint processId;

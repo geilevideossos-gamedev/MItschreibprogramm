@@ -11,7 +11,7 @@
 #   tools/app-control.ps1 -Read ZoomText                    prints the Name (text) of a control, "Window" = title of the foreground app window
 #   tools/app-control.ps1 -RightClick <id>                  right mouse click on the centre of a control (context menu)
 #   tools/app-control.ps1 -DoubleClick <id>                 left double click on the centre of a control
-#   tools/app-control.ps1 -Value 1001                       prints the text of a control with a Value pattern (file dialog name box), "" if absent
+#   tools/app-control.ps1 -Value 1001                       prints the text of a control (Value pattern, or a Win32 Edit by control id in a file dialog), "" if absent
 #   tools/app-control.ps1 -Exists NotebookList              prints True or False (collapsed controls are not in the UI Automation tree)
 #   tools/app-control.ps1 -Items NotebookList               prints the names of a list's items, one per line, in display order
 param(
@@ -101,9 +101,17 @@ if ($DoubleClick) {
     Start-Sleep -Milliseconds 400
 }
 if ($Value) {
+    # The common file dialogs hide their file name box from the managed UI Automation client; a numeric id is then
+    # looked up as Win32 control id among the dialog's Edit windows.
     $element = Find-Control ([MspNative]::ForegroundWindowOf($hwnd)) $Value -Optional
     $pattern = $null
-    if ($element -and $element.TryGetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern, [ref]$pattern)) { Write-Output $pattern.Current.Value } else { Write-Output "" }
+    $text = ""
+    if ($element -and $element.TryGetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern, [ref]$pattern)) { $text = $pattern.Current.Value }
+    elseif ($Value -match "^\d+$") {
+        $line = @([MspNative]::EditTexts([MspNative]::ForegroundWindowOf($hwnd))) | Where-Object { $_ -like "$Value|*" } | Select-Object -First 1
+        if ($line) { $text = ($line -split "\|", 3)[2] }
+    }
+    Write-Output $text
 }
 if ($Pixel) {
     $at = Get-Numbers $Pixel
