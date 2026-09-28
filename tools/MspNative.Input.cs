@@ -26,6 +26,7 @@ public static partial class MspNative
     private const uint INPUT_MOUSE = 0, INPUT_KEYBOARD = 1;
     private const uint KEYEVENTF_KEYUP = 0x2, KEYEVENTF_UNICODE = 0x4;
     private const uint MOUSEEVENTF_MOVE = 0x1, MOUSEEVENTF_LEFTDOWN = 0x2, MOUSEEVENTF_LEFTUP = 0x4;
+    private const uint MOUSEEVENTF_RIGHTDOWN = 0x8, MOUSEEVENTF_RIGHTUP = 0x10;
     private const uint MOUSEEVENTF_MIDDLEDOWN = 0x20, MOUSEEVENTF_MIDDLEUP = 0x40, MOUSEEVENTF_WHEEL = 0x800;
     private const uint MOUSEEVENTF_VIRTUALDESK = 0x4000, MOUSEEVENTF_ABSOLUTE = 0x8000;
 
@@ -112,6 +113,25 @@ public static partial class MspNative
                 Thread.Sleep(10);
             }
             Send(MouseInput(0, 0, 0, middle ? MOUSEEVENTF_MIDDLEUP : MOUSEEVENTF_LEFTUP));
+            Thread.Sleep(150);
+        }
+        finally { SetThreadDpiAwarenessContext(previous); }
+    }
+
+    // button: "left" or "right". The point is in physical screen pixels (UI Automation bounding rectangles).
+    public static void MouseClickAt(IntPtr hwnd, string button, int screenX, int screenY)
+    {
+        IntPtr previous = SetThreadDpiAwarenessContext(PerMonitorAwareV2);
+        try
+        {
+            POINT at = new POINT();
+            at.X = screenX;
+            at.Y = screenY;
+            RequireAppAt(hwnd, at);
+            bool right = button == "right";
+            MouseMove(at);
+            Send(MouseInput(0, 0, 0, right ? MOUSEEVENTF_RIGHTDOWN : MOUSEEVENTF_LEFTDOWN));
+            Send(MouseInput(0, 0, 0, right ? MOUSEEVENTF_RIGHTUP : MOUSEEVENTF_LEFTUP));
             Thread.Sleep(150);
         }
         finally { SetThreadDpiAwarenessContext(previous); }

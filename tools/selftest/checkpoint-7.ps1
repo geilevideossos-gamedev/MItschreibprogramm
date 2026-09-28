@@ -2,9 +2,7 @@
 # Section 7 of the step plan has no checkpoint of its own; it runs with the others and against the exe.
 function Checkpoint7 {
     Write-Output "Abschnitt 7: Dark Mode"
-    $file = Join-Path $outDir "cp7.msp"
     $pdf = Join-Path $outDir "cp7.pdf"
-    Remove-Item $file -ErrorAction SilentlyContinue
     Start-App
     Ctl -Keys "plus"; Ctl -Keys "plus"; Ctl -Keys "plus"; Ctl -Keys "plus"
     $origin = Get-PageOrigin 500 160
@@ -36,12 +34,10 @@ function Checkpoint7 {
     $darkGrid = Get-VerticalLineCount "cp7-dark-squared"
     Check ($darkGrid -ge 30 -and $darkGrid -le 45) "Kariert im Dark Mode: helleres Gitter auf dunkler Seite ($darkGrid senkrechte Linien)"
 
+    # Ctrl+S writes the open notebook into the library without a dialog.
     Ctl -Keys "ctrl+s"
-    Start-Sleep -Milliseconds 1200
-    & "$toolsDir/screenshot.ps1" -Dialog -Out (Join-Path $outDir "cp7-dark-savedialog.png") | Out-Null
-    Ctl -Text $file
-    Ctl -Keys "enter"
-    Start-Sleep -Milliseconds 1200
+    Start-Sleep -Milliseconds 600
+    $file = (Get-ChildItem (Join-Path $outDir "notes") -Filter "*.msp" | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
     $colors = @((Get-Content $file -Raw | ConvertFrom-Json).pages[0].strokes | ForEach-Object { $_.color })
     Check (($colors -join ",") -eq "black,black,blue,black") "Gespeichert bleibt die logische Farbe ($($colors -join ','))"
     Ctl -Keys "ctrl+e"
@@ -63,4 +59,7 @@ function Checkpoint7 {
     $restored = Get-PageOrigin 500 160
     Check ((Get-PageBrightness $restored 300 256) -lt 200) "Neustart kommt im Dark Mode hoch"
     Shot "cp7-dark-restart"
+    Ctl -Keys "ctrl+b"
+    Shot "cp7-dark-panel"
+    Check ((Ctl -Exists NotebookList) -eq "True") "Seitenleiste im Dark Mode eingeblendet (Screenshot cp7-dark-panel)"
 }

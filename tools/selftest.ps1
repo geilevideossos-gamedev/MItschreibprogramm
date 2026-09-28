@@ -35,10 +35,17 @@ function Pen { & "$PSScriptRoot/pen-sim.ps1" @args | Out-Null; Start-Sleep -Mill
 function Ctl { & "$PSScriptRoot/app-control.ps1" @args; Start-Sleep -Milliseconds 250 }
 function Shot([string]$name) { & "$PSScriptRoot/screenshot.ps1" -Out (Join-Path $outDir "$name.png") | Out-Null }
 
-function Start-App([switch]$KeepSettings) {
+# Without -KeepSettings the run starts from scratch: no settings and an empty notebook library. The older checkpoints
+# place strokes by fixed client coordinates that assume the page position without the panel, so it starts hidden
+# unless -Panel is given.
+function Start-App([switch]$KeepSettings, [switch]$Panel) {
     Stop-App
     Remove-Item $logPath -ErrorAction SilentlyContinue
-    if (-not $KeepSettings) { Remove-Item (Join-Path $outDir "settings.json") -ErrorAction SilentlyContinue }
+    if (-not $KeepSettings) {
+        Remove-Item (Join-Path $outDir "settings.json") -ErrorAction SilentlyContinue
+        Remove-Item (Join-Path $outDir "notes") -Recurse -Force -ErrorAction SilentlyContinue
+        if (-not $Panel) { Set-Content (Join-Path $outDir "settings.json") '{ "notebookPanelVisible": false }' }
+    }
     $script:logOffset = 0
     $env:MSP_DEBUG_LOG = $logPath
     try { Start-Process -FilePath $exePath } finally { $env:MSP_DEBUG_LOG = $null }
@@ -202,6 +209,11 @@ function Get-DarkerThanLinesShare([string]$name) {
 foreach ($part in Get-ChildItem (Join-Path $PSScriptRoot "selftest") -Filter "checkpoint-*.ps1") { . $part.FullName }
 
 # The run takes over mouse and keyboard. It only starts on a machine nobody is using right now, and gives up otherwise.
+# It also stops every instance of the app, so a copy somebody is working in right now must be closed first.
+if (Get-Process Mitschreibprogramm -ErrorAction SilentlyContinue) {
+    Write-Output "ABBRUCH: Mitschreibprogramm laeuft bereits. Der Selbsttest wuerde es beenden, bitte zuerst schliessen."
+    exit 98
+}
 if (-not ("MspNative" -as [type])) { Add-Type -Path (Get-ChildItem $PSScriptRoot -Filter "MspNative.*.cs").FullName -ReferencedAssemblies System.Drawing }
 [MspNative]::KeepAwake()
 $waited = 0

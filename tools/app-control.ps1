@@ -9,15 +9,25 @@
 #   tools/app-control.ps1 -Bounds                           prints the window rectangle in physical pixels (does not activate)
 #   tools/app-control.ps1 -Pixel "500,300"                  prints the screen colour at a client position as r,g,b
 #   tools/app-control.ps1 -Read ZoomText                    prints the Name (text) of a control, "Window" = title of the foreground app window
+#   tools/app-control.ps1 -RightClick <id>                  right mouse click on the centre of a control (context menu)
+#   tools/app-control.ps1 -DoubleClick <id>                 left double click on the centre of a control
+#   tools/app-control.ps1 -Value 1001                       prints the text of a control with a Value pattern (file dialog name box), "" if absent
+#   tools/app-control.ps1 -Exists NotebookList              prints True or False (collapsed controls are not in the UI Automation tree)
+#   tools/app-control.ps1 -Items NotebookList               prints the names of a list's items, one per line, in display order
 param(
     [string]$Place,
     [string]$Keys,
     [string]$Text,
     [string]$Click,
+    [string]$RightClick,
+    [string]$DoubleClick,
+    [string]$Value,
     [string]$Wheel,
     [string]$Drag,
     [string]$Hold,
     [string]$Read,
+    [string]$Exists,
+    [string]$Items,
     [string]$Pixel,
     [switch]$Bounds,
     [string]$ProcessName = "Mitschreibprogramm"
@@ -27,7 +37,8 @@ $ErrorActionPreference = "Stop"
 if (-not ("MspNative" -as [type])) { Add-Type -Path (Get-ChildItem $PSScriptRoot -Filter "MspNative.*.cs").FullName -ReferencedAssemblies System.Drawing }
 Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
 
-$virtualKeys = @{ ctrl = 0x11; shift = 0x10; alt = 0x12; enter = 0x0D; space = 0x20; esc = 0x1B; tab = 0x09; plus = 0xBB; minus = 0xBD; f4 = 0x73 }
+$virtualKeys = @{ ctrl = 0x11; shift = 0x10; alt = 0x12; enter = 0x0D; space = 0x20; esc = 0x1B; tab = 0x09; plus = 0xBB; minus = 0xBD; f4 = 0x73
+    f10 = 0x79; up = 0x26; down = 0x28; home = 0x24; end = 0x23; delete = 0x2E; apps = 0x5D }
 function Get-VirtualKey([string]$name) {
     $key = $name.Trim().ToLowerInvariant()
     if ($virtualKeys.ContainsKey($key)) { return [uint16]$virtualKeys[$key] }
@@ -38,12 +49,23 @@ function Get-Numbers([string]$list) {
     $invariant = [System.Globalization.CultureInfo]::InvariantCulture
     return @($list.Split(",") | ForEach-Object { [double]::Parse($_.Trim(), $invariant) })
 }
-function Find-Control([IntPtr]$window, [string]$automationId) {
-    $root = [System.Windows.Automation.AutomationElement]::FromHandle($window)
+# Looks in the given window first, then in every other top-level window of the app (dialogs, context menu popups).
+function Find-Control([IntPtr]$window, [string]$automationId, [switch]$Optional) {
     $condition = New-Object System.Windows.Automation.PropertyCondition(
         [System.Windows.Automation.AutomationElement]::AutomationIdProperty, $automationId)
-    $element = $root.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
-    if (-not $element) { throw "Control '$automationId' nicht gefunden." }
+    $element = $null
+    if ($window -ne [IntPtr]::Zero) {
+        $element = [System.Windows.Automation.AutomationElement]::FromHandle($window).FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
+    }
+    if (-not $element) {
+        $sameProcess = New-Object System.Windows.Automation.PropertyCondition(
+            [System.Windows.Automation.AutomationElement]::ProcessIdProperty, [MspNative]::ProcessIdOf($hwnd))
+        foreach ($top in [System.Windows.Automation.AutomationElement]::RootElement.FindAll([System.Windows.Automation.TreeScope]::Children, $sameProcess)) {
+            $element = $top.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
+            if ($element) { break }
+        }
+    }
+    if (-not $element -and -not $Optional) { throw "Control '$automationId' nicht gefunden." }
     return $element
 }
 
@@ -67,9 +89,36 @@ if ($Click) {
     else { throw "Control '$Click' unterstuetzt weder Select, Toggle noch Invoke." }
     Start-Sleep -Milliseconds 200
 }
+if ($RightClick) {
+    $rect = (Find-Control ([MspNative]::ForegroundWindowOf($hwnd)) $RightClick).Current.BoundingRectangle
+    [MspNative]::MouseClickAt($hwnd, "right", [int]($rect.X + $rect.Width / 2), [int]($rect.Y + $rect.Height / 2))
+    Start-Sleep -Milliseconds 400
+}
+if ($DoubleClick) {
+    $rect = (Find-Control ([MspNative]::ForegroundWindowOf($hwnd)) $DoubleClick).Current.BoundingRectangle
+    $x = [int]($rect.X + $rect.Width / 2); $y = [int]($rect.Y + $rect.Height / 2)
+    [MspNative]::MouseClickAt($hwnd, "left", $x, $y)
+    [MspNative]::MouseClickAt($hwnd, "left", $x, $y)
+    Start-Sleep -Milliseconds 400
+}
+if ($Value) {
+    $element = Find-Control ([MspNative]::ForegroundWindowOf($hwnd)) $Value -Optional
+    $pattern = $null
+    if ($element -and $element.TryGetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern, [ref]$pattern)) { Write-Output $pattern.Current.Value } else { Write-Output "" }
+}
 if ($Pixel) {
     $at = Get-Numbers $Pixel
     Write-Output ([MspNative]::ClientPixel($hwnd, $at[0], $at[1]))
+}
+if ($Exists) {
+    $element = Find-Control ([MspNative]::ForegroundWindowOf($hwnd)) $Exists -Optional
+    Write-Output ($null -ne $element -and -not $element.Current.IsOffscreen)
+}
+if ($Items) {
+    $list = Find-Control ([MspNative]::ForegroundWindowOf($hwnd)) $Items
+    $itemCondition = New-Object System.Windows.Automation.PropertyCondition(
+        [System.Windows.Automation.AutomationElement]::ControlTypeProperty, [System.Windows.Automation.ControlType]::ListItem)
+    foreach ($item in $list.FindAll([System.Windows.Automation.TreeScope]::Children, $itemCondition)) { Write-Output $item.Current.Name }
 }
 if ($Read -eq "Window") {
     Write-Output ([System.Windows.Automation.AutomationElement]::FromHandle([MspNative]::ForegroundWindowOf($hwnd))).Current.Name

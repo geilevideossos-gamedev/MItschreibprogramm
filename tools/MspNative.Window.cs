@@ -176,6 +176,8 @@ public static partial class MspNative
         finally { SetThreadDpiAwarenessContext(previous); }
     }
 
+    public static int ProcessIdOf(IntPtr hwnd) { return (int)ProcessOf(hwnd); }
+
     private static uint ProcessOf(IntPtr hwnd)
     {
         uint processId;
