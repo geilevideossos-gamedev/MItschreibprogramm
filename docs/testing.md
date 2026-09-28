@@ -15,7 +15,8 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 - Ausgabe: PASS/FAIL je Prüfung, am Ende `SELFTEST OK` oder Fehlerzahl (Exit-Code). Screenshots und Log liegen in tmp/selftest/.
 - Einzelschritte von Hand: `tools/app-control.ps1` (Fenster platzieren, Tasten, Maus, Controls per AutomationId), `tools/pen-sim.ps1`, `tools/screenshot.ps1`. Koordinaten sind WPF-Einheiten relativ zum Client-Bereich.
 - Das Testfenster liegt bei 20,10 mit 1500 x 1000 physischen Pixeln. Bei 125 % Skalierung beginnt die Seite dann bei Client-Koordinate ca. 188,59. `Start-App` blendet die Seitenleiste dafür über settings.json aus; Checkpoint 4 startet mit `-Panel`, dann liegt die Seite 110 Einheiten weiter rechts und die Striche gehen über `Get-PageOrigin`.
-- Jeder Start ohne `-KeepSettings` beginnt mit leerer Bibliothek (tmp/selftest/notes/ wird gelöscht). Für die Seitenleiste kann app-control.ps1 Listeneinträge per id anklicken (`-Click <id>`, ids aus index.json), doppelt klicken (`-DoubleClick`), rechts klicken (`-RightClick`, Kontextmenü, Menüpunkte danach per `-Click RenameMenuItem` usw.), Listen lesen (`-Items NotebookList`), Sichtbarkeit prüfen (`-Exists`) und den Dateinamen im Windows-Dialog lesen (`-Value 1001`).
+- Jeder Start ohne `-KeepSettings` beginnt mit leerer Bibliothek (tmp/selftest/notes/ wird gelöscht). Für die Seitenleiste kann app-control.ps1 Listeneinträge per id anklicken (`-Click <id>`, ids aus index.json), doppelt klicken (`-DoubleClick`), rechts klicken (`-RightClick`, Kontextmenü, Menüpunkte danach per `-Click RenameMenuItem` usw.), Listen lesen (`-Items NotebookList`), Sichtbarkeit prüfen (`-Exists`, gibt True/False als Text) und den Dateinamen im Windows-Dialog lesen (`-Value 1001`, per WM_GETTEXT, weil UI Automation das Feld nicht zeigt; danach die Auswahl mit Strg+A erneuern, bevor ein Pfad getippt wird).
+- Ein injizierter Strich kommt hin und wieder nicht an (siehe Checkpoint 6). `Pen` wiederholt ihn dann einmal, meldet `RETRY` und zählt ihn in der Schlusszeile mit. Die Skripte bleiben reines ASCII, weil Windows PowerShell 5.1 Dateien ohne BOM in der ANSI-Codepage liest.
 
 ## Checkpoints
 
@@ -24,7 +25,7 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 | 1 | Pen: synthetischer Strich mit steigendem Druck, Seitentaste als Radierer, invertierter Stift. Druckverlauf im Debug-Log, Screenshot | bestanden 2026-09-19, 7/7 |
 | 2 | Hintergrund, Zoom, Pan, Undo/Redo: Screenshot pro Stil und Zoomstufe, Strich bei 200 % injizieren, Koordinaten im Debug-Log prüfen | bestanden 2026-09-19, 13/13 |
 | 3 | Seitenmodell: xUnit für Konvertierung, Screenshot beider Modi, Auto-Seite per injiziertem Strich unten | bestanden 2026-09-19, 11/11, xUnit 7/7 |
-| 4 | Hefte-Bibliothek (seit 2026-09-28, vorher Datei-Befehle): mehrere Hefte anlegen, Striche injizieren, umbenennen (Doppelklick und Kontextmenü), wechseln, Sortierung, .msp-Export und -Import, PDF aus dem Kontextmenü mit vorgeschlagenem Namen, Löschen mit Rückfrage, Strg+B, schließen und neu starten: Hefte, Striche und Scrollposition wieder da, Screenshot der Seitenleiste. xUnit für Index und Autosave | offen (alte Fassung bestanden 2026-09-19, 18/18) |
+| 4 | Hefte-Bibliothek (seit 2026-09-28, vorher Datei-Befehle): mehrere Hefte anlegen, Striche injizieren, umbenennen (Doppelklick und Kontextmenü), wechseln, Sortierung, .msp-Export und -Import, PDF aus dem Kontextmenü mit vorgeschlagenem Namen, Löschen mit Rückfrage, Strg+B, schließen und neu starten: Hefte, Striche und Scrollposition wieder da, Screenshot der Seitenleiste. xUnit für Index und Autosave | bestanden 2026-09-28, 31/31, xUnit 55/55 (alte Fassung 2026-09-19, 18/18) |
 | 5 | PDF-Export: xUnit Seitenzahl, PDF in Bild wandeln (pdftoppm) und anschauen | bestanden 2026-09-19, 5/5, xUnit 22/22 |
 | 6 | exe aus dist/ starten, Selbsttest komplett gegen die exe wiederholen | bestanden 2026-09-19 gegen die finale exe, 65/65 (Teil 1: 31/31, Teil 2: 34/34) |
 
@@ -49,6 +50,15 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 - Endlos wächst nach rechts: nach einem Strich bei X 600..760 ist ein Strich bei X 900 möglich. Zurück im Seitenmodus: 5 Seiten (4 Zeilen plus eine Seite für den Inhalt rechts).
 - Gefunden und behoben: Hilfslinien verschwanden bei Zoom unter 100 % bandweise.
 
+### Ergebnis Checkpoint 4 (Hefte-Bibliothek, 2026-09-28)
+
+- 31/31 gegen den Debug-Build. Erster Start legt „Unbenannt“ an (Titel, Statusleiste, index.json, notes/<id>.msp). Ctrl+N legt ein zweites Heft an, das erste liegt danach mit beiden injizierten Strichen auf der Platte. Doppelklick öffnet den Umbenennen-Dialog, danach heißt es „Mathe“.
+- Nach zwei neuen Seiten und fünf Rasten Mausrad steht Mathe auf „Seite 3 von 3“. Klick auf das erste Heft öffnet es (Mathe gespeichert, 3 Seiten), die Liste zeigt Mathe oben. Zurück in Mathe liegt der Seitenursprung wieder bei Y −179 wie beim Verlassen, nach Alt+F4 und Neustart ebenso (index.json: scrollY gemerkt, lastOpen = Mathe).
+- Ctrl+Umschalt+S schlägt „Unbenannt.msp“ vor und schreibt die Datei mit 2 Strichen, Ctrl+O kopiert sie als Heft „cp4-export“ in die Bibliothek. „+ Neues Heft“ legt ein viertes an. Rechtsklick öffnet das Menü ohne Heftwechsel, Löschen fragt nach (Abbrechen ändert nichts), Löschen entfernt Datei und Eintrag. Menü-Umbenennen eines fremden Hefts lässt das offene offen, Menü-PDF schlägt „Physik.pdf“ vor und liefert 3 Seiten. Strg+B blendet aus und ein. Löschen des offenen Hefts öffnet das nächste.
+- Screenshots: cp4-panel.png, cp4-panel-hidden.png, cp4-panel-restart.png, cp4-rename-dialog.png, cp4-delete-dialog.png, dazu cp7-dark-panel.png im Dark Mode.
+- Vorläufe: einmal ging der erste injizierte Strich verloren (kein Log, Ursprung NaN, Lauf abgebrochen), einmal der zweite. Seither wiederholt `Pen` einen verlorenen Strich einmal. Zwei Skriptfehler aus dem Code-Review vorab behoben (Umlaut im Skript, Boolean gegen "False").
+- Checkpoints 1, 2, 3 (31/31) und 5, 7 (19/19) laufen mit ausgeblendeter Seitenleiste weiter durch.
+
 ### Ergebnis Checkpoint 4 (Datei-Befehle, Fassung bis 2026-09-28)
 
 - xUnit: .msp Round-Trip aller Felder, exakte JSON-Form, tolerantes Laden, neuere Version wird abgelehnt. Settings Round-Trip, Standardwerte bei fehlender oder kaputter Datei.
@@ -69,6 +79,7 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 - Neuer Strich im Dark Mode erscheint weiß. Undo, Themenwechsel, Redo: der Strich kommt in der Farbe des aktuellen Themas zurück.
 - Gespeicherte Datei enthält weiter `black`. PDF aus dem Dark Mode ist Schwarz auf Weiß. darkMode steht in settings.json, der Neustart kommt dunkel hoch.
 - Gefunden und behoben: Toggle reagierte nur auf Click, nicht auf UI Automation.
+- 2026-09-28: 13/13 mit der Hefte-Bibliothek, Ctrl+S schreibt still in notes/, die Seitenleiste ist im Dark Mode korrekt eingefärbt (cp7-dark-panel.png).
 
 ### Ergebnis Checkpoint 6 (gegen dist/Mitschreibprogramm.exe)
 
