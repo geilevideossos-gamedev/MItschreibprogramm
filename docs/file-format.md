@@ -91,6 +91,6 @@ Ort: `%AppData%/Mitschreibprogramm/settings.json`, JSON eingerückt. Code: `Serv
 | notebookPanelVisible | true | Seitenleiste mit den Heften eingeblendet (Strg+B) |
 | windowLeft, windowTop, windowWidth, windowHeight | null | Fensterlage im Normalzustand (WPF-Einheiten). null = Standardgröße, zentriert |
 | windowMaximized | false | Fenster war maximiert |
-| lastFolder | null | zuletzt benutzter Ordner für Öffnen / Speichern / Export |
+| lastFolder | null | zuletzt benutzter Ordner für Importieren und Exportieren (.msp und PDF) |
 
 Mit gesetztem MSP_DEBUG_LOG liegen settings.json und der Ordner notes/ neben der Logdatei statt in %AppData% (`Services/AppPaths`), damit Selbsttests weder die echten Einstellungen noch die echten Hefte anfassen.

@@ -173,3 +173,12 @@ Ein zweiter, nur lesender Durchgang über den ganzen Code hat diese Fehler gefun
 - `AtomicFile` wiederholt nur bei kurz gesperrter Datei (Sharing- oder Lock-Violation, UnauthorizedAccess), nicht bei voller Platte oder fehlendem Ordner.
 - Verworfen: Speichern im Hintergrund-Thread. Bei sehr großen Heften dauert Serialisieren plus Schreiben 100 bis 300 ms auf dem UI-Thread; der Tick setzt während eines Strichs aus, die Nassschrift läuft ohnehin auf dem Stift-Thread. Der Mehraufwand (Reihenfolge mit Wechsel und Beenden, Fehlerpfade) lohnt sich erst, wenn es spürbar wird.
 - Die Änderungszeit unter dem Heftnamen steht nicht in der Spezifikation. Sie bleibt, weil sie die verlangte Sortierung nachvollziehbar macht: eine Zeile im ItemTemplate, jederzeit streichbar.
+
+## 2026-09-28 Nach dem Code-Review
+
+- Striche, die entstehen, während kein Heft offen ist (Ordner beim ersten Start nicht beschreibbar, oder nach dem Löschen ließ sich kein Heft öffnen), gehen nicht verloren: die Session merkt sie sich (`_orphanChanges`), und der nächste erfolgreiche Speichervorgang legt daraus ein Heft „Unbenannt“ an. Bis dahin gelten sie als ungespeichert (Titel, Rückfrage beim Beenden). Verworfen: die Fläche in dem Zustand sperren, das hätte den Benutzer mitten im Schreiben ausgebremst.
+- MSP-Export in den Bibliotheksordner selbst wird abgelehnt (`NotebookLibrary.Contains`): dort hätte er ein anderes Heft oder index.json überschrieben.
+- Speicher und Platte bleiben gleich: `Rename` nimmt den Namen zurück, wenn der Index nicht geschrieben werden konnte; nach einem Löschen richtet sich die Ansicht danach, ob der Eintrag noch existiert, nicht nach dem Rückgabewert. Ids aus der Seitenleiste, die die Bibliothek nicht mehr kennt, bauen die Liste neu auf statt zu werfen (`Find` statt `Entry`).
+- Ein Heft ohne gemerkte Position (Scrollwerte 0/0, nur bei nie verlassenen Heften) startet ganz oben mit sichtbarem Rand; sonst läge die Seitenkante exakt an der Fensterkante.
+- Selbsttest-Skripte bleiben reines ASCII: Windows PowerShell 5.1 liest Dateien ohne BOM in der ANSI-Codepage, ein „ö“ im Skript käme als „Ã¶“ an. Umlaute werden mit `[char]0xF6` gebaut. `-Exists` gibt wie die anderen Schalter Text aus („True“/„False“), weil `$false -eq "False"` in PowerShell falsch ist.
+- Die Zwischencommits caa826f bis 1e4c9b7 hatten die Löschung von FileSession zu früh enthalten (bauten nicht); die lokale, nie gepushte Historie wurde dafür einmal neu geschrieben, damit jeder Commit baut.

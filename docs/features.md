@@ -12,7 +12,7 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F04 | Stiftdruck moduliert die Breite um die Basisbreite (IgnorePressure = false). Checkbox "Druck" zum Abschalten. Maus = konstante Breite | done |
 | F05 | Radierer ganzer Strich (EraseByStroke). Aktivierung auf drei Wegen: Toolbar-Button, Taste E (bleibt an bis P oder E), oder untere Seitentaste am Pen gedrückt halten = Radierer nur solange gedrückt. Meldet der Wacom-Treiber die Taste als invertierten Stift (Tastenfunktion "Radieren" im Treiber), wirkt das ebenfalls als Radierer. Wie WPF Seitentasten und Inverted liefert, steht in docs/pen-input.md | done |
 | F06 | Glättung an (FitToCurve) | done |
-| F07 | Undo / Redo strichbasiert, Ctrl+Z / Ctrl+Y, Verlauf bis zum letzten Öffnen oder Neu | done |
+| F07 | Undo / Redo strichbasiert, Ctrl+Z / Ctrl+Y, Verlauf bis zum letzten Öffnen oder Neu (seit 2026-09-28: bis zum letzten Heftwechsel) | done |
 
 ## Seite und Hintergrund
 
