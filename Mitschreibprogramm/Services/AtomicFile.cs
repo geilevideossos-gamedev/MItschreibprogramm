@@ -5,6 +5,8 @@ namespace Mitschreibprogramm.Services;
 
 public static class AtomicFile
 {
+    private const int SharingViolation = unchecked((int)0x80070020);
+    private const int LockViolation = unchecked((int)0x80070021);
     private static readonly TimeSpan[] MoveRetryDelays = [TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(150), TimeSpan.FromMilliseconds(400)];
 
     // Written next to the target and moved over it, so a crash never leaves a half-written file behind.
@@ -33,7 +35,8 @@ public static class AtomicFile
                 File.Move(temporary, path, overwrite: true);
                 return;
             }
-            catch (IOException) when (attempt < MoveRetryDelays.Length)
+            catch (Exception e) when (attempt < MoveRetryDelays.Length
+                && (e is UnauthorizedAccessException || e is IOException { HResult: SharingViolation or LockViolation }))
             {
                 Thread.Sleep(MoveRetryDelays[attempt]);
             }

@@ -11,31 +11,35 @@ public sealed class NotebookLibraryTests : IDisposable
 
     public void Dispose() => Directory.Delete(Path.GetDirectoryName(_folder)!, recursive: true);
 
+    // Tests delete permanently, so runs do not fill the recycle bin of the machine.
+    private NotebookLibrary Library(string? folder = null) => new(folder ?? _folder, _time, File.Delete);
+
     [Fact]
     public void Create_WritesTheFileAndTheIndex_AndAnotherInstanceLoadsBoth()
     {
-        var library = new NotebookLibrary(_folder, _time);
+        var library = Library();
         var document = new NoteDocument { PageStyle = PageStyle.Squared, Pages = [new NotePage()] };
 
         var entry = library.Create("Mathe", document);
         library.Open(entry.Id);
 
-        var reloaded = new NotebookLibrary(_folder, _time);
+        var reloaded = Library();
         reloaded.Load();
         var loaded = Assert.Single(reloaded.Notebooks);
         Assert.Equal(entry.Id, loaded.Id);
         Assert.Equal("Mathe", loaded.Name);
         Assert.Equal(_time.Now, loaded.Modified);
         Assert.Equal(entry.Id, reloaded.LastOpen);
+        Assert.Null(reloaded.OpenId);
         Assert.Equal(PageStyle.Squared, reloaded.LoadDocument(entry.Id).PageStyle);
         Assert.True(File.Exists(Path.Combine(_folder, entry.Id + ".msp")));
         Assert.Empty(Directory.GetFiles(_folder, "*.tmp"));
     }
 
     [Fact]
-    public void Notebooks_AreSortedByModifiedNewestFirst()
+    public void Notebooks_AreSortedByModifiedNewestFirst_AndAChangeMovesTheOpenOneUpBeforeItIsSaved()
     {
-        var library = new NotebookLibrary(_folder, _time);
+        var library = Library();
         library.Create("Alt", new NoteDocument());
         _time.Advance(TimeSpan.FromMinutes(1));
         var middle = library.Create("Mitte", new NoteDocument());
@@ -45,17 +49,18 @@ public sealed class NotebookLibraryTests : IDisposable
         Assert.Equal(["Neu", "Mitte", "Alt"], library.Notebooks.Select(entry => entry.Name));
 
         library.Open(middle.Id);
-        library.MarkChanged();
+        Assert.Equal(["Neu", "Mitte", "Alt"], library.Notebooks.Select(entry => entry.Name));
         _time.Advance(TimeSpan.FromMinutes(1));
-        library.Save(() => new NoteDocument(), 0, 0);
+        library.MarkChanged();
 
         Assert.Equal(["Mitte", "Neu", "Alt"], library.Notebooks.Select(entry => entry.Name));
+        Assert.Equal(_time.Now, library.Entry(middle.Id).Modified);
     }
 
     [Fact]
     public void Save_WritesTheFileOnlyAfterAChange_ButAlwaysRecordsTheScrollPosition()
     {
-        var library = new NotebookLibrary(_folder, _time);
+        var library = Library();
         var entry = library.Create("Mathe", new NoteDocument());
         var path = library.PathOf(entry.Id);
         var before = File.ReadAllText(path);
@@ -78,7 +83,7 @@ public sealed class NotebookLibraryTests : IDisposable
         Assert.Equal(_time.Now, library.Notebooks[0].Modified);
         Assert.Equal(40, library.Notebooks[0].ScrollY);
 
-        var reloaded = new NotebookLibrary(_folder, _time);
+        var reloaded = Library();
         reloaded.Load();
         Assert.Equal(40, reloaded.Notebooks[0].ScrollY);
         Assert.Equal(_time.Now, reloaded.Notebooks[0].Modified);
@@ -87,7 +92,7 @@ public sealed class NotebookLibraryTests : IDisposable
     [Fact]
     public void Save_KeepsTheChangeWhenTheFileCannotBeWritten()
     {
-        var library = new NotebookLibrary(_folder, _time);
+        var library = Library();
         var entry = library.Create("Mathe", new NoteDocument());
         library.Open(entry.Id);
         library.MarkChanged();
@@ -106,18 +111,21 @@ public sealed class NotebookLibraryTests : IDisposable
     }
 
     [Fact]
-    public void Save_DoesNothingWhileNoNotebookIsOpen()
+    public void Save_AndMarkChanged_DoNothingWhileNoNotebookIsOpen()
     {
-        var library = new NotebookLibrary(_folder, _time);
+        var library = Library();
+        var entry = library.Create("Mathe", new NoteDocument());
         library.MarkChanged();
 
+        Assert.False(library.HasChanges);
         Assert.False(library.Save(() => throw new InvalidOperationException("must not be called"), 0, 0));
+        Assert.Equal(_time.Now, library.Entry(entry.Id).Modified);
     }
 
     [Fact]
-    public void Rename_KeepsTheTimestamp_AndDelete_RemovesFileEntryAndLastOpen()
+    public void Rename_KeepsTheTimestamp_AndDelete_RemovesFileEntryAndOpenState()
     {
-        var library = new NotebookLibrary(_folder, _time);
+        var library = Library();
         var first = library.Create("Eins", new NoteDocument());
         _time.Advance(TimeSpan.FromMinutes(1));
         var second = library.Create("Zwei", new NoteDocument());
@@ -126,18 +134,36 @@ public sealed class NotebookLibraryTests : IDisposable
         _time.Advance(TimeSpan.FromMinutes(1));
 
         library.Rename(first.Id, "Deutsch");
-        Assert.Equal("Deutsch", library.Notebooks.Single(entry => entry.Id == first.Id).Name);
-        Assert.Equal(_time.Now - TimeSpan.FromMinutes(2), library.Notebooks.Single(entry => entry.Id == first.Id).Modified);
+        Assert.Equal("Deutsch", library.Entry(first.Id).Name);
+        Assert.Equal(_time.Now - TimeSpan.FromMinutes(2), library.Entry(first.Id).Modified);
 
         library.Delete(second.Id);
 
         Assert.False(File.Exists(library.PathOf(second.Id)));
+        Assert.Null(library.OpenId);
         Assert.Null(library.LastOpen);
         Assert.False(library.HasChanges);
-        var reloaded = new NotebookLibrary(_folder, _time);
+        Assert.False(library.Save(() => new NoteDocument(), 0, 0));
+        Assert.False(File.Exists(library.PathOf(second.Id)));
+        var reloaded = Library();
         reloaded.Load();
         Assert.Equal("Deutsch", Assert.Single(reloaded.Notebooks).Name);
         Assert.Null(reloaded.LastOpen);
+    }
+
+    [Fact]
+    public void Delete_LeavesTheEntryWhenTheFileIsLocked()
+    {
+        var library = Library();
+        var entry = library.Create("Mathe", new NoteDocument());
+        var index = File.ReadAllText(Path.Combine(_folder, "index.json"));
+        using (new FileStream(library.PathOf(entry.Id), FileMode.Open, FileAccess.Read, FileShare.None))
+        {
+            Assert.ThrowsAny<Exception>(() => library.Delete(entry.Id));
+        }
+
+        Assert.Single(library.Notebooks);
+        Assert.Equal(index, File.ReadAllText(Path.Combine(_folder, "index.json")));
     }
 
     [Fact]
@@ -145,7 +171,7 @@ public sealed class NotebookLibraryTests : IDisposable
     {
         var source = Path.Combine(Path.GetDirectoryName(_folder)!, "Physik Notizen.msp");
         File.WriteAllText(source, """{"version":1,"pageStyle":"dashed","pages":[{"strokes":[{"color":"red","width":2,"points":[[1,2,0.5]]}]}]}""");
-        var library = new NotebookLibrary(_folder, _time);
+        var library = Library();
 
         var entry = library.Import(source);
 
@@ -161,7 +187,7 @@ public sealed class NotebookLibraryTests : IDisposable
     {
         var source = Path.Combine(Path.GetDirectoryName(_folder)!, "kaputt.msp");
         File.WriteAllText(source, "{ not json");
-        var library = new NotebookLibrary(_folder, _time);
+        var library = Library();
 
         Assert.ThrowsAny<Exception>(() => library.Import(source));
 
@@ -169,48 +195,70 @@ public sealed class NotebookLibraryTests : IDisposable
     }
 
     [Fact]
-    public void Load_DropsEntriesWithoutFile_AdoptsOrphanFiles_AndClearsAStaleLastOpen()
+    public void Load_DropsEntriesWithoutFile_AdoptsOrphanFiles_IgnoresOtherFiles_AndWritesNothing()
     {
-        var library = new NotebookLibrary(_folder, _time);
+        var library = Library();
         var kept = library.Create("Bleibt", new NoteDocument());
         var lost = library.Create("Weg", new NoteDocument());
         library.Open(lost.Id);
         File.Delete(library.PathOf(lost.Id));
         MspFileService.Save(new NoteDocument(), Path.Combine(_folder, "Chemie.msp"));
         File.WriteAllText(Path.Combine(_folder, "notizen.txt"), "kein Heft");
+        File.WriteAllText(Path.Combine(_folder, "halb.msp.tmp"), "{}");
+        File.WriteAllText(Path.Combine(_folder, "index.json.tmp"), "{}");
+        var index = File.ReadAllText(Path.Combine(_folder, "index.json"));
 
-        var reloaded = new NotebookLibrary(_folder, _time);
+        var reloaded = Library();
         reloaded.Load();
 
         Assert.Equal(["Bleibt", "Chemie"], reloaded.Notebooks.Select(entry => entry.Name).OrderBy(name => name));
         Assert.Equal("Chemie", reloaded.Notebooks.Single(entry => entry.Name == "Chemie").Id);
         Assert.Equal(kept.Id, reloaded.Notebooks.Single(entry => entry.Name == "Bleibt").Id);
         Assert.Null(reloaded.LastOpen);
+        Assert.Equal(index, File.ReadAllText(Path.Combine(_folder, "index.json")));
     }
 
     [Fact]
-    public void Load_RebuildsFromTheFolderWhenTheIndexIsCorrupt_AndStartsEmptyWithoutAFolder()
+    public void Load_RebuildsFromTheFolderWhenTheIndexIsCorrupt_NamesOwnFilesRecovered_AndStartsEmptyWithoutAFolder()
     {
-        var library = new NotebookLibrary(_folder, _time);
+        var library = Library();
         var entry = library.Create("Mathe", new NoteDocument());
+        File.SetLastWriteTime(library.PathOf(entry.Id), new DateTime(2026, 9, 28, 14, 5, 0));
         File.WriteAllText(Path.Combine(_folder, "index.json"), "{ not json");
 
-        var reloaded = new NotebookLibrary(_folder, _time);
+        var reloaded = Library();
         reloaded.Load();
         var adopted = Assert.Single(reloaded.Notebooks);
         Assert.Equal(entry.Id, adopted.Id);
-        Assert.Equal(entry.Id, adopted.Name);
+        Assert.Equal("Wiederhergestellt 28.09.2026 14:05", adopted.Name);
 
-        var empty = new NotebookLibrary(Path.Combine(_folder, "missing"), _time);
+        var empty = Library(Path.Combine(_folder, "missing"));
         empty.Load();
         Assert.Empty(empty.Notebooks);
         Assert.Null(empty.LastOpen);
     }
 
     [Fact]
+    public void Load_RepairsScrollValuesThatCannotBeWrittenBack()
+    {
+        var library = Library();
+        var entry = library.Create("Mathe", new NoteDocument());
+        File.WriteAllText(Path.Combine(_folder, "index.json"),
+            $$"""{"lastOpen":"{{entry.Id}}","notebooks":[{"id":"{{entry.Id}}","name":"Mathe","modified":"2026-09-28T10:00:00+00:00","scrollX":1e309,"scrollY":-5e12}]}""");
+
+        var reloaded = Library();
+        reloaded.Load();
+        reloaded.Open(entry.Id);
+
+        Assert.Equal(0, reloaded.Entry(entry.Id).ScrollX);
+        Assert.Equal(0, reloaded.Entry(entry.Id).ScrollY);
+        Assert.Contains("\"scrollX\": 0", File.ReadAllText(Path.Combine(_folder, "index.json")));
+    }
+
+    [Fact]
     public void Index_HasTheDocumentedShape()
     {
-        var library = new NotebookLibrary(_folder, _time);
+        var library = Library();
         var entry = library.Create("Mathe", new NoteDocument());
         library.Open(entry.Id);
         library.Save(() => new NoteDocument(), 1.5, 2);

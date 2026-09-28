@@ -1,16 +1,19 @@
 using System.IO;
 using System.Text.Json;
+using Microsoft.VisualBasic.FileIO;
 using Mitschreibprogramm.Models;
 
 namespace Mitschreibprogramm.Services;
 
 // One folder holds every notebook as <id>.msp plus index.json with names, timestamps and scroll positions (docs/file-format.md).
-public sealed class NotebookLibrary(string folder, TimeProvider? time = null)
+public sealed class NotebookLibrary(string folder, TimeProvider? time = null, Action<string>? deleteFile = null)
 {
     private const string IndexFileName = "index.json";
     private const string Extension = ".msp";
+    private const string RecoveredName = "Wiederhergestellt";
 
     private readonly TimeProvider _time = time ?? TimeProvider.System;
+    private readonly Action<string> _deleteFile = deleteFile ?? RecycleFile;
     private NotebookIndex _index = new();
 
     public IReadOnlyList<NotebookEntry> Notebooks => _index.Notebooks
@@ -18,7 +21,10 @@ public sealed class NotebookLibrary(string folder, TimeProvider? time = null)
         .ThenBy(entry => entry.Name, StringComparer.CurrentCultureIgnoreCase)
         .ToList();
 
+    // The notebook the index remembers from the last run; the notebook this instance has actually opened is OpenId.
     public string? LastOpen => _index.LastOpen;
+
+    public string? OpenId { get; private set; }
 
     public bool HasChanges { get; private set; }
 
@@ -30,6 +36,8 @@ public sealed class NotebookLibrary(string folder, TimeProvider? time = null)
     public void Load()
     {
         _index = ReadIndex();
+        OpenId = null;
+        HasChanges = false;
         var files = Directory.Exists(folder)
             ? Directory.GetFiles(folder).Where(file => Path.GetExtension(file).Equals(Extension, StringComparison.OrdinalIgnoreCase)).ToList()
             : [];
@@ -43,13 +51,15 @@ public sealed class NotebookLibrary(string folder, TimeProvider? time = null)
             var id = Path.GetFileNameWithoutExtension(file);
             if (entries.All(entry => entry.Id != id))
             {
-                entries.Add(new NotebookEntry { Id = id, Name = id, Modified = File.GetLastWriteTimeUtc(file) });
+                entries.Add(new NotebookEntry { Id = id, Name = RecoveredNameFor(file), Modified = File.GetLastWriteTimeUtc(file) });
             }
         }
 
         foreach (var entry in entries)
         {
             entry.Name = string.IsNullOrWhiteSpace(entry.Name) ? entry.Id : entry.Name;
+            entry.ScrollX = Sane(entry.ScrollX);
+            entry.ScrollY = Sane(entry.ScrollY);
         }
 
         _index.Notebooks = entries;
@@ -77,17 +87,26 @@ public sealed class NotebookLibrary(string folder, TimeProvider? time = null)
 
     public void Open(string id)
     {
-        _index.LastOpen = Entry(id).Id;
+        OpenId = Entry(id).Id;
+        _index.LastOpen = OpenId;
         HasChanges = false;
         WriteIndex();
     }
 
-    public void MarkChanged() => HasChanges = true;
+    // The sort key moves at the first change, not at the save, so the open notebook is already on top before the list is rebuilt.
+    public void MarkChanged()
+    {
+        if (OpenId is { } id)
+        {
+            HasChanges = true;
+            Entry(id).Modified = _time.GetUtcNow();
+        }
+    }
 
     // Autosave of the open notebook: the file is written only after a change, the scroll position is recorded every time.
     public bool Save(Func<NoteDocument> document, double scrollX, double scrollY)
     {
-        if (_index.LastOpen is not { } id)
+        if (OpenId is not { } id)
         {
             return false;
         }
@@ -98,7 +117,6 @@ public sealed class NotebookLibrary(string folder, TimeProvider? time = null)
         {
             Directory.CreateDirectory(folder);
             MspFileService.Save(document(), PathOf(id));
-            entry.Modified = _time.GetUtcNow();
             HasChanges = false;
         }
 
@@ -115,16 +133,36 @@ public sealed class NotebookLibrary(string folder, TimeProvider? time = null)
 
     public void Delete(string id)
     {
-        File.Delete(PathOf(id));
+        _deleteFile(PathOf(id));
         _index.Notebooks.RemoveAll(entry => entry.Id == id);
+        if (OpenId == id)
+        {
+            OpenId = null;
+            HasChanges = false;
+        }
+
         if (_index.LastOpen == id)
         {
             _index.LastOpen = null;
-            HasChanges = false;
         }
 
         WriteIndex();
     }
+
+    // The recycle bin keeps a confirmed click on the wrong notebook from being the end of a subject.
+    private static void RecycleFile(string path) =>
+        FileSystem.DeleteFile(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+
+    // A file that carries one of the app's own ids as name was written by the app; the id would say nothing to the user.
+    private static string RecoveredNameFor(string file)
+    {
+        var stem = Path.GetFileNameWithoutExtension(file);
+        return Guid.TryParseExact(stem, "N", out _) ? $"{RecoveredName} {File.GetLastWriteTime(file):dd.MM.yyyy HH:mm}" : stem;
+    }
+
+    // A hand-edited index must not crash the next write (Infinity is not JSON) or push the view off the page.
+    private static double Sane(double value) =>
+        double.IsFinite(value) && Math.Abs(value) <= AppConstants.MaxCoordinate ? value : 0;
 
     private NotebookIndex ReadIndex()
     {
