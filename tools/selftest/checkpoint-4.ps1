@@ -74,7 +74,7 @@ function Checkpoint4 {
     Ctl -Click DeleteMenuItem
     Start-Sleep -Milliseconds 600
     & "$toolsDir/screenshot.ps1" -Dialog -Out (Join-Path $outDir "cp4-delete-dialog.png") | Out-Null
-    Check ((Ctl -Read Window) -eq "Heft löschen") "Loeschen fragt nach"
+    Check ((Ctl -Read Window) -eq "Heft l$([char]0xF6)schen") "Loeschen fragt nach"
     Ctl -Click CancelButton
     Check ((Test-Path (Get-NotePath $first)) -and @(Ctl -Items NotebookList).Count -eq 4) "Abbrechen loescht nichts"
     Ctl -RightClick $first

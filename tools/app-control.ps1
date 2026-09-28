@@ -37,8 +37,7 @@ $ErrorActionPreference = "Stop"
 if (-not ("MspNative" -as [type])) { Add-Type -Path (Get-ChildItem $PSScriptRoot -Filter "MspNative.*.cs").FullName -ReferencedAssemblies System.Drawing }
 Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
 
-$virtualKeys = @{ ctrl = 0x11; shift = 0x10; alt = 0x12; enter = 0x0D; space = 0x20; esc = 0x1B; tab = 0x09; plus = 0xBB; minus = 0xBD; f4 = 0x73
-    f10 = 0x79; up = 0x26; down = 0x28; home = 0x24; end = 0x23; delete = 0x2E; apps = 0x5D }
+$virtualKeys = @{ ctrl = 0x11; shift = 0x10; alt = 0x12; enter = 0x0D; space = 0x20; esc = 0x1B; tab = 0x09; plus = 0xBB; minus = 0xBD; f4 = 0x73 }
 function Get-VirtualKey([string]$name) {
     $key = $name.Trim().ToLowerInvariant()
     if ($virtualKeys.ContainsKey($key)) { return [uint16]$virtualKeys[$key] }
@@ -112,7 +111,7 @@ if ($Pixel) {
 }
 if ($Exists) {
     $element = Find-Control ([MspNative]::ForegroundWindowOf($hwnd)) $Exists -Optional
-    Write-Output ($null -ne $element -and -not $element.Current.IsOffscreen)
+    Write-Output ([string]($null -ne $element -and -not $element.Current.IsOffscreen))
 }
 if ($Items) {
     $list = Find-Control ([MspNative]::ForegroundWindowOf($hwnd)) $Items
