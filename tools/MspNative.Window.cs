@@ -80,6 +80,7 @@ public static partial class MspNative
 
     public static bool Activate(IntPtr hwnd)
     {
+        if (ForegroundWindowOf(hwnd) != IntPtr.Zero) return true;
         if (IsIconic(hwnd)) ShowWindow(hwnd, 9);
         SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
         SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
