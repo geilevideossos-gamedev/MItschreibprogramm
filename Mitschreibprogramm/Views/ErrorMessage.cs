@@ -17,7 +17,7 @@ public static class ErrorMessage
             action();
             return true;
         }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or JsonException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or JsonException or OperationCanceledException)
         {
             Show(owner, failure);
             return false;

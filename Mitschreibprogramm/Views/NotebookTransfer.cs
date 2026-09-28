@@ -82,7 +82,7 @@ public sealed class NotebookTransfer(Window owner, DocumentView document, AppSet
     private static string SafeFileName(string name)
     {
         var invalid = Path.GetInvalidFileNameChars();
-        var safe = string.Concat(name.Select(c => invalid.Contains(c) ? '_' : c)).Trim();
+        var safe = string.Concat(name.Select(c => invalid.Contains(c) ? '_' : c)).Trim().TrimEnd('.', ' ');
         return safe.Length > 0 ? safe : FallbackFileName;
     }
 

@@ -22,6 +22,7 @@ public sealed class NotebookSession
     private readonly NotebookTransfer _transfer;
     private readonly DispatcherTimer _autosave = new() { Interval = TimeSpan.FromSeconds(AppConstants.AutosaveIntervalSeconds) };
     private bool _saving;
+    private bool _saveFailed;
 
     public NotebookSession(Window owner, DocumentView document, ScrollViewer scroller, AppSettings settings, NotebookLibrary library)
     {
@@ -42,18 +43,19 @@ public sealed class NotebookSession
 
     public IReadOnlyList<NotebookEntry> Notebooks => _library.Notebooks;
 
-    public string? ActiveId => _library.LastOpen;
+    public string? ActiveId => _library.OpenId;
 
     public string ActiveName => ActiveId is { } id ? _library.Entry(id).Name : UntitledName;
 
-    // True after a failed save until the next one succeeds; the title shows it, because the error box appears only once.
-    public bool SaveFailed { get; private set; }
+    // True while changes could not be written; the title shows it, because the error box appears only once per failure.
+    public bool SaveFailed => _saveFailed && _library.HasChanges;
 
+    // The last open notebook first, then the others newest first, and a fresh one only when none can be read.
     public void Start()
     {
         _library.Load();
-        var id = _library.LastOpen ?? _library.Notebooks.FirstOrDefault()?.Id;
-        if (id is null || !Show(id))
+        var candidates = _library.Notebooks.Select(entry => entry.Id).OrderBy(id => id == _library.LastOpen ? 0 : 1);
+        if (!candidates.Any(Show))
         {
             CreateAndOpen();
         }
@@ -63,7 +65,7 @@ public sealed class NotebookSession
 
     public void New()
     {
-        if (SaveActive())
+        if (CanLeave())
         {
             CreateAndOpen();
         }
@@ -77,7 +79,7 @@ public sealed class NotebookSession
         }
 
         // Without a switch the panel still has to fall back to the notebook that is really open.
-        if (!SaveActive() || !Show(id))
+        if (!CanLeave() || !Show(id))
         {
             Changed?.Invoke();
         }
@@ -99,7 +101,7 @@ public sealed class NotebookSession
     {
         var entry = _library.Entry(id);
         var wasOpen = id == ActiveId;
-        if (!ConfirmDialog.Ask(_owner, "Heft löschen", $"Heft \"{entry.Name}\" endgültig löschen?", "Löschen")
+        if (!ConfirmDialog.Ask(_owner, "Heft löschen", $"Heft \"{entry.Name}\" löschen? Die Datei landet im Papierkorb.", "Löschen")
             || !ErrorMessage.Try(_owner, () => _library.Delete(id), "Das Heft konnte nicht gelöscht werden. Ist die Datei gesperrt?"))
         {
             return;
@@ -117,7 +119,7 @@ public sealed class NotebookSession
 
     public void Import()
     {
-        if (SaveActive() && _transfer.Import() is { } entry)
+        if (CanLeave() && _transfer.Import() is { } entry)
         {
             Show(entry.Id);
         }
@@ -143,8 +145,7 @@ public sealed class NotebookSession
     public bool TryClose()
     {
         _autosave.Stop();
-        if (SaveActive() || ConfirmDialog.Ask(_owner, "Heft nicht gespeichert",
-                $"\"{ActiveName}\" konnte nicht gespeichert werden. Trotzdem beenden? Die Änderungen gehen verloren.", "Trotzdem beenden"))
+        if (CanLeave("Trotzdem beenden"))
         {
             return true;
         }
@@ -152,6 +153,12 @@ public sealed class NotebookSession
         _autosave.Start();
         return false;
     }
+
+    // Leaving is safe after a save, or when only the index failed; unsaved content needs an explicit decision.
+    private bool CanLeave(string confirmLabel = "Trotzdem wechseln") =>
+        SaveActive() || !_library.HasChanges || ConfirmDialog.Ask(_owner, "Heft nicht gespeichert",
+            $"\"{ActiveName}\" konnte nicht gespeichert werden. {confirmLabel}? Die Änderungen gehen verloren. Mit MSP-Export lässt sich das Heft vorher woanders sichern.",
+            confirmLabel);
 
     private void CreateAndOpen()
     {
@@ -213,9 +220,9 @@ public sealed class NotebookSession
                 Changed?.Invoke();
             }
 
-            if (SaveFailed)
+            if (_saveFailed)
             {
-                SaveFailed = false;
+                _saveFailed = false;
                 Changed?.Invoke();
             }
 
@@ -223,11 +230,14 @@ public sealed class NotebookSession
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            if (!SaveFailed)
+            if (!_saveFailed)
             {
-                SaveFailed = true;
+                _saveFailed = true;
                 Changed?.Invoke();
-                ErrorMessage.Show(_owner, "Das Heft konnte nicht gespeichert werden. Ist der Ordner schreibgeschützt oder die Festplatte voll?");
+                // Without changes left the notebook itself is on disk and only index.json (names, scroll positions) failed.
+                ErrorMessage.Show(_owner, _library.HasChanges
+                    ? "Das Heft konnte nicht gespeichert werden. Ist der Ordner schreibgeschützt oder die Festplatte voll?"
+                    : "Die Heftliste konnte nicht gespeichert werden. Ist der Ordner schreibgeschützt oder die Festplatte voll?");
             }
 
             return false;
@@ -238,13 +248,24 @@ public sealed class NotebookSession
         }
     }
 
-    // Deferred until the new pages are laid out; at startup the window has no size before then.
-    private void RestoreScroll(double x, double y) =>
-        _owner.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () =>
+    // Same math as the zoom around the pointer. At startup the window has no size yet, so the first restore waits for the layout.
+    private void RestoreScroll(double x, double y)
+    {
+        if (_owner.IsLoaded)
         {
-            _scroller.UpdateLayout();
-            var moved = _document.TranslatePoint(new Point(x, y), _scroller);
-            _scroller.ScrollToHorizontalOffset(_scroller.HorizontalOffset + moved.X);
-            _scroller.ScrollToVerticalOffset(_scroller.VerticalOffset + moved.Y);
-        });
+            ScrollTo(x, y);
+        }
+        else
+        {
+            _owner.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => ScrollTo(x, y));
+        }
+    }
+
+    private void ScrollTo(double x, double y)
+    {
+        _scroller.UpdateLayout();
+        var moved = _document.TranslatePoint(new Point(x, y), _scroller);
+        _scroller.ScrollToHorizontalOffset(_scroller.HorizontalOffset + moved.X);
+        _scroller.ScrollToVerticalOffset(_scroller.VerticalOffset + moved.Y);
+    }
 }

@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Mitschreibprogramm.Models;
 
 namespace Mitschreibprogramm.Views;
@@ -37,6 +38,7 @@ public partial class NotebookPanel : UserControl
 
     private void OnNewClick(object sender, RoutedEventArgs e) => NewRequested?.Invoke();
 
+    // Programmatic selection (UI Automation) opens too; the handler itself keeps the list in sync without re-opening.
     private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!_refreshing && NotebookList.SelectedItem is NotebookEntry entry)
@@ -45,11 +47,23 @@ public partial class NotebookPanel : UserControl
         }
     }
 
-    private void OnDoubleClick(object sender, MouseButtonEventArgs e)
+    // Clicks are handled here, so the items never take keyboard focus and the window keeps seeing every key.
+    // The dialog is opened after the click has finished, not from inside the mouse handler.
+    private void OnItemLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Left && EntryOf(e.OriginalSource) is { } entry)
+        e.Handled = true;
+        if (EntryOf(sender) is not { } entry)
         {
-            RenameRequested?.Invoke(entry.Id);
+            return;
+        }
+
+        if (e.ClickCount == 2)
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, () => RenameRequested?.Invoke(entry.Id));
+        }
+        else
+        {
+            OpenRequested?.Invoke(entry.Id);
         }
     }
 

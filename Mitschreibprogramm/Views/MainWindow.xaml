@@ -17,7 +17,7 @@
                             ToolTip="Neues Heft anlegen (Strg+N)" Click="OnNewClick"/>
                     <Button x:Name="ImportButton" Style="{StaticResource FlatButton}" Content="Importieren"
                             ToolTip="Externe .msp-Datei als neues Heft in die Bibliothek kopieren (Strg+O)" Click="OnImportClick"/>
-                    <Button x:Name="ExportMspButton" Style="{StaticResource FlatButton}" Content="Exportieren"
+                    <Button x:Name="ExportMspButton" Style="{StaticResource FlatButton}" Content="MSP-Export"
                             ToolTip="Heft als .msp-Datei exportieren (Strg+Umschalt+S)" Click="OnExportMspClick"/>
                     <Border Style="{StaticResource ToolSeparator}"/>
                 </StackPanel>

@@ -46,6 +46,8 @@
             <Setter Property="AutomationProperties.AutomationId" Value="{Binding Id}"/>
             <Setter Property="AutomationProperties.Name" Value="{Binding Name}"/>
             <Setter Property="ContextMenu" Value="{StaticResource NotebookMenu}"/>
+            <Setter Property="Focusable" Value="False"/>
+            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="OnItemLeftButtonDown"/>
             <EventSetter Event="PreviewMouseRightButtonDown" Handler="OnItemRightButtonDown"/>
             <Setter Property="Foreground" Value="{DynamicResource ChromeTextBrush}"/>
             <Setter Property="Padding" Value="10,6"/>
@@ -75,9 +77,9 @@
         <DockPanel>
             <Button x:Name="NewNotebookButton" DockPanel.Dock="Top" Style="{StaticResource FlatButton}" Content="+ Neues Heft"
                     HorizontalAlignment="Stretch" Margin="6,6,6,2" ToolTip="Neues Heft anlegen (Strg+N)" Click="OnNewClick"/>
-            <ListBox x:Name="NotebookList" Background="Transparent" BorderThickness="0" IsTextSearchEnabled="False"
+            <ListBox x:Name="NotebookList" Background="Transparent" BorderThickness="0" Focusable="False" IsTextSearchEnabled="False"
                      ItemContainerStyle="{StaticResource NotebookItem}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                     SelectionChanged="OnSelectionChanged" MouseDoubleClick="OnDoubleClick">
+                     SelectionChanged="OnSelectionChanged">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
