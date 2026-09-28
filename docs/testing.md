@@ -93,7 +93,7 @@ Für einen schnellen Durchgang von Hand (Maus reicht), alles andere deckt `tools
 
 ## Offen mit echtem Pen
 
-Nur mit dem Wacom Intuos Small prüfbar. features.md bleibt bis dahin auf `done`, danach `getestet`. Zum Prüfen die App mit `MSP_DEBUG_LOG=<pfad>` starten und die Logzeilen mitlesen.
+Nur mit dem Wacom Intuos Small prüfbar. features.md bleibt bis dahin auf `done`, danach `getestet`. Zum Prüfen die App mit `MSP_DEBUG_LOG=<pfad>` starten und die Logzeilen mitlesen. Achtung: mit gesetzter Variable benutzt die App auch eine eigene Hefte-Bibliothek neben der Logdatei (`<Logordner>/notes/`), die Seitenleiste startet also leer und die echten Hefte in %AppData% bleiben unberührt. Dafür einen Pfad außerhalb von tmp/selftest/ nehmen (zum Beispiel tmp/pen/debug.log), weil der Selbsttest tmp/selftest/notes/ löscht.
 
 - **Windows Ink im Wacom-Treiber:** Mit Haken "Windows Ink verwenden" muss das Log `device=stylus` und unterschiedliche `pmin` / `pmax` zeigen. Ohne Haken: `device=mouse`, konstante Breite, Seitentaste radiert nicht. Steht so in der README, ist aber nur mit der Simulation belegt.
 - **Echte Seitentasten:** untere Taste mit Treiber-Belegung "Radieren" (erwartet `device=stylus-inverted mode=erase`) und mit "Rechtsklick" (erwartet `barrel=True mode=erase`). Radiert es nur, solange die Taste gehalten wird? Öffnet "Rechtsklick" irgendwo ein Kontextmenü oder stört die Hochstufung zur rechten Maustaste?

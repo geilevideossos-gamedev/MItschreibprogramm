@@ -110,9 +110,9 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F47 | Links ein einklappbares Panel (Toggle-Button „Hefte“ in der Toolbar und Ctrl+B) mit der Liste aller Hefte. Sichtbarkeit wird in settings.json gemerkt | wip |
 | F48 | Heft anklicken öffnet es sofort, das aktuelle wird vorher automatisch gespeichert ohne Dialog, man landet auf der Seite, wo man zuletzt war (letzte Scrollposition pro Heft) | wip |
 | F49 | Oben im Panel „+ Neues Heft“ (auch Neu / Ctrl+N), legt ein Heft „Unbenannt“ an und öffnet es | wip |
-| F50 | Doppelklick = Umbenennen. Rechtsklick-Kontextmenü mit Umbenennen, Löschen (mit Rückfrage), Als PDF exportieren, Als MSP exportieren | wip |
-| F51 | Aktives Heft markiert, Sortierung nach zuletzt bearbeitet, neueste oben | wip |
+| F50 | Doppelklick = Umbenennen. Rechtsklick-Kontextmenü mit Umbenennen, Löschen (mit Rückfrage, die Datei landet im Papierkorb), Als PDF exportieren, Als MSP exportieren | wip |
+| F51 | Aktives Heft markiert, Sortierung nach zuletzt bearbeitet, neueste oben (unter dem Namen steht die Änderungszeit, damit die Reihenfolge nachvollziehbar ist) | wip |
 | F52 | Speicherung: alle Hefte intern als einzelne .msp in %AppData%/Mitschreibprogramm/notes/, Dateiname = id. Anzeigename, Zeitstempel und Scrollposition in index.json (Begründung in decisions.md) | wip |
 | F53 | Autosave beim Heftwechsel, beim Schließen der App und alle 60 Sekunden bei Änderungen. Beim App-Start wird das zuletzt offene Heft geladen | wip |
-| F54 | Öffnen (Ctrl+O) und Speichern unter (Ctrl+Umschalt+S) bleiben als Import / Export für externe .msp-Dateien, Import kopiert in die Bibliothek | wip |
+| F54 | Öffnen (Ctrl+O, Toolbar „Importieren“) und Speichern unter (Ctrl+Umschalt+S, Toolbar „MSP-Export“) bleiben als Import / Export für externe .msp-Dateien, Import kopiert in die Bibliothek | wip |
 | F55 | PDF-Export (Ctrl+E und Kontextmenü) exportiert das ganze Heft wie bisher, vorgeschlagener Dateiname = Heftname. Titelleiste zeigt den Heftnamen | wip |
