@@ -1,0 +1,17 @@
+<Window x:Class="Mitschreibprogramm.Views.RenameDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Heft umbenennen" SizeToContent="WidthAndHeight" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="{DynamicResource ChromeBrush}" TextElement.Foreground="{DynamicResource ChromeTextBrush}">
+    <StackPanel Margin="20" MinWidth="320">
+        <TextBlock Text="Name des Hefts:"/>
+        <TextBox x:Name="NameBox" Margin="0,8,0,0" Padding="4,3" MaxLength="100"
+                 Background="{DynamicResource ChromeBrush}" Foreground="{DynamicResource ChromeTextBrush}"
+                 BorderBrush="{DynamicResource ChromeBorderBrush}" CaretBrush="{DynamicResource ChromeTextBrush}"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button x:Name="RenameButton" Style="{StaticResource DialogButton}" Content="Umbenennen" IsDefault="True" Click="OnRenameClick"/>
+            <Button x:Name="CancelRenameButton" Style="{StaticResource DialogButton}" Content="Abbrechen" IsCancel="True"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

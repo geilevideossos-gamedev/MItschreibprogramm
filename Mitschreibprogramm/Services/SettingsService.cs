@@ -6,9 +6,6 @@ namespace Mitschreibprogramm.Services;
 
 public sealed class SettingsService(string path)
 {
-    public static string DefaultPath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Mitschreibprogramm", "settings.json");
-
     public AppSettings Load()
     {
         try

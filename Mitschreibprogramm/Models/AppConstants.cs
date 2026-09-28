@@ -31,6 +31,7 @@ public static class AppConstants
     public const double ThickStrokeWidth = 6;
 
     public const double MinVisibleWindowPart = 100;
+    public const int AutosaveIntervalSeconds = 60;
 
     public const double MinZoom = 0.25;
     public const double MaxZoom = 4;

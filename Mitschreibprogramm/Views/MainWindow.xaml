@@ -10,14 +10,15 @@
                 BorderBrush="{DynamicResource ChromeBorderBrush}" BorderThickness="0,0,0,1" Padding="6,4">
             <WrapPanel TextElement.Foreground="{DynamicResource ChromeTextBrush}">
                 <StackPanel Orientation="Horizontal">
+                    <ToggleButton x:Name="NotebookPanelButton" Style="{StaticResource FlatButton}" Content="Hefte"
+                                  ToolTip="Heft-Liste ein- oder ausblenden (Strg+B)"
+                                  Checked="OnNotebookPanelToggled" Unchecked="OnNotebookPanelToggled"/>
                     <Button x:Name="NewButton" Style="{StaticResource FlatButton}" Content="Neu"
-                            ToolTip="Neues Dokument (Strg+N)" Click="OnNewClick"/>
-                    <Button x:Name="OpenButton" Style="{StaticResource FlatButton}" Content="Öffnen"
-                            ToolTip="Öffnen (Strg+O)" Click="OnOpenClick"/>
-                    <Button x:Name="SaveButton" Style="{StaticResource FlatButton}" Content="Speichern"
-                            ToolTip="Speichern (Strg+S)" Click="OnSaveClick"/>
-                    <Button x:Name="SaveAsButton" Style="{StaticResource FlatButton}" Content="Speichern unter"
-                            ToolTip="Speichern unter (Strg+Umschalt+S)" Click="OnSaveAsClick"/>
+                            ToolTip="Neues Heft anlegen (Strg+N)" Click="OnNewClick"/>
+                    <Button x:Name="ImportButton" Style="{StaticResource FlatButton}" Content="Importieren"
+                            ToolTip="Externe .msp-Datei als neues Heft in die Bibliothek kopieren (Strg+O)" Click="OnImportClick"/>
+                    <Button x:Name="ExportMspButton" Style="{StaticResource FlatButton}" Content="Exportieren"
+                            ToolTip="Heft als .msp-Datei exportieren (Strg+Umschalt+S)" Click="OnExportMspClick"/>
                     <Border Style="{StaticResource ToolSeparator}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
@@ -100,6 +101,7 @@
                 <TextBlock x:Name="FileText"/>
             </StatusBarItem>
         </StatusBar>
+        <v:NotebookPanel x:Name="Notebooks" DockPanel.Dock="Left"/>
         <ScrollViewer x:Name="Scroller" Focusable="False" HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Auto" ScrollChanged="OnScrollChanged">
             <v:DocumentView x:Name="Document" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="24"/>

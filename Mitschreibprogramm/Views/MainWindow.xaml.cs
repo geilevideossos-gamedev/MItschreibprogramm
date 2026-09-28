@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,12 +15,11 @@ public partial class MainWindow : Window
     private static readonly HashSet<Key> RepeatableKeys = [Key.OemPlus, Key.Add, Key.OemMinus, Key.Subtract, Key.Z, Key.Y];
 
     private readonly Dictionary<(ModifierKeys, Key), Action> _shortcuts = [];
-    private readonly SettingsService _settingsService = new(
-        DebugLog.Folder is { } folder ? Path.Combine(folder, "settings.json") : SettingsService.DefaultPath);
+    private readonly SettingsService _settingsService = new(AppPaths.SettingsFile);
 
     private readonly AppSettings _settings;
     private readonly ZoomPanController _zoomPan;
-    private readonly FileSession _files;
+    private readonly NotebookSession _session;
 
     public MainWindow()
     {
@@ -33,9 +31,15 @@ public partial class MainWindow : Window
         _zoomPan.ZoomChanged += UpdateStatus;
         Deactivated += (_, _) => _zoomPan.SetSpaceHeld(false);
         Document.PagesChanged += OnPagesChanged;
-        _files = new FileSession(this, Document, _settings);
-        _files.StateChanged += UpdateTitle;
-        _files.DocumentLoaded += OnDocumentLoaded;
+        _session = new NotebookSession(this, Document, Scroller, _settings, new NotebookLibrary(AppPaths.NotesFolder));
+        _session.Changed += OnSessionChanged;
+        _session.DocumentLoaded += OnDocumentLoaded;
+        Notebooks.NewRequested += _session.New;
+        Notebooks.OpenRequested += _session.Open;
+        Notebooks.RenameRequested += _session.Rename;
+        Notebooks.DeleteRequested += _session.Delete;
+        Notebooks.ExportPdfRequested += _session.ExportPdf;
+        Notebooks.ExportMspRequested += _session.ExportMsp;
         RegisterShortcuts();
 
         ApplyDarkMode();
@@ -46,8 +50,9 @@ public partial class MainWindow : Window
         PressureCheck.IsChecked = _settings.PressureEnabled;
         Document.SetPressureEnabled(_settings.PressureEnabled);
         ToolPen.IsChecked = true;
-        _files.New();
-        UpdateTitle();
+        NotebookPanelButton.IsChecked = _settings.NotebookPanelVisible;
+        ApplyNotebookPanel();
+        _session.Start();
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -59,7 +64,7 @@ public partial class MainWindow : Window
     protected override void OnClosing(CancelEventArgs e)
     {
         base.OnClosing(e);
-        e.Cancel = !_files.ConfirmDiscard();
+        e.Cancel = !_session.TryClose();
         if (!e.Cancel)
         {
             StoreWindowPlacement();
@@ -114,11 +119,12 @@ public partial class MainWindow : Window
         Add(ModifierKeys.None, () => WidthSlider.Value -= AppConstants.StrokeWidthStep, Key.OemMinus, Key.Subtract);
         Add(ModifierKeys.None, () => ToolPen.IsChecked = true, Key.P);
         Add(ModifierKeys.None, () => (ToolEraser.IsChecked == true ? ToolPen : ToolEraser).IsChecked = true, Key.E);
-        Add(ModifierKeys.Control, _files.New, Key.N);
-        Add(ModifierKeys.Control, _files.Open, Key.O);
-        Add(ModifierKeys.Control, () => _files.Save(), Key.S);
-        Add(ModifierKeys.Control | ModifierKeys.Shift, () => _files.SaveAs(), Key.S);
-        Add(ModifierKeys.Control, _files.ExportPdf, Key.E);
+        Add(ModifierKeys.Control, _session.New, Key.N);
+        Add(ModifierKeys.Control, _session.Import, Key.O);
+        Add(ModifierKeys.Control, _session.SaveNow, Key.S);
+        Add(ModifierKeys.Control | ModifierKeys.Shift, () => _session.ExportMsp(null), Key.S);
+        Add(ModifierKeys.Control, () => _session.ExportPdf(null), Key.E);
+        Add(ModifierKeys.Control, () => NotebookPanelButton.IsChecked = NotebookPanelButton.IsChecked != true, Key.B);
         Add(ModifierKeys.Control, Document.Undo, Key.Z);
         Add(ModifierKeys.Control, Document.Redo, Key.Y);
         Add(ModifierKeys.Control, _zoomPan.ZoomIn, Key.OemPlus, Key.Add);
@@ -147,15 +153,22 @@ public partial class MainWindow : Window
     private void OnToolChecked(object sender, RoutedEventArgs e) =>
         Document.SetEraser(ToolEraser.IsChecked == true);
 
-    private void OnNewClick(object sender, RoutedEventArgs e) => _files.New();
+    private void OnNewClick(object sender, RoutedEventArgs e) => _session.New();
 
-    private void OnOpenClick(object sender, RoutedEventArgs e) => _files.Open();
+    private void OnImportClick(object sender, RoutedEventArgs e) => _session.Import();
 
-    private void OnSaveClick(object sender, RoutedEventArgs e) => _files.Save();
+    private void OnExportMspClick(object sender, RoutedEventArgs e) => _session.ExportMsp(null);
 
-    private void OnSaveAsClick(object sender, RoutedEventArgs e) => _files.SaveAs();
+    private void OnExportClick(object sender, RoutedEventArgs e) => _session.ExportPdf(null);
 
-    private void OnExportClick(object sender, RoutedEventArgs e) => _files.ExportPdf();
+    private void OnNotebookPanelToggled(object sender, RoutedEventArgs e)
+    {
+        _settings.NotebookPanelVisible = NotebookPanelButton.IsChecked == true;
+        ApplyNotebookPanel();
+    }
+
+    private void ApplyNotebookPanel() =>
+        Notebooks.Visibility = _settings.NotebookPanelVisible ? Visibility.Visible : Visibility.Collapsed;
 
     private void OnPageStyleChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -222,10 +235,11 @@ public partial class MainWindow : Window
         ApplyPageStyle();
     }
 
-    private void UpdateTitle()
+    private void OnSessionChanged()
     {
-        Title = $"{_files.DisplayName}{(_files.IsDirty ? "*" : string.Empty)} - Mitschreibprogramm";
-        FileText.Text = _files.FilePath ?? _files.DisplayName;
+        Notebooks.Show(_session.Notebooks, _session.ActiveId);
+        Title = $"{_session.ActiveName}{(_session.SaveFailed ? " (nicht gespeichert)" : string.Empty)} - Mitschreibprogramm";
+        FileText.Text = _session.ActiveName;
     }
 
     private void ApplyPenWidth(double width)

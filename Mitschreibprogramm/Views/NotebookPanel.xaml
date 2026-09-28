@@ -1,0 +1,93 @@
+<UserControl x:Class="Mitschreibprogramm.Views.NotebookPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="220">
+    <UserControl.Resources>
+        <!-- Aero2 menus and list items paint fixed light colours, so both get small templates with the theme brushes. -->
+        <Style x:Key="NotebookMenuItem" TargetType="MenuItem">
+            <Setter Property="Foreground" Value="{DynamicResource ChromeTextBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border x:Name="Frame" CornerRadius="3" Padding="14,6" Background="Transparent">
+                            <ContentPresenter ContentSource="Header" RecognizesAccessKey="True"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Frame" Property="Background" Value="{DynamicResource HoverBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <ContextMenu x:Key="NotebookMenu" Background="{DynamicResource ChromeBrush}"
+                     BorderBrush="{DynamicResource ChromeBorderBrush}" Padding="3">
+            <ContextMenu.Template>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1" Padding="{TemplateBinding Padding}">
+                        <StackPanel IsItemsHost="True"/>
+                    </Border>
+                </ControlTemplate>
+            </ContextMenu.Template>
+            <MenuItem Header="_Umbenennen" Style="{StaticResource NotebookMenuItem}"
+                      AutomationProperties.AutomationId="RenameMenuItem" Click="OnRenameMenu"/>
+            <MenuItem Header="_Löschen" Style="{StaticResource NotebookMenuItem}"
+                      AutomationProperties.AutomationId="DeleteMenuItem" Click="OnDeleteMenu"/>
+            <MenuItem Header="Als _PDF exportieren" Style="{StaticResource NotebookMenuItem}"
+                      AutomationProperties.AutomationId="ExportPdfMenuItem" Click="OnExportPdfMenu"/>
+            <MenuItem Header="Als _MSP exportieren" Style="{StaticResource NotebookMenuItem}"
+                      AutomationProperties.AutomationId="ExportMspMenuItem" Click="OnExportMspMenu"/>
+        </ContextMenu>
+
+        <Style x:Key="NotebookItem" TargetType="ListBoxItem">
+            <Setter Property="AutomationProperties.AutomationId" Value="{Binding Id}"/>
+            <Setter Property="AutomationProperties.Name" Value="{Binding Name}"/>
+            <Setter Property="ContextMenu" Value="{StaticResource NotebookMenu}"/>
+            <EventSetter Event="PreviewMouseRightButtonDown" Handler="OnItemRightButtonDown"/>
+            <Setter Property="Foreground" Value="{DynamicResource ChromeTextBrush}"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Margin" Value="4,1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Frame" CornerRadius="3" Background="Transparent" BorderBrush="Transparent"
+                                BorderThickness="1" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Frame" Property="Background" Value="{DynamicResource HoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Frame" Property="Background" Value="{DynamicResource CheckedBrush}"/>
+                                <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Border Background="{DynamicResource ChromeBrush}" BorderBrush="{DynamicResource ChromeBorderBrush}" BorderThickness="0,0,1,0">
+        <DockPanel>
+            <Button x:Name="NewNotebookButton" DockPanel.Dock="Top" Style="{StaticResource FlatButton}" Content="+ Neues Heft"
+                    HorizontalAlignment="Stretch" Margin="6,6,6,2" ToolTip="Neues Heft anlegen (Strg+N)" Click="OnNewClick"/>
+            <ListBox x:Name="NotebookList" Background="Transparent" BorderThickness="0" IsTextSearchEnabled="False"
+                     ItemContainerStyle="{StaticResource NotebookItem}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     SelectionChanged="OnSelectionChanged" MouseDoubleClick="OnDoubleClick">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding Modified.LocalDateTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
+                                       FontSize="11" Opacity="0.65" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+    </Border>
+</UserControl>

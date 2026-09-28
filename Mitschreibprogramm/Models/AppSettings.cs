@@ -16,6 +16,8 @@ public sealed class AppSettings
 
     public bool DarkMode { get; set; }
 
+    public bool NotebookPanelVisible { get; set; } = true;
+
     public double? WindowLeft { get; set; }
 
     public double? WindowTop { get; set; }
