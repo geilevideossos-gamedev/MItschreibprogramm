@@ -43,10 +43,18 @@ public sealed class NotebookTransfer(Window owner, DocumentView document, AppSet
 
     public void ExportMsp(string id)
     {
-        if (AskSavePath(id, FileFilter, ".msp") is { } path)
+        if (AskSavePath(id, FileFilter, ".msp") is not { } path)
         {
-            ErrorMessage.Try(owner, () => MspFileService.Save(Snapshot(id), path), ExportError);
+            return;
         }
+
+        if (library.Contains(path))
+        {
+            ErrorMessage.Show(owner, "Dieser Ordner ist die Hefte-Bibliothek selbst. Bitte einen anderen Ordner wählen.");
+            return;
+        }
+
+        ErrorMessage.Try(owner, () => MspFileService.Save(Snapshot(id), path), ExportError);
     }
 
     public void ExportPdf(string id)

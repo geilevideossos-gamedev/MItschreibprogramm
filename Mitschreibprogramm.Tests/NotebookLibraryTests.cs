@@ -274,12 +274,28 @@ public sealed class NotebookLibraryTests : IDisposable
         Assert.Contains("\"scrollY\": 2", json);
     }
 
-    private sealed class FakeTime : TimeProvider
+    [Fact]
+    public void Contains_RecognisesPathsInsideTheLibraryOnly()
     {
-        public DateTimeOffset Now { get; private set; } = new(2026, 9, 28, 10, 0, 0, TimeSpan.Zero);
+        var library = Library();
 
-        public void Advance(TimeSpan by) => Now += by;
+        Assert.True(library.Contains(Path.Combine(_folder, "abc.msp")));
+        Assert.True(library.Contains(Path.Combine(_folder, "index.json")));
+        Assert.False(library.Contains(Path.Combine(Path.GetDirectoryName(_folder)!, "notes-backup", "abc.msp")));
+        Assert.False(library.Contains(Path.Combine(Path.GetDirectoryName(_folder)!, "Mathe.msp")));
+    }
 
-        public override DateTimeOffset GetUtcNow() => Now;
+    [Fact]
+    public void Rename_RollsBackWhenTheIndexCannotBeWritten()
+    {
+        var library = Library();
+        var entry = library.Create("Mathe", new NoteDocument());
+        using (new FileStream(Path.Combine(_folder, "index.json"), FileMode.Open, FileAccess.Read, FileShare.None))
+        {
+            Assert.ThrowsAny<Exception>(() => library.Rename(entry.Id, "Physik"));
+        }
+
+        Assert.Equal("Mathe", library.Entry(entry.Id).Name);
+        Assert.Null(library.Find("unknown"));
     }
 }

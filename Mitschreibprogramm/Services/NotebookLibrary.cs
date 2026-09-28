@@ -30,7 +30,16 @@ public sealed class NotebookLibrary(string folder, TimeProvider? time = null, Ac
 
     public string PathOf(string id) => Path.Combine(folder, id + Extension);
 
-    public NotebookEntry Entry(string id) => _index.Notebooks.First(entry => entry.Id == id);
+    public NotebookEntry Entry(string id) => Find(id) ?? throw new InvalidOperationException($"Unknown notebook '{id}'.");
+
+    public NotebookEntry? Find(string id) => _index.Notebooks.FirstOrDefault(entry => entry.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
+
+    // True for any path inside the library, so an export can never overwrite a notebook or the index.
+    public bool Contains(string path)
+    {
+        var root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(folder)) + Path.DirectorySeparatorChar;
+        return Path.GetFullPath(path).StartsWith(root, StringComparison.OrdinalIgnoreCase);
+    }
 
     // Entries without a file are dropped and files without an entry are adopted, so a damaged index never hides a notebook.
     public void Load()
@@ -38,18 +47,16 @@ public sealed class NotebookLibrary(string folder, TimeProvider? time = null, Ac
         _index = ReadIndex();
         OpenId = null;
         HasChanges = false;
-        var files = Directory.Exists(folder)
-            ? Directory.GetFiles(folder).Where(file => Path.GetExtension(file).Equals(Extension, StringComparison.OrdinalIgnoreCase)).ToList()
-            : [];
-        var ids = files.Select(Path.GetFileNameWithoutExtension).ToHashSet();
+        var files = ListNotebookFiles();
+        var ids = files.Select(Path.GetFileNameWithoutExtension).ToHashSet(StringComparer.OrdinalIgnoreCase);
         var entries = (_index.Notebooks ?? [])
             .Where(entry => entry is { Id.Length: > 0 } && ids.Contains(entry.Id))
-            .DistinctBy(entry => entry.Id)
+            .DistinctBy(entry => entry.Id, StringComparer.OrdinalIgnoreCase)
             .ToList();
         foreach (var file in files)
         {
             var id = Path.GetFileNameWithoutExtension(file);
-            if (entries.All(entry => entry.Id != id))
+            if (entries.All(entry => !entry.Id.Equals(id, StringComparison.OrdinalIgnoreCase)))
             {
                 entries.Add(new NotebookEntry { Id = id, Name = RecoveredNameFor(file), Modified = File.GetLastWriteTimeUtc(file) });
             }
@@ -125,10 +132,21 @@ public sealed class NotebookLibrary(string folder, TimeProvider? time = null, Ac
         return written;
     }
 
+    // Memory follows the disk: a name the index could not take is rolled back.
     public void Rename(string id, string name)
     {
-        Entry(id).Name = name;
-        WriteIndex();
+        var entry = Entry(id);
+        var previous = entry.Name;
+        entry.Name = name;
+        try
+        {
+            WriteIndex();
+        }
+        catch
+        {
+            entry.Name = previous;
+            throw;
+        }
     }
 
     public void Delete(string id)
@@ -152,6 +170,21 @@ public sealed class NotebookLibrary(string folder, TimeProvider? time = null, Ac
     // The recycle bin keeps a confirmed click on the wrong notebook from being the end of a subject.
     private static void RecycleFile(string path) =>
         FileSystem.DeleteFile(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+
+    // A folder that cannot be listed counts as empty; the app still starts and reports the problem at the first save.
+    private List<string> ListNotebookFiles()
+    {
+        try
+        {
+            return Directory.Exists(folder)
+                ? Directory.GetFiles(folder).Where(file => Path.GetExtension(file).Equals(Extension, StringComparison.OrdinalIgnoreCase)).ToList()
+                : [];
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return [];
+        }
+    }
 
     // A file that carries one of the app's own ids as name was written by the app; the id would say nothing to the user.
     private static string RecoveredNameFor(string file)

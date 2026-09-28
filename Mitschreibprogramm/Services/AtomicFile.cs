@@ -20,7 +20,14 @@ public static class AtomicFile
         }
         catch
         {
-            File.Delete(temporary);
+            try
+            {
+                File.Delete(temporary);
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+            }
+
             throw;
         }
     }
