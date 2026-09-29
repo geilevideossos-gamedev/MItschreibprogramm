@@ -84,8 +84,13 @@ public sealed class SelectionEditor
         }
 
         _document.Record(new UndoStep(before.Apply, after.Apply));
-        var bounds = page.Ink.GetSelectionBounds();
-        DebugLog.Write($"selection change={change} page={_document.Pages.ToList().IndexOf(page) + 1} rect=({bounds.X:0.#},{bounds.Y:0.#},{bounds.Width:0.#},{bounds.Height:0.#})");
+        if (DebugLog.IsEnabled)
+        {
+            // Pictures report their new size only after the next layout pass.
+            page.UpdateLayout();
+            var bounds = page.Ink.GetSelectionBounds();
+            DebugLog.Write($"selection change={change} page={_document.Pages.ToList().IndexOf(page) + 1} rect=({bounds.X:0.#},{bounds.Y:0.#},{bounds.Width:0.#},{bounds.Height:0.#})");
+        }
     }
 
     public Rect KeepOnPage(PageView page, Rect rect) =>
