@@ -31,6 +31,14 @@ public partial class MainWindow : Window
         _zoomPan = new ZoomPanController(Scroller, Document);
         _zoomPan.ZoomChanged += UpdateStatus;
         _images = new ImageInserter(Document, Scroller);
+        // A click on the grey workspace beside the pages ends the selection as well.
+        Scroller.PreviewMouseLeftButtonDown += (_, _) =>
+        {
+            if (!Document.IsMouseOver)
+            {
+                Document.Selection.Clear();
+            }
+        };
         Deactivated += (_, _) => _zoomPan.SetSpaceHeld(false);
         Document.PagesChanged += OnPagesChanged;
         _session = new NotebookSession(this, Document, Scroller, _settings, new NotebookLibrary(AppPaths.NotesFolder));
@@ -122,6 +130,9 @@ public partial class MainWindow : Window
         Add(ModifierKeys.None, () => ToolPen.IsChecked = true, Key.P);
         Add(ModifierKeys.None, () => (ToolEraser.IsChecked == true ? ToolPen : ToolEraser).IsChecked = true, Key.E);
         Add(ModifierKeys.None, () => ShapesButton.IsChecked = ShapesButton.IsChecked != true, Key.F);
+        Add(ModifierKeys.None, () => ToolSelect.IsChecked = true, Key.S);
+        Add(ModifierKeys.None, Document.Selection.Delete, Key.Delete);
+        Add(ModifierKeys.None, Document.Selection.Clear, Key.Escape);
         Add(ModifierKeys.Control, _session.New, Key.N);
         Add(ModifierKeys.Control, _session.Import, Key.O);
         Add(ModifierKeys.Control, _session.SaveNow, Key.S);
@@ -155,7 +166,7 @@ public partial class MainWindow : Window
     }
 
     private void OnToolChecked(object sender, RoutedEventArgs e) =>
-        Document.SetEraser(ToolEraser.IsChecked == true);
+        Document.Tools.SetTool(ToolEraser.IsChecked == true, ToolSelect.IsChecked == true);
 
     private void OnShapesToggled(object sender, RoutedEventArgs e) => Document.SetShapesAlwaysOn(ShapesButton.IsChecked == true);
 

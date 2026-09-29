@@ -57,6 +57,9 @@
                                  Content="Stift" ToolTip="Stift (P)" Checked="OnToolChecked"/>
                     <RadioButton x:Name="ToolEraser" Style="{StaticResource FlatButton}" GroupName="Tool"
                                  Content="Radierer" ToolTip="Radierer (E)" Checked="OnToolChecked"/>
+                    <RadioButton x:Name="ToolSelect" Style="{StaticResource FlatButton}" GroupName="Tool"
+                                 Content="Auswahl" ToolTip="Auswahl (S): Lasso ziehen, Auswahl ziehen, an den Ecken skalieren, Entf löscht, Esc hebt auf. Obere Stifttaste halten wirkt genauso"
+                                 Checked="OnToolChecked"/>
                     <ToggleButton x:Name="ShapesButton" Style="{StaticResource FlatButton}" Content="Formen"
                                   ToolTip="Jeden Strich beim Loslassen als Form erkennen (F). Ohne Schalter: am Strichende kurz stillhalten"
                                   Checked="OnShapesToggled" Unchecked="OnShapesToggled"/>

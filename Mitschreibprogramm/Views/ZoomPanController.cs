@@ -42,7 +42,7 @@ public sealed class ZoomPanController
         }
 
         _spaceHeld = held;
-        _document.SetPanning(held);
+        _document.Tools.SetPanning(held);
         _scroller.Cursor = held ? Cursors.Hand : null;
         _scroller.ForceCursor = held;
     }

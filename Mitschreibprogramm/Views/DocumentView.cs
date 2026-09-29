@@ -14,18 +14,15 @@ public sealed class DocumentView : StackPanel
     private readonly List<PageView> _pages = [];
     private readonly List<PageView> _created = [];
     private readonly UndoHistory _history = new();
-    private readonly SideButtonWatcher _sideButton;
     private readonly ShapeAssist _shapes;
     private double _zoom = AppConstants.DefaultZoom;
     private PenColor _penColor;
     private bool _dark;
-    private bool _eraser;
-    private bool _panning;
 
     public DocumentView()
     {
-        _sideButton = new SideButtonWatcher(this);
-        _sideButton.Changed += UpdateEditingMode;
+        Selection = new SelectionEditor(this);
+        Tools = new EditingModes(this, Selection);
         _shapes = new ShapeAssist(this);
         if (DebugLog.IsEnabled)
         {
@@ -42,6 +39,10 @@ public sealed class DocumentView : StackPanel
     public event Action? Changed;
 
     public IReadOnlyList<PageView> Pages => _pages;
+
+    public SelectionEditor Selection { get; }
+
+    public EditingModes Tools { get; }
 
     public PageMode Mode { get; private set; }
 
@@ -81,18 +82,6 @@ public sealed class DocumentView : StackPanel
     public void SetPressureEnabled(bool enabled) => _pen.IgnorePressure = !enabled;
 
     public void SetShapesAlwaysOn(bool on) => _shapes.AlwaysOn = on;
-
-    public void SetEraser(bool eraser)
-    {
-        _eraser = eraser;
-        UpdateEditingMode();
-    }
-
-    public void SetPanning(bool panning)
-    {
-        _panning = panning;
-        UpdateEditingMode();
-    }
 
     public void SetPageStyle(PageStyle style, LineColor lineColor)
     {
@@ -182,9 +171,18 @@ public sealed class DocumentView : StackPanel
         Changed?.Invoke();
     }
 
-    public void Undo() => OnHistoryApplied("undo", _history.Undo());
+    // An open selection would keep its frame around items that undo moves elsewhere.
+    public void Undo()
+    {
+        Selection.Clear();
+        OnHistoryApplied("undo", _history.Undo());
+    }
 
-    public void Redo() => OnHistoryApplied("redo", _history.Redo());
+    public void Redo()
+    {
+        Selection.Clear();
+        OnHistoryApplied("redo", _history.Redo());
+    }
 
     private List<PageView> BuildPages(NoteDocument document)
     {
@@ -212,6 +210,7 @@ public sealed class DocumentView : StackPanel
 
     private void Show(PageMode mode, List<PageView> pages)
     {
+        Selection.Clear();
         Mode = mode;
         _pages.Clear();
         _pages.AddRange(pages);
@@ -222,7 +221,7 @@ public sealed class DocumentView : StackPanel
         }
 
         ApplyTheme();
-        UpdateEditingMode();
+        Tools.Apply();
         PagesChanged?.Invoke();
     }
 
@@ -232,7 +231,7 @@ public sealed class DocumentView : StackPanel
         page.ApplyTheme(PageStyle, LineColor, _dark);
         _pages.Add(page);
         Children.Add(page);
-        UpdateEditingMode();
+        Tools.Apply();
         PagesChanged?.Invoke();
         Changed?.Invoke();
         return page;
@@ -283,17 +282,6 @@ public sealed class DocumentView : StackPanel
         foreach (var page in _pages)
         {
             page.ApplyTheme(PageStyle, LineColor, _dark);
-        }
-    }
-
-    private void UpdateEditingMode()
-    {
-        var erasing = _eraser || _sideButton.IsHeld;
-        foreach (var page in _pages)
-        {
-            page.Ink.EditingMode = _panning ? InkCanvasEditingMode.None
-                : erasing ? InkCanvasEditingMode.EraseByStroke : InkCanvasEditingMode.Ink;
-            page.Ink.EditingModeInverted = _panning ? InkCanvasEditingMode.None : InkCanvasEditingMode.EraseByStroke;
         }
     }
 }
