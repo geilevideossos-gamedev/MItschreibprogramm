@@ -72,7 +72,7 @@ public sealed class ShapeAssist
         }
 
         var shape = ShapeRecognizer.Recognize(stroke.StylusPoints.Select(point => (point.X, point.Y)).ToList(), AppConstants.MinShapeSize / zoom);
-        DebugLog.Write($"shape trigger={trigger} kind={(shape is null ? "none" : shape.Kind.ToString().ToLowerInvariant())} points={shape?.Outline.Count ?? 0}");
+        DebugLog.Write($"shape trigger={trigger} result={(shape is null ? "none" : shape.Kind.ToString().ToLowerInvariant())} points={shape?.Outline.Count ?? 0}");
         if (shape is null)
         {
             return null;

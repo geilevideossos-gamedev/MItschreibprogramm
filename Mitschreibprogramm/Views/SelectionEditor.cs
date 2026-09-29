@@ -73,7 +73,7 @@ public sealed class SelectionEditor
 
         Remove();
         _document.Record(new UndoStep(Restore, Remove));
-        DebugLog.Write($"selection deleted strokes={strokes.Count} images={images.Count}");
+        DebugLog.Write($"selection change=deleted strokes={strokes.Count} images={images.Count}");
     }
 
     public void Record(PageView page, SelectionSnapshot before, SelectionSnapshot after, string change)
@@ -85,7 +85,7 @@ public sealed class SelectionEditor
 
         _document.Record(new UndoStep(before.Apply, after.Apply));
         var bounds = page.Ink.GetSelectionBounds();
-        DebugLog.Write($"selection {change} page={_document.Pages.ToList().IndexOf(page) + 1} rect=({bounds.X:0.#},{bounds.Y:0.#},{bounds.Width:0.#},{bounds.Height:0.#})");
+        DebugLog.Write($"selection change={change} page={_document.Pages.ToList().IndexOf(page) + 1} rect=({bounds.X:0.#},{bounds.Y:0.#},{bounds.Width:0.#},{bounds.Height:0.#})");
     }
 
     public Rect KeepOnPage(PageView page, Rect rect) =>
@@ -118,7 +118,8 @@ public sealed class SelectionEditor
             ActiveChanged?.Invoke();
         }
 
-        DebugLog.Write($"selection page={_document.Pages.ToList().IndexOf(page) + 1} strokes={strokes} images={images}");
+        var bounds = page.Ink.GetSelectionBounds();
+        DebugLog.Write($"selection page={_document.Pages.ToList().IndexOf(page) + 1} strokes={strokes} images={images} rect=({bounds.X:0.#},{bounds.Y:0.#},{bounds.Width:0.#},{bounds.Height:0.#})");
     }
 
     // Raised once when the drag ends; the corrected rectangle is what InkCanvas applies.
