@@ -6,7 +6,7 @@ JSON, UTF-8 ohne BOM, kompakt in einer Zeile. Code: `Services/MspFileService`, D
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "pageMode": "pages",
   "pageStyle": "lined",
   "lineColor": "blue",
@@ -20,6 +20,9 @@ JSON, UTF-8 ohne BOM, kompakt in einer Zeile. Code: `Services/MspFileService`, D
           "fitToCurve": true,
           "points": [[112.5, 241, 0.098], [122.5, 241, 0.12]]
         }
+      ],
+      "images": [
+        { "x": 79.37, "y": 300, "width": 635, "height": 357.19, "png": "iVBORw0KGgoAAAANSUhEUgAA..." }
       ]
     }
   ]
@@ -28,7 +31,7 @@ JSON, UTF-8 ohne BOM, kompakt in einer Zeile. Code: `Services/MspFileService`, D
 
 | Feld | Werte | Bedeutung |
 |------|-------|-----------|
-| version | 1 | Formatversion. Eine höhere Version lehnt das Programm beim Öffnen ab |
+| version | 2 | Formatversion. Version 1 (ohne Bilder und ohne fitToCurve) lädt weiter und wird beim nächsten Speichern als 2 geschrieben. Eine höhere Version lehnt das Programm beim Öffnen ab |
 | pageMode | `pages`, `endless` | Seitenmodus. Bei `endless` gibt es genau eine Seite, die ganze Fläche |
 | pageStyle | `blank`, `lined`, `squared` | Hintergrundstil (Blanko, Liniert 8 mm, Kariert 5 mm). Der frühere Wert `dashed` wird als `squared` gelesen |
 | lineColor | `black`, `blue` | Farbe der Hilfslinien |
@@ -39,11 +42,15 @@ JSON, UTF-8 ohne BOM, kompakt in einer Zeile. Code: `Services/MspFileService`, D
 | pressureEnabled | true / false | true: Druck moduliert die Breite (Faktor 1,5 x Druck + 0,25). false: konstante Breite |
 | fitToCurve | true / false | true: Glättung (Bezier-Fit durch die Punkte), am Bildschirm und im PDF. false: gerade Linien von Punkt zu Punkt, so speichert die Formerkennung Linien, Rechtecke, Dreiecke und Ellipsen. Fehlt das Feld (ältere Dateien), gilt true |
 | points[] | `[x, y, druck]` | x, y in Seitenpixeln bei 100 % (96 DPI, A4 = 793,70 x 1122,52), Ursprung oben links auf der Seite. druck 0 bis 1, Maus = 0,5 |
+| images[] | | Bilder der Seite in Einfügereihenfolge, alle unter den Strichen. Fehlt das Feld (Version 1), gibt es keine |
+| x, y, width, height | Seitenpixel | Lage und Größe des Bilds auf der Seite, wie bei den Punkten bei 100 %. Auf 2 Nachkommastellen gerundet |
+| png | base64 | das Bild als PNG, so wie es eingefügt wurde (aus der Zwischenablage oder dorthin neu kodiert) |
 
 - Rundung beim Speichern: x, y auf 2, druck auf 3 Nachkommastellen.
 - Hilfslinien stehen nicht in der Datei, sie ergeben sich aus pageStyle und lineColor.
 - Die Größe der Endlos-Fläche steht nicht in der Datei. Beim Öffnen wächst sie so weit, dass alle Striche plus Rand hineinpassen.
 - Speichern schreibt erst `<name>.msp.tmp` und verschiebt sie dann über das Ziel.
+- Bilder ohne Breite oder Höhe, ohne gültiges base64 oder ohne PNG-Signatur fallen beim Öffnen weg, Lage und Größe werden wie Koordinaten begrenzt. Ein Bild, das sich trotz Signatur nicht dekodieren lässt, zeigt die App nicht an (und speichert es dann auch nicht mehr).
 - Tolerant beim Öffnen: Punkte ohne Druck bekommen 0,5, Punkte mit weniger als zwei Zahlen und Striche ohne Punkte fallen weg, Breite und Druck werden in ihre Grenzen geholt. `null` statt einer Liste gilt als leere Liste, `null`-Einträge fallen weg. Koordinaten werden auf plus/minus 1.000.000 begrenzt, damit eine kaputte Datei keine Millionen Seiten erzeugt.
 
 ## Hefte-Bibliothek: notes/

@@ -128,3 +128,9 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F60 | Erkannte Formen sind normale Striche (Farbe, Breite aus dem aktuellen Stift, konstanter Druck), damit Radieren, Undo, Speichern, PDF-Export und Lasso ohne Sonderfall funktionieren | wip |
 | F61 | Erkennung als eigene Klasse in Services/, rein rechnerisch ohne WPF-Abhängigkeit, mit xUnit getestet. Einfachste robuste Methode, Entscheidung in decisions-2.md | wip |
 | F62 | Undo nach einer Erkennung stellt den ursprünglichen Freihand-Strich wieder her | wip |
+| F63 | Bilder einfügen mit Ctrl+V: Bild aus der Zwischenablage (z. B. Snipping-Tool-Screenshot) wird auf der aktuell sichtbaren Seite in der Mitte des sichtbaren Bereichs eingefügt, Breite höchstens 80 % der Seite, Seitenverhältnis bleibt. Ist kein Bild in der Zwischenablage, passiert nichts | wip |
+| F64 | Bilder verschieben und Größe ändern über die Auswahl (F69 ff.), Seitenverhältnis beim Eckenziehen beibehalten. Entf löscht | wip |
+| F65 | Bilder liegen unter den Strichen, man kann drauf schreiben | wip |
+| F66 | Speicherung im .msp als base64-PNG, Formatversion erhöht (2), alte Dateien laden weiter. file-format.md aktualisiert | wip |
+| F67 | PDF-Export enthält die Bilder an der richtigen Position und Größe | wip |
+| F68 | Undo / Redo für Einfügen, Verschieben, Skalieren und Löschen von Bildern | wip |
