@@ -105,6 +105,7 @@ public sealed class SelectionEditor
         ink.SelectionMoved += (_, _) => Commit(page, "moved");
         ink.SelectionResized += (_, _) => Commit(page, "resized");
         _ = new ImageDrag(page, this);
+        _ = new TapSelection(page);
     }
 
     private void OnSelectionChanged(PageView page)

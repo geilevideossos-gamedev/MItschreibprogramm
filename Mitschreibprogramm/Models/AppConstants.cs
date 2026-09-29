@@ -39,6 +39,9 @@ public static class AppConstants
     public const double ShapeHoldTolerance = 4;
     public const int ShapeHoldMilliseconds = 500;
 
+    // How far a pen tap may wander (screen units) and still count as a tap for selecting.
+    public const double TapTolerance = 12;
+
     public const double MinZoom = 0.25;
     public const double MaxZoom = 4;
     public const double DefaultZoom = 1;
