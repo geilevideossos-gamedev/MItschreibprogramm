@@ -2,22 +2,22 @@
 
 # Injects a pen stroke along page coordinates. Unlike Pen it also counts selection and shape lines as arrival, so a
 # lasso (no stroke line) is not taken for a lost stroke; a stroke that left no log line at all is repeated once.
-function PagePath($origin, $points, [int]$HoldMs = 0, [switch]$Barrel) {
+function PagePath($origin, $points, [int]$HoldMs = 0, [switch]$Barrel, [switch]$Inverted) {
     $path = ($points | ForEach-Object { "{0},{1}" -f ($origin.X + $origin.Zoom * $_[0]).ToString($invariant), ($origin.Y + $origin.Zoom * $_[1]).ToString($invariant) }) -join ";"
     $before = Get-InkLineCount
-    & "$toolsDir/pen-sim.ps1" -Path $path -HoldMs $HoldMs -Barrel:$Barrel | Out-Null
+    & "$toolsDir/pen-sim.ps1" -Path $path -HoldMs $HoldMs -Barrel:$Barrel -Inverted:$Inverted | Out-Null
     Start-Sleep -Milliseconds 400
     if ((Get-InkLineCount) -eq $before) {
         Start-Sleep -Milliseconds 400
         if ((Get-InkLineCount) -eq $before) {
             Write-Output "  RETRY path (keine Logzeile)"
             $script:retries++
-            & "$toolsDir/pen-sim.ps1" -Path $path -HoldMs $HoldMs -Barrel:$Barrel | Out-Null
+            & "$toolsDir/pen-sim.ps1" -Path $path -HoldMs $HoldMs -Barrel:$Barrel -Inverted:$Inverted | Out-Null
             Start-Sleep -Milliseconds 400
         }
     }
 }
-function Get-InkLineCount { @(if (Test-Path $logPath) { Get-Content $logPath | Where-Object { $_ -match "^\S+ (stroke|shape|selection) " } }).Count }
+function Get-InkLineCount { @(if (Test-Path $logPath) { Get-Content $logPath | Where-Object { $_ -match "^\S+ (stroke|shape|selection|image) " } }).Count }
 function Circle([double]$cx, [double]$cy, [double]$r, [int]$count) {
     for ($i = 0; $i -le $count; $i++) { $a = 2 * [Math]::PI * $i / $count; , @(($cx + $r * [Math]::Cos($a)), ($cy + $r * [Math]::Sin($a))) }
 }
