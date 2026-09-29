@@ -5,14 +5,14 @@
 function PagePath($origin, $points, [int]$HoldMs = 0, [switch]$Barrel) {
     $path = ($points | ForEach-Object { "{0},{1}" -f ($origin.X + $origin.Zoom * $_[0]).ToString($invariant), ($origin.Y + $origin.Zoom * $_[1]).ToString($invariant) }) -join ";"
     $before = Get-InkLineCount
-    & "$PSScriptRoot/pen-sim.ps1" -Path $path -HoldMs $HoldMs -Barrel:$Barrel | Out-Null
+    & "$toolsDir/pen-sim.ps1" -Path $path -HoldMs $HoldMs -Barrel:$Barrel | Out-Null
     Start-Sleep -Milliseconds 400
     if ((Get-InkLineCount) -eq $before) {
         Start-Sleep -Milliseconds 400
         if ((Get-InkLineCount) -eq $before) {
             Write-Output "  RETRY path (keine Logzeile)"
             $script:retries++
-            & "$PSScriptRoot/pen-sim.ps1" -Path $path -HoldMs $HoldMs -Barrel:$Barrel | Out-Null
+            & "$toolsDir/pen-sim.ps1" -Path $path -HoldMs $HoldMs -Barrel:$Barrel | Out-Null
             Start-Sleep -Milliseconds 400
         }
     }

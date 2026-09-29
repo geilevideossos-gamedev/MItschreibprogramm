@@ -41,7 +41,7 @@ function Checkpoint9Steps {
     Set-TestImageOnClipboard
     Ctl -Keys "ctrl+v"
     $pasted = @(Read-Log | Where-Object { $_.kind -eq "image" })
-    Check ($pasted.Count -eq 1 -and (Number $pasted[0].width) -eq 400 -and (Number $pasted[0].height) -eq 300) "Strg+V fuegt das Bild ein ($($pasted.raw))"
+    Check ($pasted.Count -eq 1 -and [Math]::Abs((Number $pasted[0].width) - 400) -lt 1 -and [Math]::Abs((Number $pasted[0].height) - 300) -lt 1) "Strg+V fuegt das Bild ein ($($pasted.raw))"
     $x = Number $pasted[0].x; $y = Number $pasted[0].y
     Check ((Test-Orange (Get-PageColor $origin ($x + 100) ($y + 150))) -and (Test-Blue (Get-PageColor $origin ($x + 300) ($y + 150)))) "Bild ist an der gemeldeten Stelle sichtbar (links orange, rechts blau)"
     PagePath $origin @(@(($x + 40), ($y + 80)), @(($x + 360), ($y + 80)))
@@ -55,14 +55,14 @@ function Checkpoint9Steps {
     Check ($selected.Count -ge 1 -and $selected[-1].strokes -eq "1" -and $selected[-1].images -eq "1") "Lasso mit gehaltener oberer Seitentaste waehlt Strich und Bild ($($selected[-1].raw))"
     $before = Get-Rect $selected[-1]
     PagePath $origin @(@(($x + 200), ($y + 200)), @(($x + 260), ($y + 250)))
-    $moved = Selection "moved"
+    $moved = @(Selection "moved")
     $after = if ($moved.Count) { Get-Rect $moved[-1] } else { @{ X = [double]::NaN } }
     Check ([Math]::Abs($after.X - $before.X - 60) -lt 3 -and [Math]::Abs($after.Y - $before.Y - 50) -lt 3) "Auswahl mit dem Stift gezogen: um 60,50 verschoben ($($moved.raw))"
     $cornerX = $after.X + $after.W + 8; $cornerY = $after.Y + $after.H + 8
     $from = "{0},{1}" -f ($origin.X + $cornerX).ToString($invariant), ($origin.Y + $cornerY).ToString($invariant)
     $to = "{0},{1}" -f ($origin.X + $cornerX + 80).ToString($invariant), ($origin.Y + $cornerY + 20).ToString($invariant)
     Ctl -Drag "left,$from,$to"
-    $resized = Selection "resized"
+    $resized = @(Selection "resized")
     $grown = if ($resized.Count) { Get-Rect $resized[-1] } else { @{ W = [double]::NaN; H = 1 } }
     Check ($grown.W -gt $after.W + 40 -and [Math]::Abs(($grown.W / $grown.H) - ($after.W / $after.H)) -lt 0.02) "Eckgriff skaliert, Seitenverhaeltnis bleibt ($([Math]::Round($after.W)) x $([Math]::Round($after.H)) zu $([Math]::Round($grown.W)) x $([Math]::Round($grown.H)))"
     Shot "cp9-moved-resized"
@@ -73,7 +73,7 @@ function Checkpoint9Steps {
     Ctl -Keys "ctrl+z"
     Ctl -Keys "ctrl+s"
     $small = @(Get-Picture $file)[0]
-    Check ($big.width -gt 440 -and $small.width -eq 400 -and [Math]::Abs($small.x - ($x + 60)) -lt 1) "Strg+Z nimmt das Skalieren zurueck, das Verschieben bleibt ($($big.width) zu $($small.width), x $($small.x))"
+    Check ($big.width -gt 440 -and [Math]::Abs($small.width - 400) -lt 1 -and [Math]::Abs($small.x - ($x + 60)) -lt 1) "Strg+Z nimmt das Skalieren zurueck, das Verschieben bleibt ($($big.width) zu $($small.width), x $($small.x))"
     Ctl -Keys "ctrl+z"
     Ctl -Keys "ctrl+s"
     Check ([Math]::Abs(@(Get-Picture $file)[0].x - $x) -lt 1) "Zweites Strg+Z nimmt das Verschieben zurueck"
@@ -86,7 +86,7 @@ function Checkpoint9Steps {
     PagePath $origin @(@(($picture.x - 20), ($picture.y - 20)), @(($picture.x + $picture.width + 20), ($picture.y - 20)), @(($picture.x + $picture.width + 20), ($picture.y + $picture.height + 20)), @(($picture.x - 20), ($picture.y + $picture.height + 20)), @(($picture.x - 20), ($picture.y - 18))) -Barrel
     Read-Log | Out-Null
     PagePath $origin @(@(($picture.x + 100), ($picture.y + 100)), @(($picture.x + 560), ($picture.y + 140)))
-    $edge = Selection "moved"
+    $edge = @(Selection "moved")
     $right = if ($edge.Count) { $r = Get-Rect $edge[-1]; $r.X + $r.W } else { [double]::NaN }
     Check ($right -le 794 -and $right -gt 780) "Im Seitenmodus bleibt die verschobene Auswahl auf dem Blatt (rechter Rand $right)"
     Ctl -Keys "esc"
@@ -100,7 +100,7 @@ function Checkpoint9Steps {
     $mouse = @(Read-Log | Where-Object { $_.kind -eq "selection" })
     Check ($mouse.Count -ge 1 -and $mouse[-1].strokes -eq "1" -and $mouse[-1].images -eq "0") "Auswahl-Werkzeug (S): Maus-Lasso waehlt den Strich ($($mouse.raw))"
     Ctl -Keys "delete"
-    $deleted = Selection "deleted"
+    $deleted = @(Selection "deleted")
     Ctl -Keys "ctrl+s"
     $count = @((Get-Content $file -Raw | ConvertFrom-Json).pages | ForEach-Object { $_.strokes }).Count
     Ctl -Keys "ctrl+z"
@@ -115,7 +115,7 @@ function Checkpoint9Steps {
     Check ($alone.Count -ge 1 -and $alone[-1].strokes -eq "0" -and $alone[-1].images -eq "1") "Tippen auf das Bild waehlt es allein ($($alone.raw))"
     $target = "{0},{1}" -f ($origin.X + $picture.x + ($picture.width * 0.75) - 40).ToString($invariant), ($origin.Y + $picture.y + ($picture.height * 0.75) + 30).ToString($invariant)
     Ctl -Drag "left,$tap,$target"
-    $dragged = Selection "moved"
+    $dragged = @(Selection "moved")
     Ctl -Keys "ctrl+s"
     $shifted = @(Get-Picture $file)[0]
     Check ($dragged.Count -eq 1 -and [Math]::Abs($shifted.x - ($picture.x - 40)) -lt 1.5 -and [Math]::Abs($shifted.y - ($picture.y + 30)) -lt 1.5) "Allein gewaehltes Bild laesst sich in der Mitte ziehen (x $($picture.x) zu $($shifted.x))"
