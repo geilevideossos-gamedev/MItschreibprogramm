@@ -99,11 +99,7 @@ public sealed class DocumentView : StackPanel
 
         PageStyle = style;
         LineColor = lineColor;
-        foreach (var page in _pages)
-        {
-            page.Paper.Update(style, lineColor, _dark);
-        }
-
+        ApplyTheme();
         Changed?.Invoke();
     }
 
@@ -127,7 +123,7 @@ public sealed class DocumentView : StackPanel
         PageMode = Mode,
         PageStyle = PageStyle,
         LineColor = LineColor,
-        Pages = _pages.Select(page => new NotePage { Strokes = page.Ink.Strokes.Select(StrokeMapper.ToModel).ToList() }).ToList(),
+        Pages = _pages.Select(page => page.ToModel()).ToList(),
     };
 
     // The old page views stay alive inside the undo step, so earlier steps that point at them remain valid.
@@ -195,8 +191,7 @@ public sealed class DocumentView : StackPanel
 
     private PageView CreatePage(NotePage model)
     {
-        var page = new PageView(_pen);
-        page.Ink.Strokes = new StrokeCollection(model.Strokes.Where(stroke => stroke.Points.Count > 0).Select(StrokeMapper.ToStroke));
+        var page = new PageView(_pen, model);
         page.Ink.StrokeCollected += (_, e) => OnStrokeCollected(page, e.Stroke);
         page.Ink.StrokeErasing += (_, e) => OnStrokeErasing(page.Ink.Strokes, e.Stroke);
         _created.Add(page);
@@ -223,7 +218,7 @@ public sealed class DocumentView : StackPanel
     private PageView AppendPage()
     {
         var page = CreatePage(new NotePage());
-        page.Paper.Update(PageStyle, LineColor, _dark);
+        page.ApplyTheme(PageStyle, LineColor, _dark);
         _pages.Add(page);
         Children.Add(page);
         UpdateEditingMode();
@@ -272,16 +267,11 @@ public sealed class DocumentView : StackPanel
         Changed?.Invoke();
     }
 
-    // Also covers strokes and pages that come back through undo and still carry the other theme's colours.
     private void ApplyTheme()
     {
         foreach (var page in _pages)
         {
-            page.Paper.Update(PageStyle, LineColor, _dark);
-            foreach (var stroke in page.Ink.Strokes)
-            {
-                stroke.DrawingAttributes.Color = Palette.PenOnPage(Palette.LogicalPen(stroke.DrawingAttributes.Color), _dark);
-            }
+            page.ApplyTheme(PageStyle, LineColor, _dark);
         }
     }
 
