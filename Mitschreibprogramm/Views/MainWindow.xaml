@@ -58,11 +58,13 @@
                     <RadioButton x:Name="ToolEraser" Style="{StaticResource FlatButton}" GroupName="Tool"
                                  Content="Radierer" ToolTip="Radierer (E)" Checked="OnToolChecked"/>
                     <RadioButton x:Name="ToolSelect" Style="{StaticResource FlatButton}" GroupName="Tool"
-                                 Content="Auswahl" ToolTip="Auswahl (S): Lasso ziehen, Auswahl ziehen, an den Ecken skalieren, Entf löscht, Esc hebt auf. Obere Stifttaste halten wirkt genauso"
+                                 Content="Auswahl" ToolTip="Lasso: Bereich umkreisen, dann verschieben, skalieren oder mit Entf löschen (S)"
                                  Checked="OnToolChecked"/>
-                    <ToggleButton x:Name="ShapesButton" Style="{StaticResource FlatButton}" Content="Formen"
-                                  ToolTip="Jeden Strich beim Loslassen als Form erkennen (F). Ohne Schalter: am Strichende kurz stillhalten"
-                                  Checked="OnShapesToggled" Unchecked="OnShapesToggled"/>
+                    <Border Style="{StaticResource ToolSeparator}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="ShapesButton" Style="{StaticResource FlatButton}" Click="OnShapesClick"
+                            ToolTip="An: jeder Strich wird zu Linie, Kreis, Rechteck oder Dreieck. Aus: nur wenn der Stift am Ende kurz stillgehalten wird (F)"/>
                     <Border Style="{StaticResource ToolSeparator}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">

@@ -21,6 +21,7 @@ public partial class MainWindow : Window
     private readonly ZoomPanController _zoomPan;
     private readonly NotebookSession _session;
     private readonly ImageInserter _images;
+    private bool _shapesOn;
 
     public MainWindow()
     {
@@ -60,6 +61,7 @@ public partial class MainWindow : Window
         PressureCheck.IsChecked = _settings.PressureEnabled;
         Document.SetPressureEnabled(_settings.PressureEnabled);
         ToolPen.IsChecked = true;
+        ApplyShapes();
         NotebookPanelButton.IsChecked = _settings.NotebookPanelVisible;
         ApplyNotebookPanel();
         _session.Start();
@@ -129,7 +131,7 @@ public partial class MainWindow : Window
         Add(ModifierKeys.None, () => WidthSlider.Value -= AppConstants.StrokeWidthStep, Key.OemMinus, Key.Subtract);
         Add(ModifierKeys.None, () => ToolPen.IsChecked = true, Key.P);
         Add(ModifierKeys.None, () => (ToolEraser.IsChecked == true ? ToolPen : ToolEraser).IsChecked = true, Key.E);
-        Add(ModifierKeys.None, () => ShapesButton.IsChecked = ShapesButton.IsChecked != true, Key.F);
+        Add(ModifierKeys.None, ToggleShapes, Key.F);
         Add(ModifierKeys.None, () => ToolSelect.IsChecked = true, Key.S);
         Add(ModifierKeys.None, Document.Selection.Delete, Key.Delete);
         Add(ModifierKeys.None, Document.Selection.Clear, Key.Escape);
@@ -168,7 +170,19 @@ public partial class MainWindow : Window
     private void OnToolChecked(object sender, RoutedEventArgs e) =>
         Document.Tools.SetTool(ToolEraser.IsChecked == true, ToolSelect.IsChecked == true);
 
-    private void OnShapesToggled(object sender, RoutedEventArgs e) => Document.SetShapesAlwaysOn(ShapesButton.IsChecked == true);
+    private void OnShapesClick(object sender, RoutedEventArgs e) => ToggleShapes();
+
+    private void ToggleShapes()
+    {
+        _shapesOn = !_shapesOn;
+        ApplyShapes();
+    }
+
+    private void ApplyShapes()
+    {
+        ShapesButton.Content = _shapesOn ? "Formen: an" : "Formen: aus";
+        Document.SetShapesAlwaysOn(_shapesOn);
+    }
 
     private void OnNewClick(object sender, RoutedEventArgs e) => _session.New();
 
