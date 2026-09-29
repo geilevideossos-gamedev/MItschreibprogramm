@@ -4,7 +4,7 @@
 
 - `Mitschreibprogramm/`: WPF-App, net8.0-windows. Ordner Models/, Views/, Services/, Rendering/.
 - `Mitschreibprogramm.Tests/`: xUnit, nur Models/Services.
-- `tools/`: Selbsttest. pen-sim.ps1, screenshot.ps1, app-control.ps1, selftest.ps1 mit den Checkpoints in `tools/selftest/`, gemeinsamer Win32-Code als partielle Klasse in MspNative.Window.cs, MspNative.Pen.cs, MspNative.Input.cs.
+- `tools/`: Selbsttest. pen-sim.ps1 (auch Linienzüge mit Stillhalten: `-Path`, `-HoldMs`), screenshot.ps1, app-control.ps1 (auch Maus-Lasso: `-DragPath`), selftest.ps1 mit den Checkpoints in `tools/selftest/` (8 Formen, 9 Bilder und Lasso), gemeinsamer Win32-Code als partielle Klasse in MspNative.Window.cs, MspNative.Pen.cs, MspNative.Input.cs.
 - `docs/`, `build.sh`, `dist/` (Build-Ausgabe, nicht im Repo).
 
 ## Klassen

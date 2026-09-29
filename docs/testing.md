@@ -22,12 +22,30 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 
 | Nr | Inhalt | Ergebnis |
 |----|--------|----------|
-| 1 | Pen: synthetischer Strich mit steigendem Druck, Seitentaste als Radierer, invertierter Stift. Druckverlauf im Debug-Log, Screenshot | bestanden 2026-09-19, 7/7 |
+| 1 | Pen: synthetischer Strich mit steigendem Druck, Seitentaste (seit 2026-09-29: Lasso statt Radierer), invertierter Stift. Druckverlauf im Debug-Log, Screenshot | bestanden 2026-09-29 gegen die exe, 7/7 (2026-09-19, 7/7) |
 | 2 | Hintergrund, Zoom, Pan, Undo/Redo: Screenshot pro Stil und Zoomstufe, Strich bei 200 % injizieren, Koordinaten im Debug-Log prüfen | bestanden 2026-09-19, 13/13 |
 | 3 | Seitenmodell: xUnit für Konvertierung, Screenshot beider Modi, Auto-Seite per injiziertem Strich unten | bestanden 2026-09-19, 11/11, xUnit 7/7 |
 | 4 | Hefte-Bibliothek (seit 2026-09-28, vorher Datei-Befehle): mehrere Hefte anlegen, Striche injizieren, umbenennen (Doppelklick und Kontextmenü), wechseln, Sortierung, .msp-Export und -Import, PDF aus dem Kontextmenü mit vorgeschlagenem Namen, Löschen mit Rückfrage, Strg+B, schließen und neu starten: Hefte, Striche und Scrollposition wieder da, Screenshot der Seitenleiste. xUnit für Index und Autosave | bestanden 2026-09-28, 31/31, xUnit 55/55 (alte Fassung 2026-09-19, 18/18) |
 | 5 | PDF-Export: xUnit Seitenzahl, PDF in Bild wandeln (pdftoppm) und anschauen | bestanden 2026-09-19, 5/5, xUnit 22/22 |
-| 6 | exe aus dist/ starten, Selbsttest komplett gegen die exe wiederholen | bestanden 2026-09-19 gegen die finale exe, 65/65 (Teil 1: 31/31, Teil 2: 34/34) |
+| 6 | exe aus dist/ starten, Selbsttest komplett gegen die exe wiederholen | bestanden 2026-09-19 gegen die finale exe, 65/65 (Teil 1: 31/31, Teil 2: 34/34). 2026-09-29 gegen die neue exe: siehe „Lauf 2026-09-29“ |
+| 8 | Formerkennung: Linie, Rechteck, Dreieck, Kreis je mit Stillhalten am Ende, Rechteck ohne Stillhalten, Schalter Formen (F), Strg+Z / Strg+Y nach der Erkennung, kleine Handschrift mit Formen an, Datei (fitToCurve), PDF | bestanden 2026-09-29 gegen die exe, 11/11 |
+| 9 | Bilder und Lasso: Strg+V ohne und mit Bild, Lage und Farben, Strich auf dem Bild, Lasso mit Seitentaste, Verschieben, Eckgriff mit Seitenverhältnis, Undo / Redo, auf dem Blatt bleiben, Esc, Auswahl-Werkzeug mit Maus-Lasso, Entf und Undo, allein gewähltes Bild ziehen und löschen, Neustart, PDF mit Bild | bestanden 2026-09-29 gegen die exe, 20/20 |
+
+### Lauf 2026-09-29 (gegen die neu gepublishte dist/Mitschreibprogramm.exe)
+
+| Block | Ergebnis |
+|-------|----------|
+| Checkpoint 8 Formen | 11/11 |
+| Checkpoint 9 Bilder und Lasso | 20/20 (erster Anlauf 18/20: zwei Skriptfehler, siehe unten) |
+| Checkpoint 1, 2, 3 | 31/31 im zweiten Anlauf am Stück (erster Anlauf 28/31, Checkpoint 2 einzeln 16/16) |
+| Checkpoint 4, 5, 7 | 50/50 |
+
+- Checkpoint 2 im ersten Anlauf: drei Prüfungen zum waagrechten Scrollen ab 200 % schlugen fehl, im selben Block wurde ein verlorener Strich wiederholt (RETRY). Einzeln wiederholt liefen alle 16 Prüfungen durch. Ursache nicht belegt, wahrscheinlich ein verschluckter Eingabe-Event wie am 2026-09-19 (siehe Checkpoint 6). Der ganze Block lief danach am Stück mit 31/31 ohne Wiederholung.
+- Checkpoint 9 erster Anlauf: der Vergleich der Breite erwartete exakt 400, die Zwischenablage liefert das Testbild mit 95,99 DPI (400,06); und die Logzeile nach dem Skalieren las die Auswahlgrenzen vor dem nächsten Layout (433 statt 480). Das Bild selbst war richtig 480 x 360. Beides im Skript bzw. im Debug-Log behoben.
+- Formen am Bildschirm (cp8-shapes.png): Linie waagrecht gestellt, Rechteck, Dreieck, zwei Kreise, das Rechteck ohne Stillhalten bleibt Freihand, „o“, „4“ und „w“ bleiben Handschrift.
+- Formen im PDF: bei 100 dpi zeichnet pdftoppm dünne schräge Linien (3 px) gerastert, bei 300 dpi sind Dreieck, Rechteck und Kreis sauber durchgezogen mit spitzen Ecken. Darstellungseffekt des Renderers, kein Exportfehler.
+- Bilder (cp9-pasted.png, cp9-moved-resized.png, cp9-page-1.png): das Testbild liegt in der Mitte des sichtbaren Bereichs, der Strich darauf ist über dem Bild zu sehen, der Auswahlrahmen hat Griffe, nach dem Skalieren 480 x 360 (Seitenverhältnis gehalten), im PDF an derselben Stelle unter den Strichen.
+- Das Testbild kommt über `System.Windows.Forms.Clipboard.SetImage` als einfaches Bitmap (ohne PNG-Format), geprüft ist also der Weg ohne Alphakanal. Text in der Zwischenablage stellt der Checkpoint danach wieder her, anderes nicht.
 
 ### Ergebnis Checkpoint 1
 

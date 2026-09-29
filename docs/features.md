@@ -121,22 +121,22 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F56 | Formerkennung: gerade Linie, Kreis / Ellipse, Rechteck, Dreieck | wip |
-| F57 | Auslöser: am Ende eines Strichs den Stift ca. 500 ms stillhalten (Bewegung unter ein paar Pixel), dann wird der Strich durch die erkannte Form ersetzt. Schwelle und Haltezeit als Konstanten | wip |
-| F58 | Toggle „Formen“ in der Toolbar und Taste F: wenn an, wird jeder Strich sofort beim Loslassen erkannt | wip |
-| F59 | Wird keine Form sicher erkannt, bleibt der Strich unverändert. Lieber zu selten erkennen als Handschrift kaputt machen | wip |
-| F60 | Erkannte Formen sind normale Striche (Farbe, Breite aus dem aktuellen Stift, konstanter Druck), damit Radieren, Undo, Speichern, PDF-Export und Lasso ohne Sonderfall funktionieren | wip |
-| F61 | Erkennung als eigene Klasse in Services/, rein rechnerisch ohne WPF-Abhängigkeit, mit xUnit getestet. Einfachste robuste Methode, Entscheidung in decisions-2.md | wip |
-| F62 | Undo nach einer Erkennung stellt den ursprünglichen Freihand-Strich wieder her | wip |
-| F63 | Bilder einfügen mit Ctrl+V: Bild aus der Zwischenablage (z. B. Snipping-Tool-Screenshot) wird auf der aktuell sichtbaren Seite in der Mitte des sichtbaren Bereichs eingefügt, Breite höchstens 80 % der Seite, Seitenverhältnis bleibt. Ist kein Bild in der Zwischenablage, passiert nichts | wip |
-| F64 | Bilder verschieben und Größe ändern über die Auswahl (F69 ff.), Seitenverhältnis beim Eckenziehen beibehalten. Entf löscht | wip |
-| F65 | Bilder liegen unter den Strichen, man kann drauf schreiben | wip |
-| F66 | Speicherung im .msp als base64-PNG, Formatversion erhöht (2), alte Dateien laden weiter. file-format.md aktualisiert | wip |
-| F67 | PDF-Export enthält die Bilder an der richtigen Position und Größe | wip |
-| F68 | Undo / Redo für Einfügen, Verschieben, Skalieren und Löschen von Bildern | wip |
-| F69 | Lasso-Auswahl: obere Seitentaste am Stift gedrückt halten und einen Kreis ziehen = Lasso. Alles innerhalb (Striche und Bilder) wird ausgewählt. Die untere Taste bleibt Radierer. Wie WPF die beiden Tasten unterscheidet, steht in pen-input.md | wip |
-| F70 | Fallback: Toolbar-Button „Auswahl“ und Taste S schalten den Lasso-Modus dauerhaft an, P zurück zum Stift. Mit der Maus funktioniert der Modus genauso | wip |
-| F71 | Auswahl verschieben durch Ziehen, skalieren über die Eckgriffe, Entf löscht, Esc hebt die Auswahl auf, Klick daneben ebenfalls | wip |
-| F72 | WPF-Bordmittel: InkCanvas EditingMode.Select wählt Striche und Kind-Elemente per Lasso, verschiebt und skaliert sie. Selbst gebaut nur, was das nicht abdeckt (decisions-2.md) | wip |
-| F73 | Undo / Redo für Verschieben, Skalieren und Löschen einer Auswahl | wip |
-| F74 | Im Seitenmodus bleibt eine verschobene Auswahl auf ihrer Seite, nicht über Seitengrenzen hinaus | wip |
+| F56 | Formerkennung: gerade Linie, Kreis / Ellipse, Rechteck, Dreieck | done |
+| F57 | Auslöser: am Ende eines Strichs den Stift ca. 500 ms stillhalten (Bewegung unter ein paar Pixel), dann wird der Strich durch die erkannte Form ersetzt. Schwelle und Haltezeit als Konstanten | done |
+| F58 | Toggle „Formen“ in der Toolbar und Taste F: wenn an, wird jeder Strich sofort beim Loslassen erkannt | done |
+| F59 | Wird keine Form sicher erkannt, bleibt der Strich unverändert. Lieber zu selten erkennen als Handschrift kaputt machen | done |
+| F60 | Erkannte Formen sind normale Striche (Farbe, Breite aus dem aktuellen Stift, konstanter Druck), damit Radieren, Undo, Speichern, PDF-Export und Lasso ohne Sonderfall funktionieren | done |
+| F61 | Erkennung als eigene Klasse in Services/, rein rechnerisch ohne WPF-Abhängigkeit, mit xUnit getestet. Einfachste robuste Methode, Entscheidung in decisions-2.md | done |
+| F62 | Undo nach einer Erkennung stellt den ursprünglichen Freihand-Strich wieder her | done |
+| F63 | Bilder einfügen mit Ctrl+V: Bild aus der Zwischenablage (z. B. Snipping-Tool-Screenshot) wird auf der aktuell sichtbaren Seite in der Mitte des sichtbaren Bereichs eingefügt, Breite höchstens 80 % der Seite, Seitenverhältnis bleibt. Ist kein Bild in der Zwischenablage, passiert nichts | done |
+| F64 | Bilder verschieben und Größe ändern über die Auswahl (F69 ff.), Seitenverhältnis beim Eckenziehen beibehalten. Entf löscht | done |
+| F65 | Bilder liegen unter den Strichen, man kann drauf schreiben | done |
+| F66 | Speicherung im .msp als base64-PNG, Formatversion erhöht (2), alte Dateien laden weiter. file-format.md aktualisiert | done |
+| F67 | PDF-Export enthält die Bilder an der richtigen Position und Größe | done |
+| F68 | Undo / Redo für Einfügen, Verschieben, Skalieren und Löschen von Bildern | done |
+| F69 | Lasso-Auswahl: obere Seitentaste am Stift gedrückt halten und einen Kreis ziehen = Lasso. Alles innerhalb (Striche und Bilder) wird ausgewählt. Die untere Taste bleibt Radierer. Wie WPF die beiden Tasten unterscheidet, steht in pen-input.md | done |
+| F70 | Fallback: Toolbar-Button „Auswahl“ und Taste S schalten den Lasso-Modus dauerhaft an, P zurück zum Stift. Mit der Maus funktioniert der Modus genauso | done |
+| F71 | Auswahl verschieben durch Ziehen, skalieren über die Eckgriffe, Entf löscht, Esc hebt die Auswahl auf, Klick daneben ebenfalls | done |
+| F72 | WPF-Bordmittel: InkCanvas EditingMode.Select wählt Striche und Kind-Elemente per Lasso, verschiebt und skaliert sie. Selbst gebaut nur, was das nicht abdeckt (decisions-2.md) | done |
+| F73 | Undo / Redo für Verschieben, Skalieren und Löschen einer Auswahl | done |
+| F74 | Im Seitenmodus bleibt eine verschobene Auswahl auf ihrer Seite, nicht über Seitengrenzen hinaus | done |

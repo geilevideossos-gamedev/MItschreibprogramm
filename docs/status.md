@@ -1,21 +1,18 @@
 # Status
 
-Stand: 2026-09-28
+Stand: 2026-09-29
 
 ## Aktuell
 
-- Auftrag vom 2026-09-29 (F56 bis F62 Formerkennung, danach Bilder und Lasso): Hardware-Korrektur auf One by Wacom CTL-672 erledigt, relative Änderungszeit in der Heftliste erledigt, Formerkennung, Bilder einfügen (Strg+V, Speichern als Version 2, PDF) und Lasso-Auswahl (obere Seitentaste, Auswahl/S, Verschieben, Skalieren, Entf, Esc, Undo) implementiert, xUnit grün. Der Selbsttest gegen die neu gepublishte exe steht noch aus, deshalb `wip`.
-- Hefte-Bibliothek mit Seitenleiste (Auftrag vom 2026-09-28, F46 bis F55) ist fertig und per Selbsttest geprüft: Checkpoint 4 (neu) 31/31, Checkpoint 1, 2, 3 31/31, Checkpoint 5 und 7 19/19, alle gegen den Debug-Build vom selben Stand. `dotnet build` 0 Warnings, `dotnet test` 55 Tests grün. F46 bis F55 stehen auf `done`.
-- Was sich für den Benutzer ändert: kein Datei-Dialog mehr im Alltag. Hefte liegen in %AppData%/Mitschreibprogramm/notes/ (eine .msp je Heft plus index.json), werden beim Wechsel, beim Schließen und alle 60 s automatisch gespeichert, die Seitenleiste (Strg+B) listet sie nach zuletzt bearbeitet. Öffnen/Speichern unter heißen jetzt Importieren/MSP-Export. Kein Schließen-Dialog, kein Stern im Titel, Löschen in den Papierkorb, eine zweite Instanz beendet sich mit Meldung.
-- Zwei Reviews (Design, fünf Blickwinkel; Code, fünf Blickwinkel mit je zwei Gegenprüfern) sind eingearbeitet, siehe decisions.md „Nach dem Design-Review“ und „Nach dem Code-Review“.
-- `./build.sh` hat dist/Mitschreibprogramm.exe (141 MB) aus diesem Stand gebaut. Der Selbsttest lief gegen den Debug-Build; die exe hat denselben App-Code.
-- Vorher (2026-09-19): alle 45 Features `done`, Checkpoint 1 bis 6 bestanden, Seitenstil Strichliert durch Kariert ersetzt.
-- Selbsttest-Werkzeuge in tools/: pen-sim.ps1, screenshot.ps1, app-control.ps1 (neu: -RightClick, -DoubleClick, -Exists, -Items, -Value), selftest.ps1 (startet nicht, solange eine Instanz läuft; wiederholt einen verlorenen Strich einmal), Checkpoints in tools/selftest/.
-- Am 2026-09-28 auf Daniels Freigabe gepusht: origin/main steht auf dem Stand dieses Commits (94 Commits seit `Initial commit`). Die lokale Historie wurde vorher einmal neu geschrieben, damit jeder Commit baut (decisions.md).
+- Auftrag vom 2026-09-29 erledigt: Hardware-Korrektur auf One by Wacom CTL-672 (CLAUDE.md, pen-input.md, README ohne ExpressKeys), Formerkennung (F56 bis F62), Bilder mit Strg+V (F63 bis F68, Formatversion 2), Lasso-Auswahl (F69 bis F74). Dazu auf Daniels Wunsch die Änderungszeit in der Heftliste kurz und relativ, und seine Änderung an mega-prompt-claude-code-start.md als docs-Commit.
+- `dotnet build` 0 Warnings, 0 Errors. `dotnet test` 94 Tests grün (neu: Formerkennung mit Linien, Kreisen, Rechtecken, Dreiecken und Handschrift, die frei bleiben muss; Stillhalten; Bilder im .msp, alte Version 1 lädt; Bilder im PDF; Auswahl-Rechtecke; relative Zeit).
+- Selbsttest gegen die neu gepublishte dist/Mitschreibprogramm.exe: Checkpoint 8 11/11, Checkpoint 9 20/20, Checkpoint 4, 5, 7 50/50, Checkpoint 1, 2, 3 31/31 (im ersten Anlauf 28/31 nach einem verlorenen Eingabe-Event, Details testing.md „Lauf 2026-09-29“). F56 bis F74 stehen auf `done`.
+- Die obere Seitentaste (Barrel) radiert nicht mehr, sie ist jetzt das Lasso. Radiert wird mit der unteren Taste, belegt als „Radieren“ im Treiber (invertiert). README und pen-input.md erklären die Belegung.
+- Nichts gepusht seit dem Push vom 2026-09-28.
 
 ## Nächster Schritt
 
-- Daniel testet mit der echten One by Wacom nach testing.md, Abschnitt "Offen mit echtem Pen" (mit MSP_DEBUG_LOG liegt die Bibliothek neben dem Log). Was dort bestätigt ist, wandert in features.md von `done` auf `getestet`.
+- Daniel testet mit der echten One by Wacom nach testing.md, Abschnitt "Offen mit echtem Pen" (mit MSP_DEBUG_LOG liegt die Bibliothek neben dem Log), vor allem die Belegung der Seitentasten (oben „Rechtsklick“ = Lasso, unten „Radieren“), das Stillhalten für Formen und das Lasso. Was dort bestätigt ist, wandert in features.md von `done` auf `getestet`.
 - Weitere Pushes nur auf ausdrückliche Anweisung: `ALLOW_PUSH=1 git push origin main`.
 
 ## Schrittplan
@@ -30,6 +27,7 @@ Stand: 2026-09-28
 8. Publish, build.sh, README (fertig, Checkpoint 6 bestanden)
 9. Abschluss: features.md, status.md, testing.md "Offen mit echtem Pen" (fertig)
 10. Hefte-Bibliothek: Library + Tests, Session, Seitenleiste, Dialoge, Import/Export, Reviews, Selbsttest Checkpoint 4, docs (fertig)
+11. Hardware-Korrektur, relative Änderungszeit, Formerkennung, Bilder, Lasso, Selbsttest Checkpoint 8 und 9 gegen die exe (fertig)
 
 ## Offene Punkte
 
