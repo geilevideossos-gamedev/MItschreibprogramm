@@ -56,3 +56,9 @@ Fortsetzung von decisions.md, gleiche Regeln: chronologisch, je Eintrag Entschei
 - Befund und Ursache stehen in status.md und pen-input.md: mit gedrückter Seitentaste wurde ein leicht wanderndes Tippen zu einem leeren Mini-Lasso, ohne Auswahl griff Entf nicht.
 - Entscheidung: `TapSelection` greift nur ein, wenn InkCanvas die Auswahl nach dem Tippen unverändert gelassen hat, und macht dann dasselbe wie InkCanvas bei einem Mausklick (Strich vor Bild, daneben tippen hebt auf). So bleibt InkCanvas zuständig, wo es funktioniert, und ein Lasso, das auf einem Bild beginnt, bleibt ein Lasso. Toleranz 12 Fenstereinheiten als Konstante (`AppConstants.TapTolerance`), InkCanvas selbst nimmt 7.
 - Verworfen: ein Druck auf ein Bild wählt es sofort und zieht es. Dann könnte kein Lasso mehr auf einem Bild beginnen, und Schreiben über einem großen Screenshot im Auswahl-Modus wäre unmöglich.
+
+## 2026-09-29 Radierer löscht Bilder
+
+- Der Radierer löscht ein Bild ganz, sobald er es berührt (Werkzeug Radierer, untere Taste als „Radieren“ = invertierter Stift, Maus mit Radierer-Werkzeug), wie EraseByStroke einen ganzen Strich. Geprüft wird jeder Stiftpunkt gegen den Bildrahmen, erweitert um 4 Einheiten (halbe Größe der Standard-Radierform von InkCanvas). Jedes gelöschte Bild ist ein eigener Undo-Schritt, wie jeder radierte Strich.
+- Ob gerade radiert wird, sagt `InkCanvas.ActiveEditingMode` (dort ist der invertierte Stift schon eingerechnet), zusätzlich `StylusEventArgs.Inverted` für den Fall, dass InkCanvas den Wechsel noch nicht gesehen hat.
+- Verworfen: nur den Teil eines Bilds radieren. Der Radierer kennt auch bei Strichen nur ganz oder gar nicht.
