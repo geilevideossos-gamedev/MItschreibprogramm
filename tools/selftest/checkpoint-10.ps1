@@ -14,6 +14,8 @@ function Get-Counts([string]$file) {
     @{ Images = @($pages | ForEach-Object { $_.images }).Count; Strokes = @($pages | ForEach-Object { $_.strokes }).Count }
 }
 function Saved { Ctl -Keys "ctrl+s"; Start-Sleep -Milliseconds 300; Get-Counts (Get-NewestNote) }
+# Undo only after a real change: an undo after a missed step would take back the paste and fail every later check.
+function Undo([bool]$changed) { if ($changed) { Ctl -Keys "ctrl+z" } }
 # The top of the window (title bar and both toolbar rows) of several screenshots, stacked into one picture.
 function Join-Toolbars([string[]]$names, [string]$target) {
     Add-Type -AssemblyName System.Drawing
@@ -47,7 +49,9 @@ function Checkpoint10Steps {
     Ctl -Keys "ctrl+v"
     $pasted = @(Read-Log | Where-Object { $_.kind -eq "image" })[0]
     $x = Number $pasted.x; $y = Number $pasted.y
-    $client = "{0},{1}" -f ($origin.X + $x + 100).ToString($invariant), ($origin.Y + $y + 150).ToString($invariant)
+    # Away from the pen taps: a mouse click without any mouse movement on the spot where the pen left the cursor
+    # never selects (injection artifact, docs/pen-input.md).
+    $client = "{0},{1}" -f ($origin.X + $x + 140).ToString($invariant), ($origin.Y + $y + 180).ToString($invariant)
 
     Ctl -Keys "s"
     Read-Log | Out-Null
@@ -57,7 +61,7 @@ function Checkpoint10Steps {
     Ctl -Keys "delete"
     $deleted = @(Selection "deleted")
     $gone = Saved
-    Ctl -Keys "ctrl+z"
+    Undo ($deleted.Count -eq 1)
     $back = Saved
     Check ($deleted.Count -eq 1 -and $deleted[0].images -eq "1" -and $gone.Images -eq 0 -and $back.Images -eq 1) "Entf loescht das getippte Bild, Strg+Z holt es zurueck"
 
@@ -65,8 +69,9 @@ function Checkpoint10Steps {
     Ctl -Drag "left,$client,$client"
     $click = @(Read-Log | Where-Object { $_.kind -eq "selection" })
     Ctl -Keys "delete"
+    $deleted = @(Selection "deleted")
     $gone = Saved
-    Ctl -Keys "ctrl+z"
+    Undo ($deleted.Count -eq 1)
     $back = Saved
     Check ($click.Count -ge 1 -and $click[-1].images -eq "1" -and $gone.Images -eq 0 -and $back.Images -eq 1) "Mausklick waehlt das Bild, Entf loescht, Strg+Z holt es zurueck"
 
@@ -80,8 +85,9 @@ function Checkpoint10Steps {
     PageTap $origin ($x + 100) ($y + 150) 10 -Barrel
     $barrel = @(Read-Log | Where-Object { $_.kind -eq "selection" })
     Ctl -Keys "delete"
+    $deleted = @(Selection "deleted")
     $gone = Saved
-    Ctl -Keys "ctrl+z"
+    Undo ($deleted.Count -eq 1)
     $back = Saved
     Check ($barrel.Count -ge 1 -and $barrel[-1].images -eq "1" -and $gone.Images -eq 0 -and $back.Images -eq 1) "Tippen mit oberer Taste und 10 Einheiten Bewegung waehlt das Bild, Entf loescht, Strg+Z holt es zurueck (der Fall aus dem Bug)"
 
@@ -95,7 +101,7 @@ function Checkpoint10Steps {
     Ctl -Keys "delete"
     $deleted = @(Selection "deleted")
     $gone = Saved
-    Ctl -Keys "ctrl+z"
+    Undo ($deleted.Count -eq 1)
     $back = Saved
     Check ($lasso.Count -ge 1 -and $lasso[-1].strokes -eq "2" -and $lasso[-1].images -eq "1") "Lasso mit Seitentaste waehlt Bild und beide Striche ($($lasso[-1].raw))"
     Check ($deleted.Count -eq 1 -and $deleted[0].strokes -eq "2" -and $deleted[0].images -eq "1" -and $gone.Images -eq 0 -and $gone.Strokes -eq $before.Strokes - 2 -and $back.Images -eq 1 -and $back.Strokes -eq $before.Strokes) "Entf loescht Bild und Striche zusammen, Strg+Z holt alles zurueck ($($before.Strokes) / $($gone.Strokes) / $($back.Strokes) Striche)"
@@ -104,7 +110,7 @@ function Checkpoint10Steps {
     PagePath $origin @(@(($x + 150), ($y + 280)), @(($x + 250), ($y + 290)))
     $erased = @(Read-Log | Where-Object { $_.kind -eq "image" -and $_.raw -match "image erased" })
     $gone = Saved
-    Ctl -Keys "ctrl+z"
+    Undo ($erased.Count -ge 1)
     $back = Saved
     Check ($erased.Count -eq 1 -and $gone.Images -eq 0 -and $back.Images -eq 1 -and $back.Strokes -eq $before.Strokes) "Radierer-Werkzeug loescht das Bild beim Beruehren, Strg+Z holt es zurueck"
 
@@ -113,12 +119,12 @@ function Checkpoint10Steps {
     PagePath $origin @(@(($x + 150), ($y + 280)), @(($x + 250), ($y + 290))) -Inverted
     $erased = @(Read-Log | Where-Object { $_.kind -eq "image" -and $_.raw -match "image erased" })
     $gone = Saved
-    Ctl -Keys "ctrl+z"
+    Undo ($erased.Count -ge 1)
     $back = Saved
     Ctl -Keys "ctrl+y"
     $redo = Saved
     Check ($erased.Count -eq 1 -and $gone.Images -eq 0 -and $back.Images -eq 1 -and $redo.Images -eq 0) "Untere Taste (invertiert) loescht das Bild, Strg+Z holt es zurueck, Strg+Y loescht es wieder"
-    Ctl -Keys "ctrl+z"
+    Undo ($redo.Images -eq 0)
 
     Check ((Ctl -Read ShapesButton) -eq "Formen: aus") "Schalter zeigt 'Formen: aus'"
     $names = @()
