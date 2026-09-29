@@ -75,7 +75,7 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F32 | Ctrl+L = Seitenstil durchschalten (Blanko, Liniert, Kariert) | done |
 | F33 | Ctrl+Enter = neue Seite (nur Seitenmodus) | done |
 | F34 | Ctrl+D = Dark Mode | done |
-| F35 | Ctrl+Z / Ctrl+Y, Ctrl+N / O / S / Shift+S / E, Ctrl+Plus / Minus / 0. Einzeltasten bleiben Einzeltasten, damit sie auf die ExpressKeys gelegt werden können. Alle Shortcuts stehen als Tabelle in der README | done |
+| F35 | Ctrl+Z / Ctrl+Y, Ctrl+N / O / S / Shift+S / E, Ctrl+Plus / Minus / 0. Einzeltasten bleiben Einzeltasten, damit sie auf die ExpressKeys gelegt werden können. Alle Shortcuts stehen als Tabelle in der README. (Seit 2026-09-29: das Tablet ist ein One by Wacom CTL-672 ohne ExpressKeys, Einzeltasten bleiben) | done |
 
 ## UI
 
@@ -91,7 +91,7 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 |----|---------|--------|
 | F39 | `dotnet publish` (win-x64, self-contained, single file) ergibt dist/Mitschreibprogramm.exe, kein Trimming | done |
 | F40 | build.sh für Git Bash, Befehl auch in docs/build.md | done |
-| F41 | README.md am Ende, Deutsch, mit diesen Abschnitten: Was ist das, Voraussetzungen (Windows 10/11, Wacom-Treiber installiert). Wacom-Einrichtung ("Windows Ink verwenden", Seitentasten mit untere = Radierer halten, Vorschlag für die 4 ExpressKeys, Mapping der kleinen Fläche, "Gedrückt halten für Rechtsklick" abschalten). Start (exe, keine Installation), Bedienung, Shortcut-Tabelle, Dateiformat. Google-Drive-Tipp. Build aus Source, bekannte Einschränkungen | done |
+| F41 | README.md am Ende, Deutsch, mit diesen Abschnitten: Was ist das, Voraussetzungen (Windows 10/11, Wacom-Treiber installiert). Wacom-Einrichtung ("Windows Ink verwenden", Seitentasten mit untere = Radierer halten, Vorschlag für die 4 ExpressKeys, Mapping der kleinen Fläche, "Gedrückt halten für Rechtsklick" abschalten). Start (exe, keine Installation), Bedienung, Shortcut-Tabelle, Dateiformat. Google-Drive-Tipp. Build aus Source, bekannte Einschränkungen. (Seit 2026-09-29 ohne ExpressKeys-Abschnitt, siehe decisions-2.md) | done |
 
 ## Selbsttest
 

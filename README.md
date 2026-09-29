@@ -1,11 +1,11 @@
 # Mitschreibprogramm
 
-Handschriftliche Notizen unter Windows, gemacht für ein Wacom Intuos Small und Windows Ink. Eine einzelne exe, keine Installation, keine Cloud, kein Konto. Ein Heft pro Fach, schreiben, radieren, blättern, automatisch gespeichert, als PDF exportieren, fertig.
+Handschriftliche Notizen unter Windows, gemacht für ein One by Wacom und Windows Ink. Eine einzelne exe, keine Installation, keine Cloud, kein Konto. Ein Heft pro Fach, schreiben, radieren, blättern, automatisch gespeichert, als PDF exportieren, fertig.
 
 ## Voraussetzungen
 
 - Windows 10 oder Windows 11, 64 Bit.
-- Wacom-Treiber installiert (gebaut für das Wacom Intuos Small CTL-4100K-S mit dem Wacom Pen 4K). Mit der Maus funktioniert alles auch, nur ohne Druck.
+- Wacom-Treiber installiert (gebaut für das One by Wacom Medium CTL-672 mit seinem Stift, 2048 Druckstufen, zwei Seitentasten). Mit der Maus funktioniert alles auch, nur ohne Druck.
 - Sonst nichts. .NET steckt in der exe.
 
 ## Wacom einrichten
@@ -17,17 +17,8 @@ Alle Einstellungen stehen in den "Wacom Tablett-Eigenschaften" (Startmenü, bei 
    - untere Taste: **"Radieren"**. Gedrückt halten und über einen Strich fahren löscht ihn, loslassen schreibt wieder. Die Belegung "Rechtsklick" funktioniert genauso.
    - obere Taste: "Tastenanschlag" **Strg+Z** (Rückgängig).
    - Das Programm kann die beiden Tasten nicht unterscheiden, Windows meldet nur "Seitentaste gedrückt". Welche Taste radiert, legt also allein der Treiber fest. Liegt auf beiden "Rechtsklick", radieren beide.
-3. **ExpressKeys belegen** (Reiter "ExpressKeys", jeweils "Tastenanschlag"). Alle Shortcuts des Programms sind dafür gemacht. Vorschlag für die vier Tasten:
-
-   | Taste | Tastenanschlag | Wirkung |
-   |-------|----------------|---------|
-   | 1 | Strg+Z | Rückgängig |
-   | 2 | E | Radierer an / aus |
-   | 3 | 1 | Farbe Schwarz (oder 2, 3, 4 für Blau, Rot, Grün) |
-   | 4 | Strg+Enter | neue Seite |
-
-4. **Fläche sinnvoll mappen** (Reiter "Projektion"). Das Intuos Small ist nur etwa 152 x 95 mm groß. Auf den ganzen Bildschirm gemappt wird aus einer kleinen Handbewegung ein großer Strich, die Schrift wirkt dann zittrig. Besser: Bildschirmbereich "Teilbereich" wählen und nur den Bereich nehmen, in dem die Seite liegt. "Proportionen erzwingen" einschalten, sonst werden Kreise zu Eiern.
-5. **"Gedrückt halten für Rechtsklick" abschalten.** Windows wartet sonst bei jedem Aufsetzen kurz, ob ein Rechtsklick gemeint ist, und der Strich beginnt verzögert. Systemsteuerung, "Stift- und Fingereingabe", Eintrag "Gedrückt halten", "Einstellungen", Haken bei "Gedrückthalten für Rechtsklick aktivieren" entfernen. Für die Schreibfläche schaltet das Programm diese Funktion selbst ab, die Windows-Einstellung wirkt aber zusätzlich im Treiber und in anderen Programmen.
+3. **Fläche sinnvoll mappen** (Reiter "Projektion"). Die aktive Fläche der One by Wacom ist etwa 216 x 135 mm groß. Auf einen großen Bildschirm gemappt wird aus einer kleinen Handbewegung ein großer Strich, die Schrift wirkt dann zittrig. Besser: Bildschirmbereich "Teilbereich" wählen und nur den Bereich nehmen, in dem die Seite liegt. "Proportionen erzwingen" einschalten, sonst werden Kreise zu Eiern.
+4. **"Gedrückt halten für Rechtsklick" abschalten.** Windows wartet sonst bei jedem Aufsetzen kurz, ob ein Rechtsklick gemeint ist, und der Strich beginnt verzögert. Systemsteuerung, "Stift- und Fingereingabe", Eintrag "Gedrückt halten", "Einstellungen", Haken bei "Gedrückthalten für Rechtsklick aktivieren" entfernen. Für die Schreibfläche schaltet das Programm diese Funktion selbst ab, die Windows-Einstellung wirkt aber zusätzlich im Treiber und in anderen Programmen.
 
 ## Start
 
@@ -75,8 +66,6 @@ Die Statusleiste unten zeigt Zoom, "Seite x von y" und den Heftnamen.
 | Strg+S / Strg+Umschalt+S | jetzt speichern (passiert sonst automatisch) / als .msp exportieren |
 | Strg+E | PDF-Export |
 
-Einzeltasten sind absichtlich Einzeltasten, damit sie auf die ExpressKeys passen.
-
 ## Dateiformat
 
 Jedes Heft ist eine `.msp`-Datei: JSON als Klartext in UTF-8 mit Seitenmodus, Seitenstil, Linienfarbe und pro Seite den Strichen (Farbe, Breite, Druck an/aus, Punkte als `[x, y, druck]` in Seitenpixeln bei 100 %). Exportierte und importierte Dateien haben dasselbe Format wie die Hefte in `notes\`; dort kommt nur `index.json` mit Namen, Änderungszeit und Scrollposition dazu. Die genaue Beschreibung steht in [docs/file-format.md](docs/file-format.md).
@@ -98,7 +87,7 @@ Das baut, testet und legt `dist/Mitschreibprogramm.exe` an. Der Befehl dahinter 
 ## Bekannte Einschränkungen
 
 - Mit echtem Wacom-Stift noch nicht abgenommen. Geprüft ist alles mit einem simulierten Windows-Ink-Stift, die offenen Punkte stehen in docs/testing.md unter "Offen mit echtem Pen".
-- Der Radierer löscht nur ganze Striche, kein Teilradieren. Kein Neigen (Tilt), keine Rotation: der Pen 4K liefert beides nicht.
+- Der Radierer löscht nur ganze Striche, kein Teilradieren. Kein Neigen (Tilt), keine Rotation: der Stift der One by Wacom liefert beides nicht.
 - Wer die Seitentaste mitten im Strich drückt, verliert den angefangenen Strich. Erst drücken, dann aufsetzen.
 - Gespeichert wird beim Heftwechsel, beim Schließen und alle 60 Sekunden. Nach einem Absturz fehlt also höchstens die letzte Minute. Rückgängig reicht bis zum letzten Heftwechsel.
 - Zoom um den Mauszeiger hält den Punkt waagrecht erst, wenn die Seite breiter als das Fenster ist. Vorher bleibt die Seite zentriert.

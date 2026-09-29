@@ -104,7 +104,7 @@ Für einen schnellen Durchgang von Hand (Maus reicht), alles andere deckt `tools
 
 ## Offen mit echtem Pen
 
-Nur mit dem Wacom Intuos Small prüfbar. features.md bleibt bis dahin auf `done`, danach `getestet`. Zum Prüfen die App mit `MSP_DEBUG_LOG=<pfad>` starten und die Logzeilen mitlesen. Achtung: mit gesetzter Variable benutzt die App auch eine eigene Hefte-Bibliothek neben der Logdatei (`<Logordner>/notes/`), die Seitenleiste startet also leer und die echten Hefte in %AppData% bleiben unberührt. Dafür einen Pfad außerhalb von tmp/selftest/ nehmen (zum Beispiel tmp/pen/debug.log), weil der Selbsttest tmp/selftest/notes/ löscht.
+Nur mit dem One by Wacom (CTL-672) prüfbar. features.md bleibt bis dahin auf `done`, danach `getestet`. Zum Prüfen die App mit `MSP_DEBUG_LOG=<pfad>` starten und die Logzeilen mitlesen. Achtung: mit gesetzter Variable benutzt die App auch eine eigene Hefte-Bibliothek neben der Logdatei (`<Logordner>/notes/`), die Seitenleiste startet also leer und die echten Hefte in %AppData% bleiben unberührt. Dafür einen Pfad außerhalb von tmp/selftest/ nehmen (zum Beispiel tmp/pen/debug.log), weil der Selbsttest tmp/selftest/notes/ löscht.
 
 - **Windows Ink im Wacom-Treiber:** Mit Haken "Windows Ink verwenden" muss das Log `device=stylus` und unterschiedliche `pmin` / `pmax` zeigen. Ohne Haken: `device=mouse`, konstante Breite, Seitentaste radiert nicht. Steht so in der README, ist aber nur mit der Simulation belegt.
 - **Echte Seitentasten:** untere Taste mit Treiber-Belegung "Radieren" (erwartet `device=stylus-inverted mode=erase`) und mit "Rechtsklick" (erwartet `barrel=True mode=erase`). Radiert es nur, solange die Taste gehalten wird? Öffnet "Rechtsklick" irgendwo ein Kontextmenü oder stört die Hochstufung zur rechten Maustaste?
@@ -112,7 +112,6 @@ Nur mit dem Wacom Intuos Small prüfbar. features.md bleibt bis dahin auf `done`
 - **Druckkurve und Gefühl:** Faktor 0,25 bis 1,75 der Basisbreite. Fühlt sich dünn / mittel / dick richtig an, ist der Einsatzpunkt (leichtes Aufsetzen) brauchbar? Feinabstimmung ginge über die Druckkurve im Wacom-Treiber.
 - **Glättung (FitToCurve):** verändert kleine Schrift beim Abheben sichtbar? Bei der Simulation (gerade Linien) nicht beurteilbar.
 - **Latenz:** Strichbeginn ohne Verzögerung (Press-and-Hold ist für die Schreibfläche aus), nasse Tinte folgt dem Stift flüssig, auch bei 200 % Zoom und auf einer langen Endlos-Fläche.
-- **ExpressKeys:** die vier Tasten mit Strg+Z, E, 1, Strg+Enter belegen. Kommen sie als Tastendruck an, auch während der Stift im Hover über der Seite ist?
 - **Mapping der Fläche:** Tablett auf einen Bildschirm-Teilbereich mappen. Stimmen Stiftspitze und Strich weiter überein (auch bei 125 % Skalierung und auf einem zweiten Monitor mit anderer Skalierung, PerMonitorV2)?
 - **Handballen / Hover:** Hover über der Toolbar und Wechsel zurück auf die Seite, Stift verlässt den Erfassungsbereich mit gedrückter Seitentaste (Radierer darf nicht hängen bleiben).
 - **Strich direkt nach Zoomwechsel:** zoomen (Strg+Mausrad, Strg+Plus) und sofort schreiben. Geht dabei je ein Strich verloren? Im Selbsttest trat das nur auf, während parallel andere Prozesse Fenster öffneten (siehe Ergebnis Checkpoint 6).

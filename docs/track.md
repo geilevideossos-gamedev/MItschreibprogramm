@@ -27,7 +27,7 @@ Zuerst lesen. Danach docs/status.md, dann nur die docs, die der aktuelle Schritt
 
 ## Entscheidungen
 
-- docs/decisions.md, chronologisch, je Eintrag: Datum, Entscheidung, Begründung, verworfene Alternative.
+- docs/decisions.md und die Fortsetzung docs/decisions-2.md (neue Einträge dort), chronologisch, je Eintrag: Datum, Entscheidung, Begründung, verworfene Alternative.
 - API-Erkenntnisse (Context7, Primärquellen): Pen/Ink nach pen-input.md, alles andere nach decisions.md.
 - Neues NuGet-Paket: erst in decisions.md begründen, dann in architecture.md listen.
 

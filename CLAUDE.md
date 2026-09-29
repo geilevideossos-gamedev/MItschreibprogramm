@@ -1,6 +1,6 @@
 # Mitschreibprogramm
 
-Handschrift-Notizprogramm für Windows, bedient mit einem Wacom Intuos Small über Windows Ink.
+Handschrift-Notizprogramm für Windows, bedient mit einem One by Wacom (CTL-672) über Windows Ink.
 Stack: C# / WPF / .NET 8. Ergebnis: eine einzelne exe in dist/.
 Scope steht in docs/features.md. Was dort nicht steht, wird nicht gebaut.
 
@@ -56,11 +56,11 @@ Scope steht in docs/features.md. Was dort nicht steht, wird nicht gebaut.
   - docs/status.md: aktueller Stand, nächster Schritt, offene Punkte, bekannte Bugs
   - docs/features.md: vollständige Feature-Liste mit Status (todo / wip / done / getestet)
   - docs/architecture.md: Projektstruktur, Klassen, Datenfluss, NuGet-Pakete
-  - docs/pen-input.md: Wacom Intuos, Windows Ink, Druck, Seitentasten, Treiber-Fallstricke
+  - docs/pen-input.md: One by Wacom, Windows Ink, Druck, Seitentasten, Treiber-Fallstricke
   - docs/file-format.md: Dateiformat .msp (JSON), settings.json und notes/index.json
   - docs/build.md: Build- und Publish-Befehle, exe-Ausgabe
   - docs/testing.md: manuelle Test-Checkliste, Checkpoints
-  - docs/decisions.md: Entscheidungen mit Begründung, chronologisch
+  - docs/decisions.md, docs/decisions-2.md: Entscheidungen mit Begründung, chronologisch (neue Einträge in decisions-2.md)
 - Sessionstart: CLAUDE.md, dann docs/track.md, dann docs/status.md, dann nur die docs, die der aktuelle Schritt braucht.
 - Sessionende und vor jedem /compact: status.md und betroffene docs aktualisieren, committen.
 
@@ -75,9 +75,9 @@ Scope steht in docs/features.md. Was dort nicht steht, wird nicht gebaut.
 
 ## Hardware
 
-- Tablet: Wacom Intuos Small, CTL-4100K-S, USB. Aktive Fläche ca. 152 x 95 mm, wird per Treiber auf den Bildschirm gemappt.
-- Stift: Wacom Pen 4K. 4096 Druckstufen, zwei Seitentasten, kein Tilt, kein Radierer am Stiftende. Tilt also nie implementieren.
-- Tablet hat 4 ExpressKeys, die der Wacom-Treiber als Tastendrücke schickt. Deshalb Shortcuts als einzelne Tasten halten, damit man sie darauf legen kann.
+- Tablet: One by Wacom (Medium), CTL-672, USB. Aktive Fläche ca. 216 x 135 mm, wird per Treiber auf den Bildschirm gemappt.
+- Stift: der Stift der One by Wacom. 2048 Druckstufen, zwei Seitentasten, kein Tilt, kein Radierer am Stiftende. Tilt also nie implementieren.
+- Keine ExpressKeys am Tablet. Die Shortcuts bleiben trotzdem Einzeltasten.
 - Druck kommt in WPF nur an, wenn im Wacom-Treiber "Windows Ink verwenden" aktiv ist. Ohne Windows Ink sieht die App nur Maus-Events.
 - Daniel hat das Tablet nicht immer dabei. Ohne Tablet testest du selbst nach docs/testing.md (synthetische Pen-Eingabe über Win32, Debug-Log, Screenshots, xUnit). Maus-Eingabe muss immer auch funktionieren.
 

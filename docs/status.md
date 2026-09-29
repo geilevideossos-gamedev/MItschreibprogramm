@@ -14,7 +14,7 @@ Stand: 2026-09-28
 
 ## Nächster Schritt
 
-- Daniel testet mit dem echten Wacom Intuos nach testing.md, Abschnitt "Offen mit echtem Pen" (mit MSP_DEBUG_LOG liegt die Bibliothek neben dem Log). Was dort bestätigt ist, wandert in features.md von `done` auf `getestet`.
+- Daniel testet mit der echten One by Wacom nach testing.md, Abschnitt "Offen mit echtem Pen" (mit MSP_DEBUG_LOG liegt die Bibliothek neben dem Log). Was dort bestätigt ist, wandert in features.md von `done` auf `getestet`.
 - Offen zur Entscheidung: die Änderungszeit unter dem Heftnamen (nicht in der Spezifikation, eine Zeile in NotebookPanel.xaml) behalten oder streichen.
 - Weitere Pushes nur auf ausdrückliche Anweisung: `ALLOW_PUSH=1 git push origin main`.
 
