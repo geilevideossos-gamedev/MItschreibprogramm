@@ -4,7 +4,7 @@
 # starts and stops sending keys the moment another program comes to the foreground. Screenshots land in tmp/selftest/.
 param(
     [string]$Exe = "Mitschreibprogramm/bin/Debug/net8.0-windows/Mitschreibprogramm.exe",
-    [string]$Checkpoint = "1,2,3,4,5,7",
+    [string]$Checkpoint = "1,2,3,4,5,7,8,9",
     [int]$IdleSeconds = 15,
     [int]$IdleWaitSeconds = 120
 )

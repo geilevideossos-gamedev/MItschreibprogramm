@@ -114,6 +114,56 @@ public static partial class MspNative
         finally { SetThreadDpiAwarenessContext(previous); }
     }
 
+    // A stroke along a polyline (client DIPs), about one frame per stepPixels on screen, constant pressure. holdMs keeps
+    // the pen down and still on the last point before lifting (shape recognition by resting).
+    public static string PenPath(IntPtr hwnd, double[] xs, double[] ys, int pressure, double stepPixels, int delayMs,
+        bool barrel, bool inverted, int holdMs)
+    {
+        IntPtr previous = SetThreadDpiAwarenessContext(PerMonitorAwareV2);
+        try
+        {
+            POINT[] points = new POINT[xs.Length];
+            for (int i = 0; i < xs.Length; i++)
+            {
+                points[i] = ToScreen(hwnd, xs[i], ys[i]);
+                RequireAppAt(hwnd, points[i]);
+            }
+            IntPtr device = CreateSyntheticPointerDevice(PT_PEN, 1, POINTER_FEEDBACK_DEFAULT);
+            if (device == IntPtr.Zero) throw new Win32Exception(Marshal.GetLastWin32Error(), "CreateSyntheticPointerDevice");
+            int frames = 0;
+            try
+            {
+                uint hoverPen = (barrel ? PEN_FLAG_BARREL : 0) | (inverted ? PEN_FLAG_INVERTED : 0);
+                uint contactPen = hoverPen | (inverted ? PEN_FLAG_ERASER : 0);
+                uint contact = POINTER_FLAG_INRANGE | POINTER_FLAG_INCONTACT | (barrel ? POINTER_FLAG_SECONDBUTTON : POINTER_FLAG_FIRSTBUTTON);
+                POINT first = points[0], last = points[points.Length - 1];
+                for (int i = 0; i < 6; i++) PenFrame(device, first.X, first.Y, POINTER_FLAG_INRANGE | POINTER_FLAG_UPDATE, hoverPen, 0, delayMs);
+                PenFrame(device, first.X, first.Y, contact | POINTER_FLAG_DOWN, contactPen, (uint)pressure, delayMs);
+                for (int segment = 1; segment < points.Length; segment++)
+                {
+                    POINT from = points[segment - 1], to = points[segment];
+                    double length = Math.Sqrt((double)(to.X - from.X) * (to.X - from.X) + (double)(to.Y - from.Y) * (to.Y - from.Y));
+                    int steps = Math.Max(1, (int)Math.Ceiling(length / stepPixels));
+                    for (int i = 1; i <= steps; i++)
+                    {
+                        double t = (double)i / steps;
+                        PenFrame(device, (int)Math.Round(from.X + (to.X - from.X) * t), (int)Math.Round(from.Y + (to.Y - from.Y) * t),
+                            contact | POINTER_FLAG_UPDATE, contactPen, (uint)pressure, delayMs);
+                        frames++;
+                    }
+                }
+                for (int waited = 0; waited < holdMs; waited += delayMs)
+                    PenFrame(device, last.X, last.Y, contact | POINTER_FLAG_UPDATE, contactPen, (uint)pressure, delayMs);
+                PenFrame(device, last.X, last.Y, POINTER_FLAG_INRANGE | POINTER_FLAG_UP, hoverPen, 0, delayMs);
+                for (int i = 0; i < 6; i++) PenFrame(device, last.X, last.Y, POINTER_FLAG_INRANGE | POINTER_FLAG_UPDATE, hoverPen, 0, delayMs);
+                PenFrame(device, last.X, last.Y, POINTER_FLAG_UPDATE, 0, 0, delayMs);
+            }
+            finally { DestroySyntheticPointerDevice(device); }
+            return "points=" + points.Length + " frames=" + frames + " hold=" + holdMs;
+        }
+        finally { SetThreadDpiAwarenessContext(previous); }
+    }
+
     private static void PenFrame(IntPtr device, int x, int y, uint pointerFlags, uint penFlags, uint pressure, int delayMs)
     {
         POINTER_TYPE_INFO[] info = new POINTER_TYPE_INFO[1];

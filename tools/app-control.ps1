@@ -6,6 +6,7 @@
 #   tools/app-control.ps1 -Click PressureCheck              invokes/toggles/selects a control by AutomationId (x:Name)
 #   tools/app-control.ps1 -Wheel "500,400,120" -Hold ctrl   mouse wheel at a point, optional held key
 #   tools/app-control.ps1 -Drag "middle,500,400,500,250"    mouse drag (left or middle), optional -Hold space
+#   tools/app-control.ps1 -DragPath "300,300;500,300;400,450;300,300"  left-button drag along a polyline (mouse lasso)
 #   tools/app-control.ps1 -Bounds                           prints the window rectangle in physical pixels (does not activate)
 #   tools/app-control.ps1 -Pixel "500,300"                  prints the screen colour at a client position as r,g,b
 #   tools/app-control.ps1 -Read ZoomText                    prints the Name (text) of a control, "Window" = title of the foreground app window
@@ -24,6 +25,7 @@ param(
     [string]$Value,
     [string]$Wheel,
     [string]$Drag,
+    [string]$DragPath,
     [string]$Hold,
     [string]$Read,
     [string]$Exists,
@@ -37,7 +39,7 @@ $ErrorActionPreference = "Stop"
 if (-not ("MspNative" -as [type])) { Add-Type -Path (Get-ChildItem $PSScriptRoot -Filter "MspNative.*.cs").FullName -ReferencedAssemblies System.Drawing }
 Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
 
-$virtualKeys = @{ ctrl = 0x11; shift = 0x10; alt = 0x12; enter = 0x0D; space = 0x20; esc = 0x1B; tab = 0x09; plus = 0xBB; minus = 0xBD; f4 = 0x73 }
+$virtualKeys = @{ ctrl = 0x11; shift = 0x10; alt = 0x12; enter = 0x0D; space = 0x20; esc = 0x1B; tab = 0x09; plus = 0xBB; minus = 0xBD; f4 = 0x73; delete = 0x2E }
 function Get-VirtualKey([string]$name) {
     $key = $name.Trim().ToLowerInvariant()
     if ($virtualKeys.ContainsKey($key)) { return [uint16]$virtualKeys[$key] }
@@ -143,6 +145,10 @@ try {
     if ($Wheel) {
         $w = Get-Numbers $Wheel
         [MspNative]::MouseWheel($hwnd, $w[0], $w[1], [int]$w[2])
+    }
+    if ($DragPath) {
+        $pairs = @($DragPath.Split(";") | ForEach-Object { ,(Get-Numbers $_) })
+        [MspNative]::MouseDragPath($hwnd, [double[]]@($pairs | ForEach-Object { $_[0] }), [double[]]@($pairs | ForEach-Object { $_[1] }), 6)
     }
     if ($Drag) {
         $parts = $Drag.Split(",")

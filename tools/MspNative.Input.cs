@@ -118,6 +118,37 @@ public static partial class MspNative
         finally { SetThreadDpiAwarenessContext(previous); }
     }
 
+    // A left-button drag along a polyline in client DIPs (mouse lasso).
+    public static void MouseDragPath(IntPtr hwnd, double[] xs, double[] ys, int stepsPerSegment)
+    {
+        IntPtr previous = SetThreadDpiAwarenessContext(PerMonitorAwareV2);
+        try
+        {
+            POINT[] points = new POINT[xs.Length];
+            for (int i = 0; i < xs.Length; i++)
+            {
+                points[i] = ToScreen(hwnd, xs[i], ys[i]);
+                RequireAppAt(hwnd, points[i]);
+            }
+            MouseMove(points[0]);
+            Send(MouseInput(0, 0, 0, MOUSEEVENTF_LEFTDOWN));
+            for (int segment = 1; segment < points.Length; segment++)
+            {
+                for (int i = 1; i <= stepsPerSegment; i++)
+                {
+                    POINT p = new POINT();
+                    p.X = points[segment - 1].X + (points[segment].X - points[segment - 1].X) * i / stepsPerSegment;
+                    p.Y = points[segment - 1].Y + (points[segment].Y - points[segment - 1].Y) * i / stepsPerSegment;
+                    MouseMove(p);
+                    Thread.Sleep(10);
+                }
+            }
+            Send(MouseInput(0, 0, 0, MOUSEEVENTF_LEFTUP));
+            Thread.Sleep(150);
+        }
+        finally { SetThreadDpiAwarenessContext(previous); }
+    }
+
     // button: "left" or "right". The point is in physical screen pixels (UI Automation bounding rectangles).
     public static void MouseClickAt(IntPtr hwnd, string button, int screenX, int screenY)
     {
