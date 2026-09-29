@@ -1,3 +1,4 @@
+using System.IO;
 using Mitschreibprogramm.Models;
 using Mitschreibprogramm.Rendering;
 using PdfSharp.Drawing;
@@ -28,6 +29,13 @@ public static class PdfExporter
             if (includeRuleLines && document.PageStyle != PageStyle.Blank)
             {
                 DrawRuleLines(graphics, document);
+            }
+
+            foreach (var image in notePage.Images)
+            {
+                using var stream = new MemoryStream(Convert.FromBase64String(image.Png));
+                using var picture = XImage.FromStream(stream);
+                graphics.DrawImage(picture, image.X, image.Y, image.Width, image.Height);
             }
 
             foreach (var stroke in notePage.Strokes.Where(stroke => stroke.Points.Count > 0))

@@ -71,7 +71,7 @@ public sealed class MspFileServiceTests : IDisposable
         var bytes = File.ReadAllBytes(path);
         Assert.NotEqual(0xEF, bytes[0]);
         Assert.Equal(
-            """{"version":1,"pageMode":"pages","pageStyle":"lined","lineColor":"black","pages":[{"strokes":[{"color":"blue","width":3,"pressureEnabled":true,"fitToCurve":true,"points":[[10,20,0.5]]}]}]}""",
+            """{"version":2,"pageMode":"pages","pageStyle":"lined","lineColor":"black","pages":[{"strokes":[{"color":"blue","width":3,"pressureEnabled":true,"fitToCurve":true,"points":[[10,20,0.5]]}],"images":[]}]}""",
             Encoding.UTF8.GetString(bytes));
         Assert.False(File.Exists(path + ".tmp"));
     }
@@ -169,8 +169,56 @@ public sealed class MspFileServiceTests : IDisposable
     public void Load_RejectsNewerFormatVersion()
     {
         var path = Path.Combine(_folder, "future.msp");
-        File.WriteAllText(path, """{"version":2,"pages":[]}""");
+        File.WriteAllText(path, $$"""{"version":{{AppConstants.FileFormatVersion + 1}},"pages":[]}""");
 
         Assert.Throws<InvalidDataException>(() => MspFileService.Load(path));
+    }
+
+    [Fact]
+    public void SaveAndLoad_RoundTripsImages()
+    {
+        var path = Path.Combine(_folder, "images.msp");
+        var png = TestImages.Png(4, 3, System.Windows.Media.Colors.OrangeRed);
+        var document = new NoteDocument
+        {
+            Pages = [new NotePage(), new NotePage { Images = [new NoteImage { X = 12.5, Y = 40, Width = 300, Height = 225, Png = png }] }],
+        };
+
+        MspFileService.Save(document, path);
+        var image = Assert.Single(MspFileService.Load(path).Pages[1].Images);
+
+        Assert.Equal((12.5, 40.0, 300.0, 225.0), (image.X, image.Y, image.Width, image.Height));
+        Assert.Equal(png, image.Png);
+        Assert.Contains("\"images\":[{\"x\":12.5,\"y\":40,\"width\":300,\"height\":225,\"png\":\"", File.ReadAllText(path));
+    }
+
+    // A file as version 1 wrote it: no fitToCurve, no images.
+    [Fact]
+    public void Load_ReadsVersionOneFilesAndSavesThemAsTheCurrentVersion()
+    {
+        var path = Path.Combine(_folder, "version1.msp");
+        File.WriteAllText(path, """{"version":1,"pageMode":"pages","pageStyle":"lined","lineColor":"blue","pages":[{"strokes":[{"color":"black","width":3,"pressureEnabled":true,"points":[[112.5,241,0.098],[122.5,241,0.12]]}]}]}""");
+
+        var document = MspFileService.Load(path);
+        MspFileService.Save(document, path);
+
+        var stroke = Assert.Single(Assert.Single(document.Pages).Strokes);
+        Assert.True(stroke.FitToCurve);
+        Assert.Empty(document.Pages[0].Images);
+        Assert.Equal(AppConstants.FileFormatVersion, document.Version);
+        Assert.StartsWith($"{{\"version\":{AppConstants.FileFormatVersion},", File.ReadAllText(path));
+    }
+
+    [Fact]
+    public void Load_DropsImagesThatAreNoPngOrHaveNoSize()
+    {
+        var path = Path.Combine(_folder, "badimages.msp");
+        var png = TestImages.Png(2, 2, System.Windows.Media.Colors.Blue);
+        var notPng = Convert.ToBase64String("GIF89a"u8.ToArray());
+        File.WriteAllText(path, $$"""{"version":2,"pages":[{"strokes":[],"images":[null,{"x":1,"y":2,"width":0,"height":5,"png":"{{png}}"},{"x":1,"y":2,"width":5,"height":5,"png":"no base64!"},{"x":1,"y":2,"width":5,"height":5,"png":"{{notPng}}"},{"x":-5e12,"y":3,"width":7,"height":8,"png":"{{png}}"}]}]}""");
+
+        var image = Assert.Single(MspFileService.Load(path).Pages[0].Images);
+
+        Assert.Equal((-AppConstants.MaxCoordinate, 3.0, 7.0, 8.0), (image.X, image.Y, image.Width, image.Height));
     }
 }

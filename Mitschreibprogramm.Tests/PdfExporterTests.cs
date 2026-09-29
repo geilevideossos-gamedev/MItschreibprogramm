@@ -2,6 +2,8 @@ using System.IO;
 using System.Text;
 using Mitschreibprogramm.Models;
 using Mitschreibprogramm.Services;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.Advanced;
 using PdfSharp.Pdf.IO;
 
 namespace Mitschreibprogramm.Tests;
@@ -112,6 +114,26 @@ public sealed class PdfExporterTests : IDisposable
         Assert.Equal(0, segments[0].From.X, 6);
         Assert.Equal(400, segments[^1].To.X, 6);
         Assert.All(segments.Zip(segments.Skip(1)), pair => Assert.Equal(pair.First.To.X, pair.Second.From.X, 6));
+    }
+
+    [Fact]
+    public void Images_AreEmbeddedInThePdf()
+    {
+        var png = TestImages.Png(40, 30, System.Windows.Media.Colors.OrangeRed);
+        var document = new NoteDocument
+        {
+            Pages = [new NotePage { Images = [new NoteImage { X = 100, Y = 200, Width = 400, Height = 300, Png = png }], Strokes = [Stroke(150, 250, 300, 280)] }],
+        };
+
+        var path = Export(document, includeRuleLines: true);
+
+        using var pdf = PdfReader.Open(path, PdfDocumentOpenMode.Import);
+        Assert.Equal(1, pdf.PageCount);
+        var objects = pdf.Pages[0].Elements.GetDictionary("/Resources")!.Elements.GetDictionary("/XObject")!;
+        var image = Assert.Single(
+            objects.Elements.Values.Select(value => value is PdfReference reference ? reference.Value : value).OfType<PdfDictionary>(),
+            candidate => candidate.Elements.GetName("/Subtype") == "/Image");
+        Assert.Equal((40, 30), (image.Elements.GetInteger("/Width"), image.Elements.GetInteger("/Height")));
     }
 
     [Fact]

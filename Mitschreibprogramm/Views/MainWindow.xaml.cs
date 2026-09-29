@@ -20,6 +20,7 @@ public partial class MainWindow : Window
     private readonly AppSettings _settings;
     private readonly ZoomPanController _zoomPan;
     private readonly NotebookSession _session;
+    private readonly ImageInserter _images;
 
     public MainWindow()
     {
@@ -29,6 +30,7 @@ public partial class MainWindow : Window
         WindowPlacement.Restore(this, _settings);
         _zoomPan = new ZoomPanController(Scroller, Document);
         _zoomPan.ZoomChanged += UpdateStatus;
+        _images = new ImageInserter(Document, Scroller);
         Deactivated += (_, _) => _zoomPan.SetSpaceHeld(false);
         Document.PagesChanged += OnPagesChanged;
         _session = new NotebookSession(this, Document, Scroller, _settings, new NotebookLibrary(AppPaths.NotesFolder));
@@ -126,6 +128,7 @@ public partial class MainWindow : Window
         Add(ModifierKeys.Control | ModifierKeys.Shift, () => _session.ExportMsp(null), Key.S);
         Add(ModifierKeys.Control, () => _session.ExportPdf(null), Key.E);
         Add(ModifierKeys.Control, () => NotebookPanelButton.IsChecked = NotebookPanelButton.IsChecked != true, Key.B);
+        Add(ModifierKeys.Control, _images.Paste, Key.V);
         Add(ModifierKeys.Control, Document.Undo, Key.Z);
         Add(ModifierKeys.Control, Document.Redo, Key.Y);
         Add(ModifierKeys.Control, _zoomPan.ZoomIn, Key.OemPlus, Key.Add);

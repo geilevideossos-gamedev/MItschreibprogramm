@@ -113,6 +113,23 @@ public class PageModeConverterTests
     }
 
     [Fact]
+    public void Images_MoveWithTheirPageAndBackToTheTileOfTheirTopLeftCorner()
+    {
+        var document = PagesDocument(Stroke(1, 2, 3, 4), Stroke(5, 6, 7, 8));
+        document.Pages[1].Images.Add(new NoteImage { X = 50, Y = 900, Width = 400, Height = 300, Png = "p" });
+
+        var endless = PageModeConverter.Convert(document, PageMode.Endless);
+        var back = PageModeConverter.Convert(endless, PageMode.Pages);
+
+        var merged = Assert.Single(Assert.Single(endless.Pages).Images);
+        Assert.Equal((50, 900 + AppConstants.PageHeight, 400.0, 300.0), (merged.X, merged.Y, merged.Width, merged.Height));
+        Assert.Equal(2, back.Pages.Count);
+        Assert.Empty(back.Pages[0].Images);
+        var returned = Assert.Single(back.Pages[1].Images);
+        Assert.Equal((50, 900, "p"), (returned.X, returned.Y, returned.Png));
+    }
+
+    [Fact]
     public void SameMode_ReturnsTheDocumentUnchanged()
     {
         var document = PagesDocument(Stroke(1, 2, 3, 4));

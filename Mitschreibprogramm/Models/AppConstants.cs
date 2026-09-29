@@ -2,7 +2,7 @@ namespace Mitschreibprogramm.Models;
 
 public static class AppConstants
 {
-    public const int FileFormatVersion = 1;
+    public const int FileFormatVersion = 2;
 
     // Bounds coordinates read from a file, so a damaged file cannot ask for millions of pages.
     public const double MaxCoordinate = 1_000_000;
@@ -31,6 +31,7 @@ public static class AppConstants
     public const double ThickStrokeWidth = 6;
 
     public const double MinVisibleWindowPart = 100;
+    public const double PastedImageMaxShare = 0.8;
     public const int AutosaveIntervalSeconds = 60;
 
     // Shape recognition: sizes are screen units, so handwriting counts the same at every zoom.

@@ -28,6 +28,11 @@ public sealed class PageView : Grid
         Stylus.SetIsPressAndHoldEnabled(Ink, false);
         Stylus.SetIsFlicksEnabled(Ink, false);
         Stylus.SetIsTapFeedbackEnabled(Ink, false);
+        foreach (var image in content.Images.Select(PageImage.Create).OfType<Image>())
+        {
+            Ink.Children.Add(image);
+        }
+
         Children.Add(Paper);
         Children.Add(Ink);
     }
@@ -36,7 +41,13 @@ public sealed class PageView : Grid
 
     public InkCanvas Ink { get; }
 
-    public NotePage ToModel() => new() { Strokes = Ink.Strokes.Select(StrokeMapper.ToModel).ToList() };
+    public NotePage ToModel() => new()
+    {
+        Strokes = Ink.Strokes.Select(StrokeMapper.ToModel).ToList(),
+        Images = Ink.Children.OfType<Image>().Select(PageImage.ToModel).ToList(),
+    };
+
+    public Rect ContentBounds() => Ink.Children.OfType<Image>().Select(PageImage.Bounds).Aggregate(Ink.Strokes.GetBounds(), Rect.Union);
 
     // Also covers strokes that come back through undo and still carry the other theme's colours.
     public void ApplyTheme(PageStyle style, LineColor lineColor, bool dark)

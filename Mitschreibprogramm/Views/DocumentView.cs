@@ -189,12 +189,12 @@ public sealed class DocumentView : StackPanel
     private List<PageView> BuildPages(NoteDocument document)
     {
         var models = document.PageMode == PageMode.Endless
-            ? [new NotePage { Strokes = document.Pages.SelectMany(page => page.Strokes).ToList() }]
+            ? [new NotePage { Strokes = document.Pages.SelectMany(page => page.Strokes).ToList(), Images = document.Pages.SelectMany(page => page.Images).ToList() }]
             : document.Pages.DefaultIfEmpty(new NotePage()).ToList();
         var pages = models.Select(CreatePage).ToList();
         if (document.PageMode == PageMode.Endless)
         {
-            pages[0].GrowToFit(pages[0].Ink.Strokes.GetBounds());
+            pages[0].GrowToFit(pages[0].ContentBounds());
         }
 
         return pages;
