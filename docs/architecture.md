@@ -45,6 +45,7 @@
 - `SelectionEditor`: eine Auswahl über alle Seiten (eine neue Auswahl hebt die auf dem anderen Blatt auf, ein Klick auf ein anderes Blatt beendet sie nur). Korrigiert in SelectionMoving/-Resizing das Rechteck (`SelectionBounds`), macht vorher und nachher eine `SelectionSnapshot` und legt daraus den Undo-Schritt an, löscht mit Entf (Striche und Bilder an ihren alten Platz zurück beim Undo), hebt mit Esc auf.
 - `SelectionSnapshot`: Punkte der gewählten Striche und Rahmen der gewählten Bilder, zum Wiederherstellen.
 - `ImageDrag`: zieht ein allein gewähltes Bild an seiner Mitte (Stift und Maus), weil InkCanvas das dann nicht tut.
+- `TapSelection`: wertet ein Stift-Tippen im Select-Modus nach InkCanvas aus; hat InkCanvas die Auswahl nicht geändert, wählt es Strich oder Bild unter dem Stift bzw. hebt die Auswahl auf (pen-input.md).
 - `ZoomPanController`: Mausrad, Ctrl/Shift+Mausrad, mittlere Maustaste, Leertaste+Ziehen, Zoom um den Zeiger.
 - `StrokeLogger`: nur mit MSP_DEBUG_LOG erzeugt, schreibt pro Strich eine Logzeile.
 

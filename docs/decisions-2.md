@@ -50,3 +50,9 @@ Fortsetzung von decisions.md, gleiche Regeln: chronologisch, je Eintrag Entschei
 - Seitenverhältnis: enthält die Auswahl ein Bild, wird jedes Skalieren gleichmäßig (Ecken und Kanten), die nicht gezogene Seite bleibt stehen. Reine Strich-Auswahlen skalieren frei, wie InkCanvas es anbietet.
 - Ein allein gewähltes Bild: InkCanvas lässt dann in der Bildmitte ein Loch im Auswahlrahmen, Ziehen dort würde ein neues Lasso starten. `ImageDrag` übernimmt dieses Ziehen (Stift und Maus) und legt danach denselben Undo-Schritt an.
 - Nach dem Einfügen wird ein Bild nicht ausgewählt: sonst würde der erste Strich darauf das Bild verschieben statt darauf zu schreiben.
+
+## 2026-09-29 Tippen wählt Bilder zuverlässig (Daniels Test)
+
+- Befund und Ursache stehen in status.md und pen-input.md: mit gedrückter Seitentaste wurde ein leicht wanderndes Tippen zu einem leeren Mini-Lasso, ohne Auswahl griff Entf nicht.
+- Entscheidung: `TapSelection` greift nur ein, wenn InkCanvas die Auswahl nach dem Tippen unverändert gelassen hat, und macht dann dasselbe wie InkCanvas bei einem Mausklick (Strich vor Bild, daneben tippen hebt auf). So bleibt InkCanvas zuständig, wo es funktioniert, und ein Lasso, das auf einem Bild beginnt, bleibt ein Lasso. Toleranz 12 Fenstereinheiten als Konstante (`AppConstants.TapTolerance`), InkCanvas selbst nimmt 7.
+- Verworfen: ein Druck auf ein Bild wählt es sofort und zieht es. Dann könnte kein Lasso mehr auf einem Bild beginnen, und Schreiben über einem großen Screenshot im Auswahl-Modus wäre unmöglich.
