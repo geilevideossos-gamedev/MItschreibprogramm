@@ -116,3 +116,15 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F53 | Autosave beim Heftwechsel, beim Schließen der App und alle 60 Sekunden bei Änderungen. Beim App-Start wird das zuletzt offene Heft geladen | done |
 | F54 | Öffnen (Ctrl+O, Toolbar „Importieren“) und Speichern unter (Ctrl+Umschalt+S, Toolbar „MSP-Export“) bleiben als Import / Export für externe .msp-Dateien, Import kopiert in die Bibliothek | done |
 | F55 | PDF-Export (Ctrl+E und Kontextmenü) exportiert das ganze Heft wie bisher, vorgeschlagener Dateiname = Heftname. Titelleiste zeigt den Heftnamen | done |
+
+## Formerkennung, Bilder, Lasso (Auftrag vom 2026-09-29)
+
+| ID | Feature | Status |
+|----|---------|--------|
+| F56 | Formerkennung: gerade Linie, Kreis / Ellipse, Rechteck, Dreieck | wip |
+| F57 | Auslöser: am Ende eines Strichs den Stift ca. 500 ms stillhalten (Bewegung unter ein paar Pixel), dann wird der Strich durch die erkannte Form ersetzt. Schwelle und Haltezeit als Konstanten | wip |
+| F58 | Toggle „Formen“ in der Toolbar und Taste F: wenn an, wird jeder Strich sofort beim Loslassen erkannt | wip |
+| F59 | Wird keine Form sicher erkannt, bleibt der Strich unverändert. Lieber zu selten erkennen als Handschrift kaputt machen | wip |
+| F60 | Erkannte Formen sind normale Striche (Farbe, Breite aus dem aktuellen Stift, konstanter Druck), damit Radieren, Undo, Speichern, PDF-Export und Lasso ohne Sonderfall funktionieren | wip |
+| F61 | Erkennung als eigene Klasse in Services/, rein rechnerisch ohne WPF-Abhängigkeit, mit xUnit getestet. Einfachste robuste Methode, Entscheidung in decisions-2.md | wip |
+| F62 | Undo nach einer Erkennung stellt den ursprünglichen Freihand-Strich wieder her | wip |

@@ -36,6 +36,7 @@ Die Toolbar von links nach rechts:
 - **Breite:** Regler von 1 bis 12 px in halben Schritten, daneben die aktuelle Breite und die Voreinstellungen dünn (1,5), mittel (3), dick (6).
 - **Druck:** mit Haken macht fester Druck den Strich breiter (etwa ein Viertel bis eindreiviertel der eingestellten Breite). Ohne Haken ist der Strich überall gleich breit. Die Maus schreibt immer gleich breit.
 - **Stift / Radierer:** der Radierer löscht immer ganze Striche. Drei Wege: Button, Taste E, oder die untere Seitentaste am Stift gedrückt halten.
+- **Formen:** am Ende eines Strichs den Stift etwa eine halbe Sekunde stillhalten, dann wird aus einer gezeichneten Linie, einem Kreis, einer Ellipse, einem Rechteck oder einem Dreieck eine saubere Form. Mit dem Schalter **Formen** (Taste F) passiert das bei jedem Strich schon beim Loslassen. Handschrift bleibt Handschrift: kleine Striche und alles, was nicht klar nach Form aussieht, bleiben unverändert. Strg+Z direkt danach holt den freihand gezeichneten Strich zurück.
 - **Seitenstil:** Blanko, Liniert (Linienabstand 8 mm), Kariert (Karo-Gitter mit 5 mm, wie im Rechenheft). **Linien: Blau / Schwarz** schaltet die Linienfarbe um. Die Linien sind nur Hintergrund und lassen sich nicht wegradieren.
 - **Modus: Seiten / Endlos.** "Seiten" sind A4-Blätter untereinander, **+ Seite** hängt eines an. Wer in den unteren 15 % des letzten Blatts schreibt, bekommt automatisch ein neues. "Endlos" ist eine einzige Fläche, die nach unten und rechts mitwächst. Umschalten geht jederzeit: Seiten werden untereinander zusammengelegt, die Endlos-Fläche wird in A4-Blätter geschnitten (ein Strich landet auf dem Blatt, auf dem er beginnt).
 - **Dunkel:** Dark Mode. Die Seite wird dunkelgrau, Schwarz wird weiß angezeigt. Gespeichert und exportiert wird trotzdem Schwarz auf Weiß.
@@ -52,6 +53,7 @@ Die Statusleiste unten zeigt Zoom, "Seite x von y" und den Heftnamen.
 | 1 / 2 / 3 / 4 | Schwarz / Blau / Rot / Grün |
 | P | Stift |
 | E | Radierer an, noch einmal E oder P: wieder Stift |
+| F | Formen erkennen an / aus (sonst: am Strichende stillhalten) |
 | + / - | Strich breiter / schmaler |
 | Strg+Z / Strg+Y | Rückgängig / Wiederholen |
 | Strg+L | Seitenstil durchschalten (Blanko, Liniert, Kariert) |

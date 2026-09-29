@@ -4,6 +4,7 @@ Stand: 2026-09-28
 
 ## Aktuell
 
+- Auftrag vom 2026-09-29 (F56 bis F62 Formerkennung, danach Bilder und Lasso): Hardware-Korrektur auf One by Wacom CTL-672 erledigt, relative Änderungszeit in der Heftliste erledigt, Formerkennung implementiert (xUnit grün, Selbsttest steht noch aus, deshalb `wip`). Bilder und Lasso folgen.
 - Hefte-Bibliothek mit Seitenleiste (Auftrag vom 2026-09-28, F46 bis F55) ist fertig und per Selbsttest geprüft: Checkpoint 4 (neu) 31/31, Checkpoint 1, 2, 3 31/31, Checkpoint 5 und 7 19/19, alle gegen den Debug-Build vom selben Stand. `dotnet build` 0 Warnings, `dotnet test` 55 Tests grün. F46 bis F55 stehen auf `done`.
 - Was sich für den Benutzer ändert: kein Datei-Dialog mehr im Alltag. Hefte liegen in %AppData%/Mitschreibprogramm/notes/ (eine .msp je Heft plus index.json), werden beim Wechsel, beim Schließen und alle 60 s automatisch gespeichert, die Seitenleiste (Strg+B) listet sie nach zuletzt bearbeitet. Öffnen/Speichern unter heißen jetzt Importieren/MSP-Export. Kein Schließen-Dialog, kein Stern im Titel, Löschen in den Papierkorb, eine zweite Instanz beendet sich mit Meldung.
 - Zwei Reviews (Design, fünf Blickwinkel; Code, fünf Blickwinkel mit je zwei Gegenprüfern) sind eingearbeitet, siehe decisions.md „Nach dem Design-Review“ und „Nach dem Code-Review“.

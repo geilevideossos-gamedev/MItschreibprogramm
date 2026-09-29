@@ -12,3 +12,20 @@ Fortsetzung von decisions.md, gleiche Regeln: chronologisch, je Eintrag Entschei
 
 - Daniel: anzeigen, kurz und relativ. Format `heute 10:04`, `gestern`, sonst `28.09.`, bei einem anderen Jahr `31.12.2025`. Rechnung in `Services/RelativeDate` (xUnit), Anzeige über `RelativeDateConverter`.
 - Die Zeile wird beim Neuaufbau der Liste berechnet (jeder Wechsel, jedes Speichern mit Änderung). Bleibt die App über Mitternacht offen, steht bis dahin noch „heute“. Verworfen: eigener Timer nur dafür.
+
+## 2026-09-29 Formerkennung
+
+- Auslöser: Stillhalten am Strichende (Standard) oder Schalter „Formen“ / F (jeder Strich). Gemessen wird mit den Zeitstempeln der Eingabe-Ereignisse (`InputEventArgs.Timestamp`): wie lange lag die letzte Bewegung über 4 Einheiten vor dem Abheben? Positionen in Fenster-Einheiten, damit die Toleranz bei jedem Zoom gleich groß wirkt. Ersetzt wird beim Abheben. Verworfen: schon während des Haltens ersetzen, dafür müsste man in die laufende Strichsammlung von InkCanvas eingreifen.
+- Methode (`Services/ShapeRecognizer`, rein rechnerisch, xUnit):
+  1. Mindestgröße: die längere Seite des Rahmens muss 40 Bildschirm-Einheiten erreichen (ca. 10,6 mm bei 100 %). Buchstaben und Ziffern auf 8-mm-Linien sind kleiner, das ist der wichtigste Schutz der Handschrift.
+  2. Linie: kein Punkt weiter als 6 % der Sehnenlänge von der Strecke Anfang–Ende (Abstand zur Strecke, nicht zur Geraden, damit Zurückfahren zählt). Verworfen: Verhältnis Sehne zu Pfadlänge, das schlägt schon bei Zittern an.
+  3. Geschlossen: das Ende kommt bis auf 25 % der Rahmengröße an den Anfang zurück. Ein Überschießen darf höchstens 15 % des Umfangs lang sein und wird abgeschnitten; ein längerer Schwanz (Abstrich eines „a“, Spirale) heißt: keine Form.
+  4. Ecken: Douglas-Peucker (Toleranz 5 % der Rahmendiagonale) auf beiden Hälften der Schleife, geteilt am vom Start entferntesten Punkt. Ecken näher als 12 % der Diagonale zählen einmal, Ecken mit weniger als 30° Richtungswechsel fallen weg (Start mitten auf einer Kante, abgerundete Ecke).
+  5. 3 Ecken: Dreieck, wenn jeder Winkel mindestens 15° hat und der mittlere Abstand der Punkte zum Dreieck unter 4 % der Diagonale liegt. 4 Ecken: Rechteck, wenn jeder Winkel 90° ± 25° ist, das Viereck konvex ist und der Umriss so gut passt. Die Lage ergibt sich aus den über Kantenlängen gemittelten Kantenrichtungen (auf eine Vierteldrehung gefaltet), die Seiten aus den gemittelten Ecken.
+  6. Sonst Ellipse: Achsen aus den zweiten Momenten der gleichmäßig nachabgetasteten Schleife, Radien aus der Ausdehnung entlang der Achsen. Mittlerer radialer Fehler höchstens 7 %, größter höchstens 20 %, Achsenverhältnis mindestens 0,2. Ab Achsenverhältnis 0,85 wird ein Kreis daraus.
+  7. Linien, Rechtecke und Ellipsen, die weniger als 8° von den Achsen abweichen, werden gerade gestellt.
+- Verworfen: Vorlagenvergleich ($1-Recognizer) oder ein Klassifikator. Mehr Code, Trainings- oder Vorlagendaten, und die Ablehnung von Handschrift wäre schwerer zu begründen als mit Größe, Geschlossenheit und Passfehler.
+- Grenzen: eine sehr große, saubere „0“ oder ein großes „D“ kann als Ellipse durchgehen, nur Formen aus einem Strich werden erkannt, Vielecke mit mehr als vier Ecken nicht.
+- Ergebnis ist ein normaler Strich mit dem Stift des Originals, Druck 0,5 an jedem Punkt (Faktor 1, also genau die eingestellte Breite) und `FitToCurve = false`. Ohne das Flag würde WPFs Bezier-Fit die Ecken runden, nach dem Laden und im PDF. Deshalb steht `fitToCurve` jetzt pro Strich in der .msp (fehlt es, gilt true; ältere Versionen des Programms ignorieren das Feld). Die Formatversion bleibt dafür 1.
+- Undo: das Aufnehmen des Strichs und das Ersetzen sind zwei Schritte. Das erste Strg+Z holt den Freihand-Strich zurück, das zweite entfernt ihn.
+- Der Schalter „Formen“ wird nicht in settings.json gemerkt, das stand nicht im Auftrag.

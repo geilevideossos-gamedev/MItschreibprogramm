@@ -11,11 +11,12 @@
 
 ### Models
 
-- `AppConstants`: alle Maße und Grenzen (A4 in Pixeln bei 96 DPI, Linienabstand 8 mm, Gitterabstand 5 mm, Strichbreiten, Zoomgrenzen und -stufen).
+- `AppConstants`: alle Maße und Grenzen (A4 in Pixeln bei 96 DPI, Linienabstand 8 mm, Gitterabstand 5 mm, Strichbreiten, Zoomgrenzen und -stufen, Mindestgröße, Haltezeit und Ruhetoleranz der Formerkennung).
 - `RuleLines`: Positionen der Hintergrundlinien je Seitenstil. `Rows` (Liniert 8 mm, Kariert 5 mm, pro A4-Höhe neu gestartet) und `Columns` (nur Kariert). Wird vom Bildschirm-Hintergrund und vom PDF-Export benutzt.
 - Enums `PenColor`, `PageStyle`, `LineColor`, `PageMode`.
 - `AppSettings`: alles, was settings.json speichert, mit Standardwerten.
-- `NoteDocument` / `NotePage` / `NoteStroke`: reine Datenklassen ohne WPF. Punkte als `[x, y, druck]`. Sie sind zugleich das Dateiformat.
+- `NoteDocument` / `NotePage` / `NoteStroke`: reine Datenklassen ohne WPF. Punkte als `[x, y, druck]`. Sie sind zugleich das Dateiformat. `NoteStroke.FitToCurve` ist bei erkannten Formen false.
+- `ShapeKind` (Linie, Kreis, Ellipse, Rechteck, Dreieck) und `RecognizedShape` (Art plus Umriss als Punktliste): Ergebnis der Formerkennung.
 - `NotebookIndex` / `NotebookEntry`: Inhalt von notes/index.json (zuletzt offenes Heft, je Heft id, Name, Änderungszeit, Scrollposition).
 
 ### Rendering
@@ -27,8 +28,9 @@
 ### Views
 
 - `MainWindow`: Toolbar (Border + WrapPanel), links das `NotebookPanel`, Statusleiste, ScrollViewer. Verdrahtet Controls mit `DocumentView` und `NotebookSession`, hält die Shortcut-Tabelle (`Dictionary<(ModifierKeys, Key), Action>`) und die `AppSettings` als einzigen Zustand für Werkzeug, Seite und Seitenleiste. Lädt die Settings im Konstruktor, speichert sie in OnClosing, nachdem die Session das Heft gesichert hat. `WindowPlacement`: Fensterlage merken und wiederherstellen. `ScrollPosition`: Dokumentpunkt oben links im Fenster erfassen und wiederherstellen (beim Start erst nach dem ersten Layout, 0/0 = ganz oben).
-- `DocumentView` (StackPanel): hält die `PageView`-Liste, Seitenmodus, das gemeinsame `DrawingAttributes`-Objekt, Radierer-/Pan-Zustand, Undo-Verlauf und den Zoom (LayoutTransform). `Load(NoteDocument)` / `ToDocument()` wandeln zwischen Ansicht und Datenklassen, `SetMode` konvertiert, `AddPage` hängt an, Auto-Seite und Endlos-Wachstum hängen an StrokeCollected.
-- `PageView` (Grid): eine Seite = `PageBackground` + transparenter `InkCanvas`, auf Seitengröße geclippt. `GrowToFit` vergrößert die Endlos-Fläche.
+- `DocumentView` (StackPanel): hält die `PageView`-Liste, Seitenmodus, das gemeinsame `DrawingAttributes`-Objekt, Radierer-/Pan-Zustand, Undo-Verlauf und den Zoom (LayoutTransform). `Load(NoteDocument)` / `ToDocument()` wandeln zwischen Ansicht und Datenklassen, `SetMode` konvertiert, `AddPage` hängt an, Auto-Seite und Endlos-Wachstum hängen an StrokeCollected. `Record(UndoStep)` nimmt Änderungen auf, die nicht aus den InkCanvas-Ereignissen kommen (Formen, Bilder, Auswahl).
+- `PageView` (Grid): eine Seite = `PageBackground` + transparenter `InkCanvas`, auf Seitengröße geclippt. Lädt ihren Inhalt aus einer `NotePage`, gibt ihn mit `ToModel` zurück und färbt ihn mit `ApplyTheme` ein. `GrowToFit` vergrößert die Endlos-Fläche.
+- `ShapeAssist`: verfolgt Aufsetzen, Bewegung und Abheben (Stift und echte Maus, Positionen in Fenster-Einheiten) mit einem `HoldDetector`. Nach StrokeCollected ersetzt `Apply` den Strich durch die erkannte Form, wenn „Formen“ an ist oder der Stift am Ende stillstand, und legt dafür einen eigenen Undo-Schritt an.
 - `NotebookSession`: hält das offene Heft der `NotebookLibrary` in der `DocumentView`. Start (zuletzt offenes Heft, dann die anderen, neueste zuerst, sonst ein neues „Unbenannt“), Wechsel mit Autosave ohne Dialog, Neu, Umbenennen (`RenameDialog`), Löschen (`ConfirmDialog`, beim offenen Heft wird das nächste geöffnet), Autosave-Timer (`AppConstants.AutosaveIntervalSeconds`, setzt aus, solange ein Strich läuft), Scrollposition merken (Dokumentpunkt oben links, `TranslatePoint`) und nach dem Laden wiederherstellen (beim Start erst nach dem ersten Layout). Schlägt das Speichern fehl, gehen Wechsel, Neu, Import und Beenden nur nach Rückfrage weiter, solange Änderungen offen sind; war nur der Index betroffen, geht es ohne Nachfrage weiter. Meldet `Changed` (Liste, Titel) und `DocumentLoaded` (Toolbar abgleichen).
 - `NotebookTransfer`: Import einer externen .msp als Kopie in die Bibliothek, Export eines Hefts als .msp oder PDF über die Windows-Dateidialoge, vorgeschlagener Dateiname = Heftname (ungültige Zeichen werden ersetzt). Das offene Heft kommt aus der Ansicht, andere von der Platte.
 - `NotebookPanel` (UserControl): „+ Neues Heft“, ListBox der Hefte (Name, Änderungszeit), das offene Heft ist markiert, Klick öffnet, Doppelklick benennt um, Kontextmenü mit Umbenennen, Löschen, Als PDF exportieren, Als MSP exportieren. Eigene Vorlagen für ListBoxItem und Menü, damit der Dark Mode stimmt. Liste und Einträge sind nicht fokussierbar, Klicks werden im Preview-Handler behandelt (ein Klick öffnet, zwei benennen um, Rechtsklick nur Menü): das Fenster sieht weiter jede Taste. UI Automation öffnet über die Auswahl (`SelectionChanged`). Meldet nur Wünsche (`OpenRequested` usw.), die Session entscheidet.
@@ -49,7 +51,8 @@
 - `AppPaths`: Ort von settings.json und notes/ (%AppData%, mit MSP_DEBUG_LOG neben dem Log).
 - `LibraryLock`: hält notes/.lock exklusiv. `App.OnStartup` holt die Sperre, beendet eine zweite Instanz mit Meldung und erzeugt erst danach das Hauptfenster (kein StartupUri).
 - `SettingsService`: settings.json laden (mit Standardwerten bei Fehler) und speichern.
-- `PdfExporter`: `NoteDocument` zu PDF (PDFsharp). `PressureSegments` liefert die Linienstücke eines Druckstrichs.
+- `PdfExporter`: `NoteDocument` zu PDF (PDFsharp). `PressureSegments` liefert die Linienstücke eines Druckstrichs. Striche mit `FitToCurve = false` (Formen) gehen ohne Bezier-Fit durch ihre Punkte.
+- `ShapeRecognizer`: Linie, Kreis, Ellipse, Rechteck oder Dreieck in einer Punktliste, sonst null (Methode in decisions-2.md). `Polyline`: Geometrie dafür (Abstände, Douglas-Peucker, gleichmäßiges Nachabtasten, Drehung). `HoldDetector`: hat der Stift am Strichende lange genug stillgestanden?
 - `RelativeDate`: Änderungszeit kurz und relativ („heute 10:04“, „gestern“, „28.09.“, Jahr nur wenn nicht das aktuelle).
 - `DebugLog`: hängt Zeilen an die Datei aus MSP_DEBUG_LOG an, kulturinvariant.
 

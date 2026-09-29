@@ -17,6 +17,7 @@ JSON, UTF-8 ohne BOM, kompakt in einer Zeile. Code: `Services/MspFileService`, D
           "color": "black",
           "width": 3,
           "pressureEnabled": true,
+          "fitToCurve": true,
           "points": [[112.5, 241, 0.098], [122.5, 241, 0.12]]
         }
       ]
@@ -36,6 +37,7 @@ JSON, UTF-8 ohne BOM, kompakt in einer Zeile. Code: `Services/MspFileService`, D
 | color | `black`, `blue`, `red`, `green` | logische Stiftfarbe. Im Dark Mode wird `black` weiß dargestellt, gespeichert bleibt `black` |
 | width | 1 bis 12 | Basisbreite in Seitenpixeln |
 | pressureEnabled | true / false | true: Druck moduliert die Breite (Faktor 1,5 x Druck + 0,25). false: konstante Breite |
+| fitToCurve | true / false | true: Glättung (Bezier-Fit durch die Punkte), am Bildschirm und im PDF. false: gerade Linien von Punkt zu Punkt, so speichert die Formerkennung Linien, Rechtecke, Dreiecke und Ellipsen. Fehlt das Feld (ältere Dateien), gilt true |
 | points[] | `[x, y, druck]` | x, y in Seitenpixeln bei 100 % (96 DPI, A4 = 793,70 x 1122,52), Ursprung oben links auf der Seite. druck 0 bis 1, Maus = 0,5 |
 
 - Rundung beim Speichern: x, y auf 2, druck auf 3 Nachkommastellen.
