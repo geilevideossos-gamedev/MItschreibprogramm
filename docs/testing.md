@@ -55,7 +55,7 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 | Checkpoint 10 Bilder löschen und Toolbar | 12/12 (erster Anlauf 5/12: Skriptfehler, siehe unten) |
 | Regression Checkpoint 8, 9, 1 | 11/11, 20/20, 7/7 |
 
-- Checkpoint 10 erster Anlauf: der Mausklick landete genau dort, wo das Stift-Tippen davor den Cursor gelassen hatte, und kam ohne Mausbewegung nicht an (Artefakt der Injektion, pen-input.md). Das Strg+Z danach nahm das Einfügen zurück, alle späteren Schritte hatten kein Bild mehr. Jetzt klickt das Skript 40 Einheiten versetzt und nimmt nur nach einer echten Änderung zurück.
+- Checkpoint 10 erster Anlauf: der Mausklick landete genau dort, wo das Stift-Tippen davor den Cursor gelassen hatte, und kam ohne Mausbewegung nicht an (Artefakt der Injektion, pen-input.md). Das Strg+Z danach nahm das Einfügen zurück, alle späteren Schritte hatten kein Bild mehr. Jetzt klickt das Skript 40 Einheiten rechts und 30 unter der Tipp-Stelle und nimmt nur nach einer echten Änderung zurück.
 - Toolbar (cp10-toolbars.png, sechs Zustände): immer genau eines von Stift, Radierer, Auswahl blau hervorgehoben, „Formen: aus“ / „Formen: an“ steht abgesetzt zwischen zwei Trennern und bleibt beim Werkzeugwechsel unverändert.
 
 ### Ergebnis Checkpoint 1
