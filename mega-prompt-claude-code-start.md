@@ -38,13 +38,14 @@ Voraussetzungen für den Selbsttest: Laptop an, angemeldet, Bildschirm entsperrt
 
 ## Seite und Hintergrund
 
-- Hintergrundstil: Blanko, Liniert, Strichliert (gestrichelte Linien). Linienabstand 8 mm als Konstante.
+- Hintergrundstil: Blanko, Liniert, Strichliert (quadriert Linien). Linienabstand 8 mm als Konstante.
 - Linienfarbe: Schwarz oder Blau, jeweils dezent (Alpha), umschaltbar.
 - Hintergrund wird gezeichnet, ist kein Strich, ist nicht radierbar.
 
 ## Seitenmodell
 
-- Modus "Seiten": A4 (210 x 297 mm bei 96 DPI), Seiten untereinander mit Abstand, Seitenzähler in der Statusleiste. Neue Seite per Button und Ctrl+Enter. Automatisch neue Seite, wenn auf der letzten Seite in den unteren 15 % geschrieben wird.
+- Modus "Seiten": A4 (210 x 297 mm bei 96 DPI), Seite
+n untereinander mit Abstand, Seitenzähler in der Statusleiste. Neue Seite per Button und Ctrl+Enter. Automatisch neue Seite, wenn auf der letzten Seite in den unteren 15 % geschrieben wird.
 - Modus "Endlos": eine Fläche, wächst automatisch nach unten und rechts, wenn ein Strich in Randnähe kommt.
 - Umschalten pro Dokument in der Toolbar. Seiten zu Endlos: Seiten werden untereinander zusammengeführt (Y-Offset = Seitenhöhe mal Index). Endlos zu Seiten: Fläche wird in A4-Höhen geschnitten, ein Strich gehört zur Seite, in der sein erster Punkt liegt. Einfachste korrekte Umsetzung wählen und in docs/decisions.md begründen.
 
