@@ -114,6 +114,26 @@ public sealed class PdfExporterTests : IDisposable
         Assert.All(segments.Zip(segments.Skip(1)), pair => Assert.Equal(pair.First.To.X, pair.Second.From.X, 6));
     }
 
+    [Fact]
+    public void ShapeStrokes_KeepTheirCornersInsteadOfTheCurveFit()
+    {
+        var rectangle = new NoteStroke
+        {
+            Color = PenColor.Black,
+            Width = 3,
+            PressureEnabled = true,
+            FitToCurve = false,
+            Points = [[100, 100, 0.5], [300, 100, 0.5], [300, 200, 0.5], [100, 200, 0.5], [100, 100, 0.5]],
+        };
+
+        var segments = PdfExporter.PressureSegments(rectangle).ToList();
+
+        Assert.Equal(4, segments.Count);
+        Assert.Equal((300.0, 100.0), (segments[0].To.X, segments[0].To.Y));
+        Assert.Equal((300.0, 200.0), (segments[1].To.X, segments[1].To.Y));
+        Assert.All(segments, segment => Assert.Equal(3, segment.Width, 6));
+    }
+
     private string Export(NoteDocument document, bool includeRuleLines)
     {
         var path = Path.Combine(_folder, $"{Guid.NewGuid():N}.pdf");

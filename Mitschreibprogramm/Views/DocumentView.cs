@@ -15,6 +15,7 @@ public sealed class DocumentView : StackPanel
     private readonly List<PageView> _created = [];
     private readonly UndoHistory _history = new();
     private readonly SideButtonWatcher _sideButton;
+    private readonly ShapeAssist _shapes;
     private double _zoom = AppConstants.DefaultZoom;
     private PenColor _penColor;
     private bool _dark;
@@ -25,6 +26,7 @@ public sealed class DocumentView : StackPanel
     {
         _sideButton = new SideButtonWatcher(this);
         _sideButton.Changed += UpdateEditingMode;
+        _shapes = new ShapeAssist(this);
         if (DebugLog.IsEnabled)
         {
             _ = new StrokeLogger(this);
@@ -77,6 +79,8 @@ public sealed class DocumentView : StackPanel
     }
 
     public void SetPressureEnabled(bool enabled) => _pen.IgnorePressure = !enabled;
+
+    public void SetShapesAlwaysOn(bool on) => _shapes.AlwaysOn = on;
 
     public void SetEraser(bool eraser)
     {
@@ -171,6 +175,13 @@ public sealed class DocumentView : StackPanel
         return index < 0 ? _pages.Count : index + 1;
     }
 
+    // For changes that do not come from the ink canvas events themselves (shapes, images, selection).
+    public void Record(UndoStep step)
+    {
+        _history.Push(step);
+        Changed?.Invoke();
+    }
+
     public void Undo() => OnHistoryApplied("undo", _history.Undo());
 
     public void Redo() => OnHistoryApplied("redo", _history.Redo());
@@ -246,7 +257,7 @@ public sealed class DocumentView : StackPanel
     {
         var strokes = page.Ink.Strokes;
         _history.Push(new UndoStep(() => strokes.Remove(stroke), () => strokes.Add(stroke)));
-        var bounds = stroke.GetBounds();
+        var bounds = _shapes.Apply(strokes, stroke).GetBounds();
         if (Mode == PageMode.Endless)
         {
             page.GrowToFit(bounds);

@@ -15,6 +15,7 @@ public static class StrokeMapper
         Color = Palette.LogicalPen(stroke.DrawingAttributes.Color),
         Width = stroke.DrawingAttributes.Width,
         PressureEnabled = !stroke.DrawingAttributes.IgnorePressure,
+        FitToCurve = stroke.DrawingAttributes.FitToCurve,
         Points = stroke.StylusPoints.Select(point => new[]
         {
             Math.Round(point.X, CoordinateDigits),
@@ -32,7 +33,7 @@ public static class StrokeMapper
             Width = model.Width,
             Height = model.Width,
             IgnorePressure = !model.PressureEnabled,
-            FitToCurve = true,
+            FitToCurve = model.FitToCurve,
         });
     }
 }

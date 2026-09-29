@@ -119,6 +119,7 @@ public partial class MainWindow : Window
         Add(ModifierKeys.None, () => WidthSlider.Value -= AppConstants.StrokeWidthStep, Key.OemMinus, Key.Subtract);
         Add(ModifierKeys.None, () => ToolPen.IsChecked = true, Key.P);
         Add(ModifierKeys.None, () => (ToolEraser.IsChecked == true ? ToolPen : ToolEraser).IsChecked = true, Key.E);
+        Add(ModifierKeys.None, () => ShapesButton.IsChecked = ShapesButton.IsChecked != true, Key.F);
         Add(ModifierKeys.Control, _session.New, Key.N);
         Add(ModifierKeys.Control, _session.Import, Key.O);
         Add(ModifierKeys.Control, _session.SaveNow, Key.S);
@@ -152,6 +153,8 @@ public partial class MainWindow : Window
 
     private void OnToolChecked(object sender, RoutedEventArgs e) =>
         Document.SetEraser(ToolEraser.IsChecked == true);
+
+    private void OnShapesToggled(object sender, RoutedEventArgs e) => Document.SetShapesAlwaysOn(ShapesButton.IsChecked == true);
 
     private void OnNewClick(object sender, RoutedEventArgs e) => _session.New();
 

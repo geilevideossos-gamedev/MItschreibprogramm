@@ -8,5 +8,8 @@ public sealed class NoteStroke
 
     public bool PressureEnabled { get; set; }
 
+    // False for recognised shapes: WPF's curve fitting would round the corners of a rectangle or triangle.
+    public bool FitToCurve { get; set; } = true;
+
     public List<double[]> Points { get; set; } = [];
 }

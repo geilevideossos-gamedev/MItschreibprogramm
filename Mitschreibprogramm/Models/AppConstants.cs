@@ -33,6 +33,11 @@ public static class AppConstants
     public const double MinVisibleWindowPart = 100;
     public const int AutosaveIntervalSeconds = 60;
 
+    // Shape recognition: sizes are screen units, so handwriting counts the same at every zoom.
+    public const double MinShapeSize = 40;
+    public const double ShapeHoldTolerance = 4;
+    public const int ShapeHoldMilliseconds = 500;
+
     public const double MinZoom = 0.25;
     public const double MaxZoom = 4;
     public const double DefaultZoom = 1;

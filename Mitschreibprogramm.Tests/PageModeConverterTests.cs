@@ -24,6 +24,19 @@ public class PageModeConverterTests
     }
 
     [Fact]
+    public void Conversion_KeepsTheCurveFitSetting()
+    {
+        var shape = Stroke(10, 20, 30, 40);
+        shape.FitToCurve = false;
+
+        var endless = PageModeConverter.Convert(PagesDocument(Stroke(1, 2, 3, 4), shape), PageMode.Endless);
+        var back = PageModeConverter.Convert(endless, PageMode.Pages);
+
+        Assert.Equal([true, false], endless.Pages[0].Strokes.Select(stroke => stroke.FitToCurve));
+        Assert.Equal([true, false], back.Pages.SelectMany(page => page.Strokes).Select(stroke => stroke.FitToCurve));
+    }
+
+    [Fact]
     public void PagesToEndlessAndBack_RestoresEveryPoint()
     {
         var document = PagesDocument(Stroke(10, 20, 30, 1100), Stroke(50, 60, 70, 80), Stroke(5, 1000, 7, 8));

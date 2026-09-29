@@ -57,7 +57,7 @@ public static class PdfExporter
     // points, so a piece is subdivided until its width changes by at most MaxWidthStep from one part to the next.
     public static IEnumerable<(XPoint From, XPoint To, double Width)> PressureSegments(NoteStroke stroke)
     {
-        var points = StrokeMapper.ToStroke(stroke).GetBezierStylusPoints();
+        var points = CurvePoints(stroke);
         for (var index = 1; index < points.Count; index++)
         {
             var (from, to) = (points[index - 1], points[index]);
@@ -74,12 +74,12 @@ public static class PdfExporter
         }
     }
 
-    // Same curve as on screen: the Bezier fit WPF computes from the raw points, with interpolated pressure.
+    // Same curve as on screen: the Bezier fit WPF computes from the raw points (or the raw points for shapes), with interpolated pressure.
     private static void DrawStroke(XGraphics graphics, NoteStroke stroke)
     {
         var color = ToXColor(Palette.Pen(stroke.Color));
         var pen = new XPen(color, stroke.Width) { LineCap = XLineCap.Round, LineJoin = XLineJoin.Round };
-        var points = StrokeMapper.ToStroke(stroke).GetBezierStylusPoints();
+        var points = CurvePoints(stroke);
         if (points.Count < 2)
         {
             var diameter = WidthAt(stroke, stroke.Points[0][2]);
@@ -97,6 +97,12 @@ public static class PdfExporter
                 graphics.DrawLine(pen, from, to);
             }
         }
+    }
+
+    private static System.Windows.Input.StylusPointCollection CurvePoints(NoteStroke stroke)
+    {
+        var wpfStroke = StrokeMapper.ToStroke(stroke);
+        return stroke.FitToCurve ? wpfStroke.GetBezierStylusPoints() : wpfStroke.StylusPoints;
     }
 
     private static double WidthAt(NoteStroke stroke, double pressure) =>

@@ -27,7 +27,7 @@ public sealed class MspFileServiceTests : IDisposable
                     Strokes =
                     [
                         new NoteStroke { Color = PenColor.Red, Width = 4.5, PressureEnabled = true, Points = [[1.25, 2.5, 0.1], [30, 40.75, 0.875]] },
-                        new NoteStroke { Color = PenColor.Green, Width = 1.5, PressureEnabled = false, Points = [[5, 6, 0.5]] },
+                        new NoteStroke { Color = PenColor.Green, Width = 1.5, PressureEnabled = false, FitToCurve = false, Points = [[5, 6, 0.5]] },
                     ],
                 },
                 new NotePage(),
@@ -52,6 +52,8 @@ public sealed class MspFileServiceTests : IDisposable
         var second = loaded.Pages[0].Strokes[1];
         Assert.Equal(PenColor.Green, second.Color);
         Assert.False(second.PressureEnabled);
+        Assert.False(second.FitToCurve);
+        Assert.True(first.FitToCurve);
     }
 
     [Fact]
@@ -69,7 +71,7 @@ public sealed class MspFileServiceTests : IDisposable
         var bytes = File.ReadAllBytes(path);
         Assert.NotEqual(0xEF, bytes[0]);
         Assert.Equal(
-            """{"version":1,"pageMode":"pages","pageStyle":"lined","lineColor":"black","pages":[{"strokes":[{"color":"blue","width":3,"pressureEnabled":true,"points":[[10,20,0.5]]}]}]}""",
+            """{"version":1,"pageMode":"pages","pageStyle":"lined","lineColor":"black","pages":[{"strokes":[{"color":"blue","width":3,"pressureEnabled":true,"fitToCurve":true,"points":[[10,20,0.5]]}]}]}""",
             Encoding.UTF8.GetString(bytes));
         Assert.False(File.Exists(path + ".tmp"));
     }

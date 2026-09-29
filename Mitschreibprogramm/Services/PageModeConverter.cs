@@ -57,6 +57,7 @@ public static class PageModeConverter
         Color = stroke.Color,
         Width = stroke.Width,
         PressureEnabled = stroke.PressureEnabled,
+        FitToCurve = stroke.FitToCurve,
         Points = stroke.Points.Select(point => new[] { point[0] + offsetX, point[1] + offsetY, point[2] }).ToList(),
     };
 
