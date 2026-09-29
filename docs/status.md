@@ -8,11 +8,13 @@ Stand: 2026-09-29
 - `dotnet build` 0 Warnings, 0 Errors. `dotnet test` 94 Tests grün (neu: Formerkennung mit Linien, Kreisen, Rechtecken, Dreiecken und Handschrift, die frei bleiben muss; Stillhalten; Bilder im .msp, alte Version 1 lädt; Bilder im PDF; Auswahl-Rechtecke; relative Zeit).
 - Selbsttest gegen die neu gepublishte dist/Mitschreibprogramm.exe: Checkpoint 8 11/11, Checkpoint 9 20/20, Checkpoint 4, 5, 7 50/50, Checkpoint 1, 2, 3 31/31 (im ersten Anlauf 28/31 nach einem verlorenen Eingabe-Event, Details testing.md „Lauf 2026-09-29“). F56 bis F74 stehen auf `done`.
 - Die obere Seitentaste (Barrel) radiert nicht mehr, sie ist jetzt das Lasso. Radiert wird mit der unteren Taste, belegt als „Radieren“ im Treiber (invertiert). README und pen-input.md erklären die Belegung.
+- Korrekturen nach Daniels Test (2026-09-29) erledigt, F75 bis F78 auf `done`: Stift / Radierer / Auswahl als Werkzeuggruppe (genau eines hervorgehoben), „Formen: an / aus“ als eigener Schalter mit Tooltips, README klarer; Tippen auf ein Bild wählt es auch mit oberer Taste und leichter Bewegung (`TapSelection`), Entf löscht es, auch mit per Lasso gewählten Strichen; der Radierer löscht Bilder ganz (`ImageEraser`). Ursache des Bugs unten unter „Bekannte Bugs“.
+- Selbsttest gegen die neue exe: Checkpoint 10 12/12, Regression 8 11/11, 9 20/20, 1 7/7. `dotnet test` 94 grün, 0 Warnings.
 - Nichts gepusht seit dem Push vom 2026-09-28.
 
 ## Nächster Schritt
 
-- Daniel testet mit der echten One by Wacom nach testing.md, Abschnitt "Offen mit echtem Pen" (mit MSP_DEBUG_LOG liegt die Bibliothek neben dem Log), vor allem die Belegung der Seitentasten (oben „Rechtsklick“ = Lasso, unten „Radieren“), das Stillhalten für Formen und das Lasso. Was dort bestätigt ist, wandert in features.md von `done` auf `getestet`.
+- Daniel testet mit der echten One by Wacom nach testing.md, Abschnitt "Offen mit echtem Pen" (mit MSP_DEBUG_LOG liegt die Bibliothek neben dem Log), vor allem das Löschen von Bildern (Tippen, Entf, Radierer), die Belegung der Seitentasten (oben „Rechtsklick“ = Lasso, unten „Radieren“), das Stillhalten für Formen und das Lasso. Was dort bestätigt ist, wandert in features.md von `done` auf `getestet`.
 - Weitere Pushes nur auf ausdrückliche Anweisung: `ALLOW_PUSH=1 git push origin main`.
 
 ## Schrittplan
@@ -28,6 +30,7 @@ Stand: 2026-09-29
 9. Abschluss: features.md, status.md, testing.md "Offen mit echtem Pen" (fertig)
 10. Hefte-Bibliothek: Library + Tests, Session, Seitenleiste, Dialoge, Import/Export, Reviews, Selbsttest Checkpoint 4, docs (fertig)
 11. Hardware-Korrektur, relative Änderungszeit, Formerkennung, Bilder, Lasso, Selbsttest Checkpoint 8 und 9 gegen die exe (fertig)
+12. Korrekturen nach Daniels Test: Toolbar, Bilder löschen per Tippen, Entf und Radierer, Selbsttest Checkpoint 10 (fertig)
 
 ## Offene Punkte
 

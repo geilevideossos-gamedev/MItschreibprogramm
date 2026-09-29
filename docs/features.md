@@ -145,7 +145,7 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 
 | ID | Feature | Status |
 |----|---------|--------|
-| F75 | Toolbar: „Auswahl“ gehört zur Werkzeuggruppe Stift / Radierer / Auswahl und wird wie diese hervorgehoben, wenn aktiv. Genau eines der drei ist immer aktiv | wip |
-| F76 | „Formen“ ist ein An/Aus-Schalter, kein Werkzeug: „Formen: an“ / „Formen: aus“ (wie „Linien: Blau“), sichtbar abgesetzt von der Werkzeuggruppe. Tooltips: Auswahl = „Lasso: Bereich umkreisen, dann verschieben, skalieren oder mit Entf löschen (S)“, Formen = „An: jeder Strich wird zu Linie, Kreis, Rechteck oder Dreieck. Aus: nur wenn der Stift am Ende kurz stillgehalten wird (F)“. README-Abschnitt klarer | wip |
-| F77 | Im Auswahl-Modus wählt ein einfacher Klick / Tipp auf ein Bild dieses direkt aus, ohne Lasso, Entf löscht es. Per Lasso ausgewählte Bilder löscht Entf ebenfalls, zusammen mit mitausgewählten Strichen. Undo / Redo | wip |
-| F78 | Der Radierer (Werkzeug und untere Seitentaste) löscht ein Bild ganz, sobald er es berührt, genau wie einen ganzen Strich. Undo / Redo | wip |
+| F75 | Toolbar: „Auswahl“ gehört zur Werkzeuggruppe Stift / Radierer / Auswahl und wird wie diese hervorgehoben, wenn aktiv. Genau eines der drei ist immer aktiv | done |
+| F76 | „Formen“ ist ein An/Aus-Schalter, kein Werkzeug: „Formen: an“ / „Formen: aus“ (wie „Linien: Blau“), sichtbar abgesetzt von der Werkzeuggruppe. Tooltips: Auswahl = „Lasso: Bereich umkreisen, dann verschieben, skalieren oder mit Entf löschen (S)“, Formen = „An: jeder Strich wird zu Linie, Kreis, Rechteck oder Dreieck. Aus: nur wenn der Stift am Ende kurz stillgehalten wird (F)“. README-Abschnitt klarer | done |
+| F77 | Im Auswahl-Modus wählt ein einfacher Klick / Tipp auf ein Bild dieses direkt aus, ohne Lasso, Entf löscht es. Per Lasso ausgewählte Bilder löscht Entf ebenfalls, zusammen mit mitausgewählten Strichen. Undo / Redo | done |
+| F78 | Der Radierer (Werkzeug und untere Seitentaste) löscht ein Bild ganz, sobald er es berührt, genau wie einen ganzen Strich. Undo / Redo | done |

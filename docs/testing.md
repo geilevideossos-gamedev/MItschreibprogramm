@@ -30,6 +30,7 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 | 6 | exe aus dist/ starten, Selbsttest komplett gegen die exe wiederholen | bestanden 2026-09-19 gegen die finale exe, 65/65 (Teil 1: 31/31, Teil 2: 34/34). 2026-09-29 gegen die neue exe: siehe „Lauf 2026-09-29“ |
 | 8 | Formerkennung: Linie, Rechteck, Dreieck, Kreis je mit Stillhalten am Ende, Rechteck ohne Stillhalten, Schalter Formen (F), Strg+Z / Strg+Y nach der Erkennung, kleine Handschrift mit Formen an, Datei (fitToCurve), PDF | bestanden 2026-09-29 gegen die exe, 11/11 |
 | 9 | Bilder und Lasso: Strg+V ohne und mit Bild, Lage und Farben, Strich auf dem Bild, Lasso mit Seitentaste, Verschieben, Eckgriff mit Seitenverhältnis, Undo / Redo, auf dem Blatt bleiben, Esc, Auswahl-Werkzeug mit Maus-Lasso, Entf und Undo, allein gewähltes Bild ziehen und löschen, Neustart, PDF mit Bild | bestanden 2026-09-29 gegen die exe, 20/20 |
+| 10 | Bilder löschen und Toolbar (nach Daniels Test): Bild einfügen, per Stift-Tippen, Mausklick und Tippen mit oberer Taste und 10 Einheiten Bewegung wählen, Entf, Undo; Tippen daneben hebt die Auswahl auf; Lasso um Bild und zwei Striche, Entf, Undo; Radierer-Werkzeug und invertierter Stift über dem Bild, Undo, Redo; Schalter „Formen: an / aus“ über F und Klick; Screenshot der Toolbar für jedes Werkzeug mit Formen an und aus | bestanden 2026-09-29 gegen die exe, 12/12 |
 
 ### Lauf 2026-09-29 (gegen die neu gepublishte dist/Mitschreibprogramm.exe)
 
@@ -46,6 +47,16 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 - Formen im PDF: bei 100 dpi zeichnet pdftoppm dünne schräge Linien (3 px) gerastert, bei 300 dpi sind Dreieck, Rechteck und Kreis sauber durchgezogen mit spitzen Ecken. Darstellungseffekt des Renderers, kein Exportfehler.
 - Bilder (cp9-pasted.png, cp9-moved-resized.png, cp9-page-1.png): das Testbild liegt in der Mitte des sichtbaren Bereichs, der Strich darauf ist über dem Bild zu sehen, der Auswahlrahmen hat Griffe, nach dem Skalieren 480 x 360 (Seitenverhältnis gehalten), im PDF an derselben Stelle unter den Strichen.
 - Das Testbild kommt über `System.Windows.Forms.Clipboard.SetImage` als einfaches Bitmap (ohne PNG-Format), geprüft ist also der Weg ohne Alphakanal. Text in der Zwischenablage stellt der Checkpoint danach wieder her, anderes nicht.
+
+### Lauf 2026-09-29, Korrekturen nach Daniels Test (gegen die neu gepublishte exe)
+
+| Block | Ergebnis |
+|-------|----------|
+| Checkpoint 10 Bilder löschen und Toolbar | 12/12 (erster Anlauf 5/12: Skriptfehler, siehe unten) |
+| Regression Checkpoint 8, 9, 1 | 11/11, 20/20, 7/7 |
+
+- Checkpoint 10 erster Anlauf: der Mausklick landete genau dort, wo das Stift-Tippen davor den Cursor gelassen hatte, und kam ohne Mausbewegung nicht an (Artefakt der Injektion, pen-input.md). Das Strg+Z danach nahm das Einfügen zurück, alle späteren Schritte hatten kein Bild mehr. Jetzt klickt das Skript 40 Einheiten versetzt und nimmt nur nach einer echten Änderung zurück.
+- Toolbar (cp10-toolbars.png, sechs Zustände): immer genau eines von Stift, Radierer, Auswahl blau hervorgehoben, „Formen: aus“ / „Formen: an“ steht abgesetzt zwischen zwei Trennern und bleibt beim Werkzeugwechsel unverändert.
 
 ### Ergebnis Checkpoint 1
 
@@ -135,4 +146,5 @@ Nur mit dem One by Wacom (CTL-672) prüfbar. features.md bleibt bis dahin auf `d
 - **Handballen / Hover:** Hover über der Toolbar und Wechsel zurück auf die Seite, Stift verlässt den Erfassungsbereich mit gedrückter Seitentaste (das Lasso darf nicht hängen bleiben).
 - **Strich direkt nach Zoomwechsel:** zoomen (Strg+Mausrad, Strg+Plus) und sofort schreiben. Geht dabei je ein Strich verloren? Im Selbsttest trat das nur auf, während parallel andere Prozesse Fenster öffneten (siehe Ergebnis Checkpoint 6).
 - **Pan mit Stift:** Leertaste halten und mit dem Stift ziehen verschiebt die Ansicht, ohne zu zeichnen.
+- **Bilder löschen mit echtem Stift:** im Auswahl-Werkzeug auf ein Bild tippen (Spitze und obere Taste), Entf, Strg+Z. Mit dem Radierer und mit gehaltener unterer Taste über ein Bild fahren: es verschwindet sofort ganz, Strg+Z holt es zurück. Logzeilen `selection … images=1`, `image erased`.
 - **Formen durch Stillhalten:** Fühlt sich eine halbe Sekunde richtig an (`AppConstants.ShapeHoldMilliseconds`)? Reicht die Ruhetoleranz von 4 Einheiten für eine echte, leicht zitternde Hand (`ShapeHoldTolerance`), ohne dass beim normalen Schreiben aus Versehen eine Form entsteht (Log-Zeile `shape trigger=hold`)? Werden echt gezeichnete Kreise, Rechtecke und Dreiecke erkannt, und bleibt Handschrift mit eingeschaltetem „Formen“ unverändert?
