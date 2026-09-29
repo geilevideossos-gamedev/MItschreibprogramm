@@ -14,9 +14,9 @@ Alle Einstellungen stehen in den "Wacom Tablett-Eigenschaften" (Startmenü, bei 
 
 1. **Windows Ink einschalten.** Werkzeug "Stift" wählen, Reiter "Projektion", Haken bei **"Windows Ink verwenden"**. Ohne diesen Haken sieht das Programm den Stift nur als Maus: kein Druck, kein Radieren per Seitentaste.
 2. **Seitentasten belegen** (Reiter "Stift"). Empfehlung:
-   - untere Taste: **"Radieren"**. Gedrückt halten und über einen Strich fahren löscht ihn, loslassen schreibt wieder. Die Belegung "Rechtsklick" funktioniert genauso.
-   - obere Taste: "Tastenanschlag" **Strg+Z** (Rückgängig).
-   - Das Programm kann die beiden Tasten nicht unterscheiden, Windows meldet nur "Seitentaste gedrückt". Welche Taste radiert, legt also allein der Treiber fest. Liegt auf beiden "Rechtsklick", radieren beide.
+   - untere Taste: **"Radieren"**. Gedrückt halten und über einen Strich fahren löscht ihn, loslassen schreibt wieder.
+   - obere Taste: **"Rechtsklick"**. Gedrückt halten und einen Kreis um Striche oder Bilder ziehen wählt sie aus (Lasso).
+   - Das Programm erkennt die Tasten nur an ihrer Belegung: "Radieren" kommt als Radiergummi an, "Rechtsklick" als Seitentaste. Deshalb genau so belegen.
 3. **Fläche sinnvoll mappen** (Reiter "Projektion"). Die aktive Fläche der One by Wacom ist etwa 216 x 135 mm groß. Auf einen großen Bildschirm gemappt wird aus einer kleinen Handbewegung ein großer Strich, die Schrift wirkt dann zittrig. Besser: Bildschirmbereich "Teilbereich" wählen und nur den Bereich nehmen, in dem die Seite liegt. "Proportionen erzwingen" einschalten, sonst werden Kreise zu Eiern.
 4. **"Gedrückt halten für Rechtsklick" abschalten.** Windows wartet sonst bei jedem Aufsetzen kurz, ob ein Rechtsklick gemeint ist, und der Strich beginnt verzögert. Systemsteuerung, "Stift- und Fingereingabe", Eintrag "Gedrückt halten", "Einstellungen", Haken bei "Gedrückthalten für Rechtsklick aktivieren" entfernen. Für die Schreibfläche schaltet das Programm diese Funktion selbst ab, die Windows-Einstellung wirkt aber zusätzlich im Treiber und in anderen Programmen.
 
@@ -35,7 +35,8 @@ Die Toolbar von links nach rechts:
 - **Vier Farbkreise:** Schwarz, Blau, Rot, Grün.
 - **Breite:** Regler von 1 bis 12 px in halben Schritten, daneben die aktuelle Breite und die Voreinstellungen dünn (1,5), mittel (3), dick (6).
 - **Druck:** mit Haken macht fester Druck den Strich breiter (etwa ein Viertel bis eindreiviertel der eingestellten Breite). Ohne Haken ist der Strich überall gleich breit. Die Maus schreibt immer gleich breit.
-- **Stift / Radierer:** der Radierer löscht immer ganze Striche. Drei Wege: Button, Taste E, oder die untere Seitentaste am Stift gedrückt halten.
+- **Stift / Radierer / Auswahl:** der Radierer löscht immer ganze Striche. Drei Wege: Button, Taste E, oder die untere Seitentaste am Stift gedrückt halten.
+- **Auswahl (Lasso):** obere Seitentaste gedrückt halten und einen Kreis um Striche und Bilder ziehen, oder dauerhaft mit dem Button **Auswahl** bzw. Taste S (zurück mit P); mit der Maus geht es genauso. Die Auswahl hat einen Rahmen: in der Mitte ziehen verschiebt sie (vorher die Seitentaste loslassen), an den Eckgriffen ziehen ändert die Größe, Bilder behalten dabei ihr Seitenverhältnis. Entf löscht, Esc oder ein Klick daneben hebt die Auswahl auf. Im Modus Seiten bleibt eine Auswahl auf ihrem Blatt. Verschieben, Größe ändern und Löschen lassen sich mit Strg+Z zurücknehmen.
 - **Bilder:** Strg+V fügt ein Bild aus der Zwischenablage ein, zum Beispiel einen Screenshot aus dem Snipping Tool (Win+Umschalt+S). Es landet in der Mitte des sichtbaren Bereichs, höchstens 80 % der Seite breit, und liegt unter den Strichen: man kann darauf schreiben. Verschieben, Größe ändern und Löschen geht über die Auswahl. Bilder werden im Heft gespeichert und sind im PDF-Export dabei.
 - **Formen:** am Ende eines Strichs den Stift etwa eine halbe Sekunde stillhalten, dann wird aus einer gezeichneten Linie, einem Kreis, einer Ellipse, einem Rechteck oder einem Dreieck eine saubere Form. Mit dem Schalter **Formen** (Taste F) passiert das bei jedem Strich schon beim Loslassen. Handschrift bleibt Handschrift: kleine Striche und alles, was nicht klar nach Form aussieht, bleiben unverändert. Strg+Z direkt danach holt den freihand gezeichneten Strich zurück.
 - **Seitenstil:** Blanko, Liniert (Linienabstand 8 mm), Kariert (Karo-Gitter mit 5 mm, wie im Rechenheft). **Linien: Blau / Schwarz** schaltet die Linienfarbe um. Die Linien sind nur Hintergrund und lassen sich nicht wegradieren.
@@ -55,6 +56,8 @@ Die Statusleiste unten zeigt Zoom, "Seite x von y" und den Heftnamen.
 | P | Stift |
 | E | Radierer an, noch einmal E oder P: wieder Stift |
 | F | Formen erkennen an / aus (sonst: am Strichende stillhalten) |
+| S | Auswahl (Lasso), P: wieder Stift |
+| Entf / Esc | Auswahl löschen / Auswahl aufheben |
 | + / - | Strich breiter / schmaler |
 | Strg+Z / Strg+Y | Rückgängig / Wiederholen |
 | Strg+L | Seitenstil durchschalten (Blanko, Liniert, Kariert) |
@@ -93,6 +96,7 @@ Das baut, testet und legt `dist/Mitschreibprogramm.exe` an. Der Befehl dahinter 
 - Mit echtem Wacom-Stift noch nicht abgenommen. Geprüft ist alles mit einem simulierten Windows-Ink-Stift, die offenen Punkte stehen in docs/testing.md unter "Offen mit echtem Pen".
 - Der Radierer löscht nur ganze Striche, kein Teilradieren. Kein Neigen (Tilt), keine Rotation: der Stift der One by Wacom liefert beides nicht.
 - Wer die Seitentaste mitten im Strich drückt, verliert den angefangenen Strich. Erst drücken, dann aufsetzen.
+- Eine Auswahl gilt immer nur auf einem Blatt. Leertaste (Verschieben der Ansicht) oder die Radier-Taste heben eine offene Auswahl auf.
 - Gespeichert wird beim Heftwechsel, beim Schließen und alle 60 Sekunden. Nach einem Absturz fehlt also höchstens die letzte Minute. Rückgängig reicht bis zum letzten Heftwechsel.
 - Zoom um den Mauszeiger hält den Punkt waagrecht erst, wenn die Seite breiter als das Fenster ist. Vorher bleibt die Seite zentriert.
 - Ein Strich gehört immer zu genau einem Blatt. Ragt er nach dem Umwandeln von Endlos in Seiten über den Blattrand, wird er dort abgeschnitten dargestellt (die Punkte bleiben erhalten).

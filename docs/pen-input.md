@@ -19,12 +19,27 @@
 - Druck zu Breite: `StrokeNodeIterator.GetNormalizedPressureFactor` (Datei `PresentationCore/MS/internal/Ink/StrokeNodeEnumerator.cs`): Faktor = 1,5 x Druck + 0,25. Druck 0..1 ergibt 0,25x bis 1,75x der eingestellten Breite. Der PDF-Export rechnet mit derselben Formel.
 - Maus: Punkte bekommen `StylusPoint.DefaultPressure` = 0,5, also Faktor 1,0. Ein Mausstrich ist exakt so breit wie eingestellt und konstant.
 - Checkbox "Druck" aus = `DrawingAttributes.IgnorePressure = true`. Gilt pro Strich (InkCanvas klont die Attribute beim Strichbeginn).
-- Seitentaste (Barrel): InkCanvas wertet sie selbst nie aus (`EditingCoordinator.OnInkCanvasDeviceDown` prüft keine Buttons). Die App liest deshalb `StylusDevice.StylusButtons` (Guid `StylusPointProperties.BarrelButton`) in PreviewStylusInRange, -InAirMove, -ButtonDown/Up und -Down und schaltet auf EraseByStroke, solange die Taste unten ist. PreviewStylusDown läuft vor dem Handler von InkCanvas, der Zustand ist dort schon aktuell.
+- Seitentaste (Barrel): InkCanvas wertet sie selbst nie aus (`EditingCoordinator.OnInkCanvasDeviceDown` prüft keine Buttons). Die App liest deshalb `StylusDevice.StylusButtons` (Guid `StylusPointProperties.BarrelButton`) in PreviewStylusInRange, -InAirMove, -ButtonDown/Up und -Down und schaltet auf Select (Lasso), solange die Taste unten ist (bis 2026-09-28: EraseByStroke). PreviewStylusDown läuft vor dem Handler von InkCanvas, der Zustand ist dort schon aktuell.
 - StylusButtonDown/Up kommen auch im Hover (über InAirMove-Pakete). Wechselt die Taste im selben Paket wie das Aufsetzen, kommt das Button-Event erst nach StylusDown, deshalb zusätzlich der Check in PreviewStylusDown.
 - Invertierter Stift: `InkCanvas.EditingModeInverted` steht auf EraseByStroke. InkCanvas schaltet bei InRange, InAirMove und Down selbst um. Meldet der Wacom-Treiber die Seitentaste als "Radieren", kommt sie als invertiert an und radiert ohne eigenen Code.
 - Moduswechsel im Hover ist sicher. Moduswechsel mitten im Strich (Seitentaste während des Schreibens drücken) verwirft den laufenden Strich.
 - Press-and-Hold: `Stylus.IsPressAndHoldEnabled = false` auf dem InkCanvas, sonst verzögert Windows jeden Strichbeginn für die Rechtsklick-Erkennung. Flicks und Tap-Feedback sind ebenfalls aus.
-- Seitentaste + Aufsetzen wird von WPF zusätzlich als rechte Maustaste hochgestuft. InkCanvas ignoriert Nicht-Links-Klicks, das stört nicht.
+- Seitentaste + Aufsetzen wird von WPF zusätzlich als rechte Maustaste hochgestuft (`WispStylusDevice`, SystemGesture RightTap/RightDrag). InkCanvas ignoriert Nicht-Links-Klicks, das stört nicht. Das Lasso läuft über die Stylus-Ereignisse und funktioniert mit gehaltener Taste. Verschieben einer Auswahl macht InkCanvas immer über die Maus („We always use MouseDevice for the selection editing“), mit gehaltener Taste also nur als Rechtsklick: zum Ziehen die Taste loslassen.
+
+## Zwei Seitentasten unterscheiden (Recherche 2026-09-29, dotnet/wpf release/8.0)
+
+- WPF kann die beiden Tasten physisch nicht unterscheiden. `StylusPointPropertyIds` kennt TipButton, BarrelButton und SecondaryTipButton (HID 0x43, ein zweiter Spitzen-Schalter, keine zweite Seitentaste). Die Windows-Pointer-API hat nur PEN_FLAG_BARREL (1), PEN_FLAG_INVERTED (2) und PEN_FLAG_ERASER (4), kein Flag für eine zweite Seitentaste.
+- Unterscheidbar ist nur, was der Wacom-Treiber aus einer Taste macht: Belegung „Rechtsklick“ kommt als BarrelButton an (App: Lasso), Belegung „Radieren“ schaltet den Stift in den Radiermodus und kommt als `StylusDevice.Inverted` an (App: `EditingModeInverted` = EraseByStroke). Deshalb: obere Taste „Rechtsklick“, untere Taste „Radieren“ (README).
+- Ein Wechsel des Inverted-Zustands schaltet InkCanvas intern um und hebt dabei eine offene Auswahl auf (`EditingCoordinator.UpdateInvertedState`). Wer mit der unteren Taste radiert, beendet also eine Auswahl.
+
+## InkCanvas-Auswahl (Select-Modus, Recherche 2026-09-29)
+
+- Jeder Wechsel von `EditingMode` hebt die Auswahl auf (`EditingCoordinator.ChangeEditingBehavior` ruft `ClearSelection(true)`). Deshalb bleiben die Seiten im Select-Modus, solange etwas ausgewählt ist (`EditingModes`). `InkCanvas.Select(...)` schaltet selbst in den Select-Modus.
+- Lasso: ein Strich gilt als gewählt, wenn 80 % seiner Länge im Lasso liegen, ein Element bei 60 % seiner Fläche (Punktraster). Tippen (weniger als 7 Einheiten Bewegung) wählt den obersten Strich oder das Element unter dem Punkt, Tippen auf leere Fläche hebt die Auswahl auf, Ziehen außerhalb startet ein neues Lasso.
+- SelectionMoving / SelectionResizing kommen einmal beim Loslassen, `NewRectangle` ist setzbar und wird übernommen, `Cancel` wirkt. Striche werden mit `Stroke.Transform(matrix, false)` bewegt: die Punkte ändern sich an Ort und Stelle, die Stiftspitze (Breite) nie. Elemente bekommen InkCanvas.Left/Top und Width/Height neu (nur die geänderte Seite bei Kantengriffen, Margin wird abgezogen, Bilder haben keinen).
+- Ist genau ein Element und kein Strich gewählt, lässt der Auswahlrahmen über dem Element ein Loch (für Textfelder gedacht): Klicks gehen an das Element, verschieben geht nur am Rahmen. Die App zieht ein allein gewähltes Bild deshalb selbst (`ImageDrag`).
+- Tastenbefehle (Entf, Esc) bindet InkCanvas nur mit Tastaturfokus. Die Seiten sind nicht fokussierbar, die App erledigt Entf und Esc in ihrer Shortcut-Tabelle.
+- Tinte über Bildern: die Striche liegen über den Kind-Elementen (`InkPresenter.GetVisualChild`: 0 = Kinder, 1 = Striche), Schreiben auf einem Bild geht ohne Einstellung.
 
 ## Synthetischer Pen (Selbsttest)
 
@@ -38,5 +53,5 @@
 
 ## Treiber-Fallstricke
 
-- Die App kann obere und untere Seitentaste nicht unterscheiden. Windows Ink kennt nur ein Barrel-Flag. Welche Taste radiert, legt der Wacom-Treiber fest (Belegung "Rechtsklick" = Barrel oder "Radieren" = invertiert, beides funktioniert).
+- Die App kann obere und untere Seitentaste nicht selbst unterscheiden, nur über die Treiber-Belegung: obere Taste „Rechtsklick“ = Lasso, untere Taste „Radieren“ = Radierer. Liegt auf beiden „Rechtsklick“, sind beide Lasso; liegt auf beiden „Radieren“, radieren beide.
 - Windows-Einstellung "Gedrückt halten für Rechtsklick" (Stift-Einstellungen) wirkt systemweit. Die App schaltet sie für die Schreibfläche ab, in der README steht der Hinweis trotzdem.

@@ -10,7 +10,7 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F02 | Genau vier Farben: Schwarz, Blau, Rot, Grün. Hex-Werte an einer Stelle als Konstanten | done |
 | F03 | Strichbreite: Slider 1 bis 12 px in 0,5er-Schritten, Presets dünn (1,5), mittel (3), dick (6), aktuelle Breite sichtbar | done |
 | F04 | Stiftdruck moduliert die Breite um die Basisbreite (IgnorePressure = false). Checkbox "Druck" zum Abschalten. Maus = konstante Breite | done |
-| F05 | Radierer ganzer Strich (EraseByStroke). Aktivierung auf drei Wegen: Toolbar-Button, Taste E (bleibt an bis P oder E), oder untere Seitentaste am Pen gedrückt halten = Radierer nur solange gedrückt. Meldet der Wacom-Treiber die Taste als invertierten Stift (Tastenfunktion "Radieren" im Treiber), wirkt das ebenfalls als Radierer. Wie WPF Seitentasten und Inverted liefert, steht in docs/pen-input.md | done |
+| F05 | Radierer ganzer Strich (EraseByStroke). Aktivierung auf drei Wegen: Toolbar-Button, Taste E (bleibt an bis P oder E), oder untere Seitentaste am Pen gedrückt halten = Radierer nur solange gedrückt. Meldet der Wacom-Treiber die Taste als invertierten Stift (Tastenfunktion "Radieren" im Treiber), wirkt das ebenfalls als Radierer. Wie WPF Seitentasten und Inverted liefert, steht in docs/pen-input.md. (Seit 2026-09-29: radiert wird über „Radieren“ = invertiert, die Seitentaste als Barrel ist das Lasso, F69) | done |
 | F06 | Glättung an (FitToCurve) | done |
 | F07 | Undo / Redo strichbasiert, Ctrl+Z / Ctrl+Y, Verlauf bis zum letzten Öffnen oder Neu (seit 2026-09-28: bis zum letzten Heftwechsel) | done |
 
@@ -134,3 +134,9 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F66 | Speicherung im .msp als base64-PNG, Formatversion erhöht (2), alte Dateien laden weiter. file-format.md aktualisiert | wip |
 | F67 | PDF-Export enthält die Bilder an der richtigen Position und Größe | wip |
 | F68 | Undo / Redo für Einfügen, Verschieben, Skalieren und Löschen von Bildern | wip |
+| F69 | Lasso-Auswahl: obere Seitentaste am Stift gedrückt halten und einen Kreis ziehen = Lasso. Alles innerhalb (Striche und Bilder) wird ausgewählt. Die untere Taste bleibt Radierer. Wie WPF die beiden Tasten unterscheidet, steht in pen-input.md | wip |
+| F70 | Fallback: Toolbar-Button „Auswahl“ und Taste S schalten den Lasso-Modus dauerhaft an, P zurück zum Stift. Mit der Maus funktioniert der Modus genauso | wip |
+| F71 | Auswahl verschieben durch Ziehen, skalieren über die Eckgriffe, Entf löscht, Esc hebt die Auswahl auf, Klick daneben ebenfalls | wip |
+| F72 | WPF-Bordmittel: InkCanvas EditingMode.Select wählt Striche und Kind-Elemente per Lasso, verschiebt und skaliert sie. Selbst gebaut nur, was das nicht abdeckt (decisions-2.md) | wip |
+| F73 | Undo / Redo für Verschieben, Skalieren und Löschen einer Auswahl | wip |
+| F74 | Im Seitenmodus bleibt eine verschobene Auswahl auf ihrer Seite, nicht über Seitengrenzen hinaus | wip |

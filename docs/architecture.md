@@ -41,6 +41,10 @@
 - `RenameDialog`, `ConfirmDialog` (Löschen und Beenden trotz Schreibfehler), `ErrorMessage` (Warn-MessageBox und `Try` für Datei-Operationen).
 - `ExportDialog`: Checkbox "Hintergrundlinien mit exportieren", danach fragt `NotebookTransfer.ExportPdf` den Zielpfad ab (Vorschlag: Heftname.pdf).
 - `SideButtonWatcher`: verfolgt die Seitentaste des Stifts (Barrel) über die Preview-Stylus-Events.
+- `EditingModes`: setzt den InkCanvas-Modus aller Seiten. Select (Lasso), solange das Werkzeug „Auswahl“ an ist, die Seitentaste (Barrel) gehalten wird oder etwas ausgewählt ist; sonst Radierer oder Stift, beim Verschieben der Ansicht None. `EditingModeInverted` ist immer EraseByStroke.
+- `SelectionEditor`: eine Auswahl über alle Seiten (eine neue Auswahl hebt die auf dem anderen Blatt auf, ein Klick auf ein anderes Blatt beendet sie nur). Korrigiert in SelectionMoving/-Resizing das Rechteck (`SelectionBounds`), macht vorher und nachher eine `SelectionSnapshot` und legt daraus den Undo-Schritt an, löscht mit Entf (Striche und Bilder an ihren alten Platz zurück beim Undo), hebt mit Esc auf.
+- `SelectionSnapshot`: Punkte der gewählten Striche und Rahmen der gewählten Bilder, zum Wiederherstellen.
+- `ImageDrag`: zieht ein allein gewähltes Bild an seiner Mitte (Stift und Maus), weil InkCanvas das dann nicht tut.
 - `ZoomPanController`: Mausrad, Ctrl/Shift+Mausrad, mittlere Maustaste, Leertaste+Ziehen, Zoom um den Zeiger.
 - `StrokeLogger`: nur mit MSP_DEBUG_LOG erzeugt, schreibt pro Strich eine Logzeile.
 
@@ -55,6 +59,7 @@
 - `LibraryLock`: hält notes/.lock exklusiv. `App.OnStartup` holt die Sperre, beendet eine zweite Instanz mit Meldung und erzeugt erst danach das Hauptfenster (kein StartupUri).
 - `SettingsService`: settings.json laden (mit Standardwerten bei Fehler) und speichern.
 - `PdfExporter`: `NoteDocument` zu PDF (PDFsharp). `PressureSegments` liefert die Linienstücke eines Druckstrichs. Striche mit `FitToCurve = false` (Formen) gehen ohne Bezier-Fit durch ihre Punkte. Bilder kommen per `XImage.FromStream` (PNG, Core-Build) vor den Strichen auf die Seite, gleiche Koordinaten.
+- `SelectionBounds`: Seitenverhältnis beim Skalieren halten (die nicht gezogene Seite bleibt stehen) und eine Auswahl auf dem A4-Blatt halten bzw. auf der Endlos-Fläche nicht über den linken und oberen Rand.
 - `ShapeRecognizer`: Linie, Kreis, Ellipse, Rechteck oder Dreieck in einer Punktliste, sonst null (Methode in decisions-2.md). `Polyline`: Geometrie dafür (Abstände, Douglas-Peucker, gleichmäßiges Nachabtasten, Drehung). `HoldDetector`: hat der Stift am Strichende lange genug stillgestanden?
 - `RelativeDate`: Änderungszeit kurz und relativ („heute 10:04“, „gestern“, „28.09.“, Jahr nur wenn nicht das aktuelle).
 - `DebugLog`: hängt Zeilen an die Datei aus MSP_DEBUG_LOG an, kulturinvariant.
@@ -64,7 +69,7 @@
 - Toolbar oder Shortcut setzt den Zustand an `DocumentView`, die ihn auf alle Seiten anwendet.
 - `DocumentView.Changed` meldet jede Dokumentänderung (Strich, Radieren, Undo/Redo, Seite, Stil, Modus), `NotebookLibrary.MarkChanged` setzt damit das Änderungsflag und stempelt `modified` (das Heft rückt in der Liste sofort nach oben). Geschrieben wird beim Heftwechsel, beim Schließen und per Timer alle 60 s, jeweils nur mit Änderung; die Scrollposition kommt bei jedem dieser Schritte in den Index.
 - InkCanvas sammelt Striche selbst (Maus und Stylus). `DocumentView` hängt sich an StrokeCollected / StrokeErasing für Undo.
-- Editiermodus je Seite: Pan aktiv = None, Radierer oder Seitentaste = EraseByStroke, sonst Ink. EditingModeInverted = EraseByStroke.
+- Editiermodus je Seite (`EditingModes`): Pan aktiv = None, Auswahl-Werkzeug, Seitentaste oder offene Auswahl = Select, Radierer = EraseByStroke, sonst Ink. EditingModeInverted = EraseByStroke. Undo, Redo und jeder Seitenwechsel (Laden, Moduswechsel) heben die Auswahl zuerst auf.
 
 ## NuGet-Pakete
 

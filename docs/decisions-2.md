@@ -38,3 +38,15 @@ Fortsetzung von decisions.md, gleiche Regeln: chronologisch, je Eintrag Entschei
 - Format: `images[]` pro Seite, Formatversion 2. Version-1-Dateien laden unverändert und werden beim nächsten Speichern als 2 geschrieben. Ältere Programmversionen lehnen Version 2 ab, statt Bilder beim Speichern still zu verlieren.
 - PDF: PDFsharp 6.2.4 (Core) liest PNG über `XImage.FromStream`, der Test prüft das Bild-XObject im erzeugten PDF. Kein zusätzliches Paket.
 - Bilder werden mit `BitmapScalingMode.HighQuality` gezeichnet, damit verkleinerte Screenshots lesbar bleiben.
+
+## 2026-09-29 Lasso-Auswahl
+
+- Obere Seitentaste = Lasso, untere = Radierer. WPF kennt nur eine Seitentaste (Barrel); die zweite ist nur über die Treiber-Belegung „Radieren“ unterscheidbar, die als invertierter Stift ankommt (pen-input.md, Recherche im dotnet/wpf-Quelltext; Context7 hatte zu InkCanvas nichts). Die Barrel-Taste radiert deshalb nicht mehr, sondern schaltet auf Select. Verworfen: Unterscheidung über SecondaryTipButton (ein Spitzen-Schalter, keine Seitentaste).
+- Bordmittel: InkCanvas `EditingMode.Select` macht Lasso, Tippen-Auswahl, Rahmen, Verschieben und Skalieren von Strichen und Bildern. Selbst gebaut ist nur, was fehlt: Undo, Entf/Esc ohne Tastaturfokus, eine Auswahl über alle Seiten, auf dem Blatt bleiben, Seitenverhältnis bei Bildern, Ziehen eines allein gewählten Bilds.
+- Weil InkCanvas bei jedem Moduswechsel die Auswahl aufhebt, bleiben die Seiten im Select-Modus, solange etwas ausgewählt ist. Nach dem Lasso mit der Seitentaste kann man die Taste also loslassen und ziehen. Erst Esc, ein Klick daneben (auch auf ein anderes Blatt oder die graue Fläche) oder Entf beendet die Auswahl, dann gilt wieder das Werkzeug. P oder E beenden sie ebenfalls.
+- Ein Klick auf ein anderes Blatt beendet die Auswahl nur und wird verschluckt: er soll weder einen Punkt malen noch ein neues Lasso beginnen.
+- Undo für Verschieben und Skalieren: vorher (SelectionMoving/-Resizing, einmal beim Loslassen) und nachher (SelectionMoved/-Resized) die Punkte der Striche und die Rahmen der Bilder festhalten. InkCanvas ändert die Stiftspitze nie, die Punkte reichen. Verworfen: die Transformationsmatrix zurückrechnen (Rundungsdrift).
+- Auf dem Blatt bleiben: das von InkCanvas vorgeschlagene Rechteck wird in SelectionMoving/-Resizing in das A4-Blatt geschoben (größer als das Blatt: verkleinert). Auf der Endlos-Fläche nur nicht über links und oben, danach wächst die Fläche mit.
+- Seitenverhältnis: enthält die Auswahl ein Bild, wird jedes Skalieren gleichmäßig (Ecken und Kanten), die nicht gezogene Seite bleibt stehen. Reine Strich-Auswahlen skalieren frei, wie InkCanvas es anbietet.
+- Ein allein gewähltes Bild: InkCanvas lässt dann in der Bildmitte ein Loch im Auswahlrahmen, Ziehen dort würde ein neues Lasso starten. `ImageDrag` übernimmt dieses Ziehen (Stift und Maus) und legt danach denselben Undo-Schritt an.
+- Nach dem Einfügen wird ein Bild nicht ausgewählt: sonst würde der erste Strich darauf das Bild verschieben statt darauf zu schreiben.
