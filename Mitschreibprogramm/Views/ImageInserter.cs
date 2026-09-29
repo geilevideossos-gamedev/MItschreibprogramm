@@ -2,6 +2,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Mitschreibprogramm.Models;
 using Mitschreibprogramm.Services;
@@ -44,24 +45,27 @@ public sealed class ImageInserter(DocumentView document, ScrollViewer scroller)
         DebugLog.Write($"image pasted page={document.Pages.ToList().IndexOf(page) + 1} x={left:0.#} y={top:0.#} width={width:0.#} height={height:0.#}");
     }
 
-    // PNG as the clipboard offers it (Snipping Tool, browsers: keeps transparency), otherwise the bitmap re-encoded.
+    // The clipboard's PNG format (Snipping Tool, browsers) keeps transparency. The plain bitmap (Print key, other
+    // programs) often carries an alpha channel of zeros and would paste invisible, so it is taken without alpha.
+    // Either way the picture is stored as an 8-bit PNG: PDFsharp cannot embed 16-bit PNGs.
     // Null when there is no picture or another program holds the clipboard.
     private static byte[]? ReadClipboardPng()
     {
         try
         {
-            if (Clipboard.GetData(PngFormat) is MemoryStream stream && stream.ToArray() is var png && IsPng(png))
+            BitmapSource? source = Clipboard.GetData(PngFormat) is MemoryStream stream ? PageImage.TryDecode(stream.ToArray()) : null;
+            if (source is null && Clipboard.ContainsImage() && Clipboard.GetImage() is { } bitmap)
             {
-                return png;
+                source = new FormatConvertedBitmap(bitmap, PixelFormats.Bgr32, null, 0);
             }
 
-            if (!Clipboard.ContainsImage() || Clipboard.GetImage() is not { } bitmap)
+            if (source is null)
             {
                 return null;
             }
 
             var encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(bitmap));
+            encoder.Frames.Add(BitmapFrame.Create(source.Format == PixelFormats.Bgr32 ? source : new FormatConvertedBitmap(source, PixelFormats.Bgra32, null, 0)));
             using var output = new MemoryStream();
             encoder.Save(output);
             return output.ToArray();
@@ -71,6 +75,4 @@ public sealed class ImageInserter(DocumentView document, ScrollViewer scroller)
             return null;
         }
     }
-
-    private static bool IsPng(byte[] bytes) => bytes.Length > 8 && bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47;
 }
