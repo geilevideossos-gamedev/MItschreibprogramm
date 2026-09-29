@@ -35,10 +35,13 @@ Die Toolbar von links nach rechts:
 - **Vier Farbkreise:** Schwarz, Blau, Rot, Grün.
 - **Breite:** Regler von 1 bis 12 px in halben Schritten, daneben die aktuelle Breite und die Voreinstellungen dünn (1,5), mittel (3), dick (6).
 - **Druck:** mit Haken macht fester Druck den Strich breiter (etwa ein Viertel bis eindreiviertel der eingestellten Breite). Ohne Haken ist der Strich überall gleich breit. Die Maus schreibt immer gleich breit.
-- **Stift / Radierer / Auswahl:** der Radierer löscht immer ganze Striche und ganze Bilder, sobald er sie berührt. Drei Wege: Button, Taste E, oder die untere Seitentaste am Stift gedrückt halten. Strg+Z holt Gelöschtes zurück.
-- **Auswahl (Lasso):** obere Seitentaste gedrückt halten und einen Kreis um Striche und Bilder ziehen, oder dauerhaft mit dem Button **Auswahl** bzw. Taste S (zurück mit P); mit der Maus geht es genauso. Die Auswahl hat einen Rahmen: in der Mitte ziehen verschiebt sie (vorher die Seitentaste loslassen), an den Eckgriffen ziehen ändert die Größe, Bilder behalten dabei ihr Seitenverhältnis. Entf löscht, Esc oder ein Klick daneben hebt die Auswahl auf. Im Modus Seiten bleibt eine Auswahl auf ihrem Blatt. Verschieben, Größe ändern und Löschen lassen sich mit Strg+Z zurücknehmen.
+- **Werkzeuge: Stift, Radierer, Auswahl.** Genau eines ist immer aktiv und blau hervorgehoben.
+  - **Stift** (P) schreibt.
+  - **Radierer** (E) löscht ganze Striche und ganze Bilder, sobald er sie berührt. Die untere Seitentaste gedrückt halten radiert ebenfalls, egal welches Werkzeug aktiv ist.
+  - **Auswahl** (S) ist das Lasso: einen Bereich umkreisen, dann die Auswahl in der Mitte ziehen (verschieben), an den Eckgriffen ziehen (Größe ändern, Bilder behalten ihr Seitenverhältnis) oder mit Entf löschen. Ein einfacher Tipp oder Klick auf ein Bild wählt es direkt aus. Esc oder ein Klick daneben hebt die Auswahl auf, im Modus Seiten bleibt eine Auswahl auf ihrem Blatt. Die obere Seitentaste gedrückt halten wirkt wie das Lasso, ohne das Werkzeug zu wechseln; zum Ziehen danach die Taste loslassen.
+  - Radieren, Verschieben, Größe ändern und Löschen lassen sich mit Strg+Z zurücknehmen.
+- **Formen: an / aus** (rechts neben den Werkzeugen, Taste F) ist ein Schalter, kein Werkzeug. An: jeder Strich wird beim Loslassen zu Linie, Kreis, Rechteck oder Dreieck, wenn er danach aussieht. Aus: nur dann, wenn der Stift am Ende des Strichs kurz (etwa eine halbe Sekunde) stillgehalten wird. Handschrift bleibt in beiden Fällen Handschrift: kleine Striche und alles, was nicht klar nach Form aussieht, bleiben unverändert. Strg+Z direkt danach holt den freihand gezeichneten Strich zurück.
 - **Bilder:** Strg+V fügt ein Bild aus der Zwischenablage ein, zum Beispiel einen Screenshot aus dem Snipping Tool (Win+Umschalt+S). Es landet in der Mitte des sichtbaren Bereichs, höchstens 80 % der Seite breit, und liegt unter den Strichen: man kann darauf schreiben. Verschieben, Größe ändern und Löschen geht über die Auswahl. Bilder werden im Heft gespeichert und sind im PDF-Export dabei.
-- **Formen:** am Ende eines Strichs den Stift etwa eine halbe Sekunde stillhalten, dann wird aus einer gezeichneten Linie, einem Kreis, einer Ellipse, einem Rechteck oder einem Dreieck eine saubere Form. Mit dem Schalter **Formen** (Taste F) passiert das bei jedem Strich schon beim Loslassen. Handschrift bleibt Handschrift: kleine Striche und alles, was nicht klar nach Form aussieht, bleiben unverändert. Strg+Z direkt danach holt den freihand gezeichneten Strich zurück.
 - **Seitenstil:** Blanko, Liniert (Linienabstand 8 mm), Kariert (Karo-Gitter mit 5 mm, wie im Rechenheft). **Linien: Blau / Schwarz** schaltet die Linienfarbe um. Die Linien sind nur Hintergrund und lassen sich nicht wegradieren.
 - **Modus: Seiten / Endlos.** "Seiten" sind A4-Blätter untereinander, **+ Seite** hängt eines an. Wer in den unteren 15 % des letzten Blatts schreibt, bekommt automatisch ein neues. "Endlos" ist eine einzige Fläche, die nach unten und rechts mitwächst. Umschalten geht jederzeit: Seiten werden untereinander zusammengelegt, die Endlos-Fläche wird in A4-Blätter geschnitten (ein Strich landet auf dem Blatt, auf dem er beginnt).
 - **Dunkel:** Dark Mode. Die Seite wird dunkelgrau, Schwarz wird weiß angezeigt. Gespeichert und exportiert wird trotzdem Schwarz auf Weiß.
@@ -55,8 +58,8 @@ Die Statusleiste unten zeigt Zoom, "Seite x von y" und den Heftnamen.
 | 1 / 2 / 3 / 4 | Schwarz / Blau / Rot / Grün |
 | P | Stift |
 | E | Radierer an, noch einmal E oder P: wieder Stift |
-| F | Formen erkennen an / aus (sonst: am Strichende stillhalten) |
-| S | Auswahl (Lasso), P: wieder Stift |
+| F | Schalter „Formen: an / aus“ (aus: Form nur nach kurzem Stillhalten am Strichende) |
+| S | Werkzeug Auswahl (Lasso), P: Stift, E: Radierer |
 | Entf / Esc | Auswahl löschen / Auswahl aufheben |
 | + / - | Strich breiter / schmaler |
 | Strg+Z / Strg+Y | Rückgängig / Wiederholen |

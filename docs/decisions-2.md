@@ -62,3 +62,8 @@ Fortsetzung von decisions.md, gleiche Regeln: chronologisch, je Eintrag Entschei
 - Der Radierer löscht ein Bild ganz, sobald er es berührt (Werkzeug Radierer, untere Taste als „Radieren“ = invertierter Stift, Maus mit Radierer-Werkzeug), wie EraseByStroke einen ganzen Strich. Geprüft wird jeder Stiftpunkt gegen den Bildrahmen, erweitert um 4 Einheiten (halbe Größe der Standard-Radierform von InkCanvas). Jedes gelöschte Bild ist ein eigener Undo-Schritt, wie jeder radierte Strich.
 - Ob gerade radiert wird, sagt `InkCanvas.ActiveEditingMode` (dort ist der invertierte Stift schon eingerechnet), zusätzlich `StylusEventArgs.Inverted` für den Fall, dass InkCanvas den Wechsel noch nicht gesehen hat.
 - Verworfen: nur den Teil eines Bilds radieren. Der Radierer kennt auch bei Strichen nur ganz oder gar nicht.
+
+## 2026-09-29 Toolbar: Werkzeuge und Formen-Schalter (Daniels Test)
+
+- Stift, Radierer und Auswahl sind eine Gruppe von RadioButtons mit derselben Hervorhebung, genau eines ist aktiv. Die gehaltene obere Seitentaste schaltet das Lasso nur vorübergehend und ändert das angezeigte Werkzeug nicht.
+- „Formen“ war ein ToggleButton in derselben Gruppe und sah eingeschaltet wie ein viertes Werkzeug aus. Jetzt ist es ein eigener Button hinter einem Trenner, der seinen Zustand als Text zeigt („Formen: an“ / „Formen: aus“), wie „Linien: Blau“. Taste F schaltet weiter um, der Zustand wird nicht gespeichert.
