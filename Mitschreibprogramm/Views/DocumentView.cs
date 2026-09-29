@@ -24,6 +24,7 @@ public sealed class DocumentView : StackPanel
         Selection = new SelectionEditor(this);
         Tools = new EditingModes(this, Selection);
         _shapes = new ShapeAssist(this);
+        _ = new ImageEraser(this);
         if (DebugLog.IsEnabled)
         {
             _ = new StrokeLogger(this);
