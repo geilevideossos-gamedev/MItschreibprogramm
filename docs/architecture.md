@@ -32,6 +32,7 @@
 - `NotebookSession`: hält das offene Heft der `NotebookLibrary` in der `DocumentView`. Start (zuletzt offenes Heft, dann die anderen, neueste zuerst, sonst ein neues „Unbenannt“), Wechsel mit Autosave ohne Dialog, Neu, Umbenennen (`RenameDialog`), Löschen (`ConfirmDialog`, beim offenen Heft wird das nächste geöffnet), Autosave-Timer (`AppConstants.AutosaveIntervalSeconds`, setzt aus, solange ein Strich läuft), Scrollposition merken (Dokumentpunkt oben links, `TranslatePoint`) und nach dem Laden wiederherstellen (beim Start erst nach dem ersten Layout). Schlägt das Speichern fehl, gehen Wechsel, Neu, Import und Beenden nur nach Rückfrage weiter, solange Änderungen offen sind; war nur der Index betroffen, geht es ohne Nachfrage weiter. Meldet `Changed` (Liste, Titel) und `DocumentLoaded` (Toolbar abgleichen).
 - `NotebookTransfer`: Import einer externen .msp als Kopie in die Bibliothek, Export eines Hefts als .msp oder PDF über die Windows-Dateidialoge, vorgeschlagener Dateiname = Heftname (ungültige Zeichen werden ersetzt). Das offene Heft kommt aus der Ansicht, andere von der Platte.
 - `NotebookPanel` (UserControl): „+ Neues Heft“, ListBox der Hefte (Name, Änderungszeit), das offene Heft ist markiert, Klick öffnet, Doppelklick benennt um, Kontextmenü mit Umbenennen, Löschen, Als PDF exportieren, Als MSP exportieren. Eigene Vorlagen für ListBoxItem und Menü, damit der Dark Mode stimmt. Liste und Einträge sind nicht fokussierbar, Klicks werden im Preview-Handler behandelt (ein Klick öffnet, zwei benennen um, Rechtsklick nur Menü): das Fenster sieht weiter jede Taste. UI Automation öffnet über die Auswahl (`SelectionChanged`). Meldet nur Wünsche (`OpenRequested` usw.), die Session entscheidet.
+- `RelativeDateConverter`: bindet `RelativeDate` an die Zeile unter dem Heftnamen.
 - `RenameDialog`, `ConfirmDialog` (Löschen und Beenden trotz Schreibfehler), `ErrorMessage` (Warn-MessageBox und `Try` für Datei-Operationen).
 - `ExportDialog`: Checkbox "Hintergrundlinien mit exportieren", danach fragt `NotebookTransfer.ExportPdf` den Zielpfad ab (Vorschlag: Heftname.pdf).
 - `SideButtonWatcher`: verfolgt die Seitentaste des Stifts (Barrel) über die Preview-Stylus-Events.
@@ -49,6 +50,7 @@
 - `LibraryLock`: hält notes/.lock exklusiv. `App.OnStartup` holt die Sperre, beendet eine zweite Instanz mit Meldung und erzeugt erst danach das Hauptfenster (kein StartupUri).
 - `SettingsService`: settings.json laden (mit Standardwerten bei Fehler) und speichern.
 - `PdfExporter`: `NoteDocument` zu PDF (PDFsharp). `PressureSegments` liefert die Linienstücke eines Druckstrichs.
+- `RelativeDate`: Änderungszeit kurz und relativ („heute 10:04“, „gestern“, „28.09.“, Jahr nur wenn nicht das aktuelle).
 - `DebugLog`: hängt Zeilen an die Datei aus MSP_DEBUG_LOG an, kulturinvariant.
 
 ## Datenfluss

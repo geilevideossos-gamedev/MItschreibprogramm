@@ -111,7 +111,7 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F48 | Heft anklicken öffnet es sofort, das aktuelle wird vorher automatisch gespeichert ohne Dialog, man landet auf der Seite, wo man zuletzt war (letzte Scrollposition pro Heft) | done |
 | F49 | Oben im Panel „+ Neues Heft“ (auch Neu / Ctrl+N), legt ein Heft „Unbenannt“ an und öffnet es | done |
 | F50 | Doppelklick = Umbenennen. Rechtsklick-Kontextmenü mit Umbenennen, Löschen (mit Rückfrage, die Datei landet im Papierkorb), Als PDF exportieren, Als MSP exportieren | done |
-| F51 | Aktives Heft markiert, Sortierung nach zuletzt bearbeitet, neueste oben (unter dem Namen steht die Änderungszeit, damit die Reihenfolge nachvollziehbar ist) | done |
+| F51 | Aktives Heft markiert, Sortierung nach zuletzt bearbeitet, neueste oben. Unter dem Namen steht die Änderungszeit, kurz und relativ: „heute 10:04“, „gestern“, „28.09.“ (Daniel, 2026-09-29) | done |
 | F52 | Speicherung: alle Hefte intern als einzelne .msp in %AppData%/Mitschreibprogramm/notes/, Dateiname = id. Anzeigename, Zeitstempel und Scrollposition in index.json (Begründung in decisions.md) | done |
 | F53 | Autosave beim Heftwechsel, beim Schließen der App und alle 60 Sekunden bei Änderungen. Beim App-Start wird das zuletzt offene Heft geladen | done |
 | F54 | Öffnen (Ctrl+O, Toolbar „Importieren“) und Speichern unter (Ctrl+Umschalt+S, Toolbar „MSP-Export“) bleiben als Import / Export für externe .msp-Dateien, Import kopiert in die Bibliothek | done |
