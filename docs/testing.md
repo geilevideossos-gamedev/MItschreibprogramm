@@ -31,6 +31,7 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 | 8 | Formerkennung: Linie, Rechteck, Dreieck, Kreis je mit Stillhalten am Ende, Rechteck ohne Stillhalten, Schalter Formen (F), Strg+Z / Strg+Y nach der Erkennung, kleine Handschrift mit Formen an, Datei (fitToCurve), PDF | bestanden 2026-09-29 gegen die exe, 11/11 |
 | 9 | Bilder und Lasso: Strg+V ohne und mit Bild, Lage und Farben, Strich auf dem Bild, Lasso mit Seitentaste, Verschieben, Eckgriff mit Seitenverhältnis, Undo / Redo, auf dem Blatt bleiben, Esc, Auswahl-Werkzeug mit Maus-Lasso, Entf und Undo, allein gewähltes Bild ziehen und löschen, Neustart, PDF mit Bild | bestanden 2026-09-29 gegen die exe, 20/20 |
 | 10 | Bilder löschen und Toolbar (nach Daniels Test): Bild einfügen, per Stift-Tippen, Mausklick und Tippen mit oberer Taste und 10 Einheiten Bewegung wählen, Entf, Undo; Tippen daneben hebt die Auswahl auf; Lasso um Bild und zwei Striche, Entf, Undo; Radierer-Werkzeug und invertierter Stift über dem Bild, Undo, Redo; Schalter „Formen: an / aus“ über F und Klick; Screenshot der Toolbar für jedes Werkzeug mit Formen an und aus | bestanden 2026-09-29 gegen die exe, 12/12 |
+| 11 | Lasso mit oberer Taste aus Stift und Radierer (Taste beim Abheben bzw. 150 ms davor losgelassen): Auswahl, Toolbar zeigt Auswahl, ohne Taste verschieben, Eckgriff skalieren, Esc, Toolbar zeigt wieder das alte Werkzeug, Undo / Redo; Entf, Undo; Tippen daneben (der Absturz-Fall); Werkzeug Auswahl bleibt; dasselbe mit Bild und Strich aus dem Radierer | bestanden 2026-10-01 gegen die exe, 20/20 |
 
 ### Lauf 2026-09-29 (gegen die neu gepublishte dist/Mitschreibprogramm.exe)
 
@@ -57,6 +58,16 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 
 - Checkpoint 10 erster Anlauf: der Mausklick landete genau dort, wo das Stift-Tippen davor den Cursor gelassen hatte, und kam ohne Mausbewegung nicht an (Artefakt der Injektion, pen-input.md). Das Strg+Z danach nahm das Einfügen zurück, alle späteren Schritte hatten kein Bild mehr. Jetzt klickt das Skript 40 Einheiten rechts und 30 unter der Tipp-Stelle und nimmt nur nach einer echten Änderung zurück.
 - Toolbar (cp10-toolbars.png, sechs Zustände): immer genau eines von Stift, Radierer, Auswahl blau hervorgehoben, „Formen: aus“ / „Formen: an“ steht abgesetzt zwischen zwei Trennern und bleibt beim Werkzeugwechsel unverändert.
+
+### Lauf 2026-10-01, Absturz beim Lasso mit Taste (gegen die neu gepublishte exe)
+
+| Block | Ergebnis |
+|-------|----------|
+| Absturz mit der alten exe | reproduziert: Lasso mit Taste aus dem Stift, dann Stift-Tippen daneben, `InvalidCastException` wie in Daniels Dumps |
+| Checkpoint 11 | 20/20 (erster Anlauf: Skriptfehler, Namenskollision `Get-LastStroke` und Strich unterhalb des Fensters) |
+| Regression Checkpoint 1, 9, 10 | 7/7, 20/20, 12/12 (Checkpoint 1 erst 6/7: Prüfung erwartete die Auswahl als letzte Logzeile, jetzt folgt `tool now=Select`) |
+
+- Screenshot cp11-auto-select.png: Auswahlrahmen mit Griffen, in der Toolbar ist „Auswahl“ hervorgehoben.
 
 ### Ergebnis Checkpoint 1
 
@@ -138,6 +149,7 @@ Nur mit dem One by Wacom (CTL-672) prüfbar. features.md bleibt bis dahin auf `d
 - **Windows Ink im Wacom-Treiber:** Mit Haken "Windows Ink verwenden" muss das Log `device=stylus` und unterschiedliche `pmin` / `pmax` zeigen. Ohne Haken: `device=mouse`, konstante Breite, Seitentaste radiert nicht. Steht so in der README, ist aber nur mit der Simulation belegt.
 - **Echte Seitentasten:** untere Taste mit Treiber-Belegung "Radieren" (erwartet `device=stylus-inverted mode=erase`), obere mit "Rechtsklick" (erwartet eine Lasso-Auswahl, Logzeile `selection page=… strokes=…`). Radiert es nur, solange die untere Taste gehalten wird? Öffnet "Rechtsklick" irgendwo ein Kontextmenü oder stört die Hochstufung zur rechten Maustaste? Kommt die obere Taste bei der One by Wacom wirklich als Barrel an und die untere als invertiert?
 - **Lasso mit echter oberer Taste:** Taste halten, Kreis um Striche ziehen, Taste loslassen, Auswahl in der Mitte ziehen, an einer Ecke skalieren, Entf, Strg+Z. Fühlt sich das Loslassen vor dem Ziehen natürlich an? Bleibt die Auswahl beim Abheben des Stifts (Stift verlässt den Erfassungsbereich) erhalten?
+- **Lasso mit Taste aus Stift und Radierer:** Toolbar springt auf Auswahl, nach Esc, Tippen daneben oder Entf zurück. Taste beim Abheben lockerlassen: bleibt die Auswahl? Kein Absturz mehr.
 - **Seitentaste mitten im Strich:** WPF verwirft dann den laufenden Strich. Passiert das beim normalen Schreiben aus Versehen (Finger liegt auf der Taste)? Falls ja, Umschalten nur im Hover erlauben.
 - **Druckkurve und Gefühl:** Faktor 0,25 bis 1,75 der Basisbreite. Fühlt sich dünn / mittel / dick richtig an, ist der Einsatzpunkt (leichtes Aufsetzen) brauchbar? Feinabstimmung ginge über die Druckkurve im Wacom-Treiber.
 - **Glättung (FitToCurve):** verändert kleine Schrift beim Abheben sichtbar? Bei der Simulation (gerade Linien) nicht beurteilbar.

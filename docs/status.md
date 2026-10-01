@@ -1,6 +1,6 @@
 # Status
 
-Stand: 2026-09-29
+Stand: 2026-10-01
 
 ## Aktuell
 
@@ -10,11 +10,13 @@ Stand: 2026-09-29
 - Die obere Seitentaste (Barrel) radiert nicht mehr, sie ist jetzt das Lasso. Radiert wird mit der unteren Taste, belegt als „Radieren“ im Treiber (invertiert). README und pen-input.md erklären die Belegung.
 - Korrekturen nach Daniels Test (2026-09-29) erledigt, F75 bis F78 auf `done`: Stift / Radierer / Auswahl als Werkzeuggruppe (genau eines hervorgehoben), „Formen: an / aus“ als eigener Schalter mit Tooltips, README klarer; Tippen auf ein Bild wählt es auch mit oberer Taste und leichter Bewegung (`TapSelection`), Entf löscht es, auch mit per Lasso gewählten Strichen; der Radierer löscht Bilder ganz (`ImageEraser`). Ursache des Bugs unten unter „Bekannte Bugs“.
 - Selbsttest gegen die neue exe: Checkpoint 10 12/12, Regression 8 11/11, 9 20/20, 1 7/7. `dotnet test` 94 grün, 0 Warnings.
-- Nichts gepusht seit dem Push vom 2026-09-28.
+- Gepusht am 2026-09-29 (origin/main 3162d04).
+- 2026-10-01: Absturz beim Lasso mit oberer Taste behoben (Ursache unter „Bekannte Bugs“). F79: Lasso per Taste aus Stift und Radierer wechselt ins Werkzeug Auswahl und nach dem Ende der Auswahl zurück (`ToolSwitch`, `EditingModes`); die Taste darf kurz vor dem Abheben losgelassen werden (`SideButtonWatcher`). `dotnet test` 101 grün, 0 Warnings. Selbsttest gegen die neue exe: Checkpoint 11 20/20, Regression 1 7/7, 9 20/20, 10 12/12.
+- Ab 2026-10-01 gilt: ein Commit pro Feature oder Bugfix, docs im selben Commit, keine `docs:`-Commits (CLAUDE.md, track.md).
 
 ## Nächster Schritt
 
-- Daniel testet mit der echten One by Wacom nach testing.md, Abschnitt "Offen mit echtem Pen" (mit MSP_DEBUG_LOG liegt die Bibliothek neben dem Log), vor allem das Löschen von Bildern (Tippen, Entf, Radierer), die Belegung der Seitentasten (oben „Rechtsklick“ = Lasso, unten „Radieren“), das Stillhalten für Formen und das Lasso. Was dort bestätigt ist, wandert in features.md von `done` auf `getestet`.
+- Daniel testet mit der echten One by Wacom nach testing.md, Abschnitt "Offen mit echtem Pen" (mit MSP_DEBUG_LOG liegt die Bibliothek neben dem Log), vor allem das Lasso mit oberer Taste aus Stift und Radierer (Werkzeugwechsel hin und zurück), das Löschen von Bildern (Tippen, Entf, Radierer), die Belegung der Seitentasten (oben „Rechtsklick“ = Lasso, unten „Radieren“), das Stillhalten für Formen und das Lasso. Was dort bestätigt ist, wandert in features.md von `done` auf `getestet`.
 - Weitere Pushes nur auf ausdrückliche Anweisung: `ALLOW_PUSH=1 git push origin main`.
 
 ## Schrittplan
@@ -31,6 +33,7 @@ Stand: 2026-09-29
 10. Hefte-Bibliothek: Library + Tests, Session, Seitenleiste, Dialoge, Import/Export, Reviews, Selbsttest Checkpoint 4, docs (fertig)
 11. Hardware-Korrektur, relative Änderungszeit, Formerkennung, Bilder, Lasso, Selbsttest Checkpoint 8 und 9 gegen die exe (fertig)
 12. Korrekturen nach Daniels Test: Toolbar, Bilder löschen per Tippen, Entf und Radierer, Selbsttest Checkpoint 10 (fertig)
+13. Absturz beim Lasso mit oberer Taste, automatischer Werkzeugwechsel, Selbsttest Checkpoint 11 (fertig)
 
 ## Offene Punkte
 
@@ -42,6 +45,7 @@ Stand: 2026-09-29
 ## Bekannte Bugs
 
 - keine offenen.
+- Behoben am 2026-10-01 (Daniels Test): Absturz nach einem Lasso mit oberer Taste, wenn nicht das Werkzeug Auswahl aktiv war. Belegt durch Daniels Crash-Dumps vom 2026-09-30 und mit der alten exe reproduziert: `InvalidCastException` in `EditingCoordinator.UpdateEditingState`. Ablauf: das Lasso wählt etwas, die App bleibt wegen der offenen Auswahl im Select-Modus. Der nächste Stift-Kontakt ohne Taste daneben ist für InkCanvas ein neues Lasso; beim Abheben wird die Auswahl leer, und `EditingModes.Apply` schaltete noch in diesem `SelectionChanged` auf Ink zurück. In dem Moment hält InkCanvas das Capture noch (`IsInMidStroke`), hat aber schon auf den Auswahl-Editor umgestellt, und der Cast auf `StylusEditingBehavior` schlägt fehl. Behoben: Moduswechsel aus Auswahländerungen laufen erst nach dem Abheben (Dispatcher), dazu F79.
 - Behoben am 2026-09-29 (Daniels Test): Bilder ließen sich nicht löschen. Ursache nach der Diagnose mit dem synthetischen Stift (Tippen mit 60 bis 80 ms Kontakt, gegen den Stand vom 2026-09-29): (1) Tippt man mit gedrückter oberer Seitentaste auf ein Bild und der Stift wandert dabei etwa 10 Einheiten, wählt InkCanvas im Select-Modus nichts aus; ohne Auswahl hat Entf nichts zu löschen. Mit der Spitze wählt InkCanvas bei 10 und 14 Einheiten Bewegung noch aus, ebenso per Mausklick und per Lasso (auch Bild samt Strichen), und Entf löscht dann samt Undo. (2) Der Radierer (Werkzeug und untere Taste) radiert nur Striche, Bilder blieben liegen. Korrektur des ersten Eintrags: ein Tippen ganz ohne Kontakt-Pakete zwischen Aufsetzen und Abheben kommt bei der Injektion oft gar nicht an; das war ein Artefakt des Testwerkzeugs, kein Verhalten des echten Stifts. Welcher der beiden Wege es bei Daniel war, lässt sich ohne seinen Ablauf nicht sagen. Behoben: `TapSelection` wählt nach einem solchen Tippen Strich oder Bild unter dem Stift, und der Radierer löscht Bilder jetzt ganz (`ImageEraser`, F78).
 - Behoben am 2026-09-28 (vor dem Selbsttest, aus den Reviews): Löschen des offenen Hefts öffnete kein Folgeheft; Striche ohne offenes Heft gingen verloren; Rechtsklick öffnete das Heft vor dem Menü; zwei Instanzen überschrieben sich den Index; MSP-Export in den Bibliotheksordner überschrieb Hefte.
 - Behoben am 2026-09-19: Hilfslinien verschwanden bandweise bei Zoom unter 100 %. Gerader Druckstrich kam im PDF mit konstanter Breite an. Dark-Mode-Toggle reagierte nicht auf UI Automation. Kaputte .msp (null-Listen, Riesenkoordinaten, Enum als Zahl) konnte abstürzen. Gehaltene Taste ließ Umschalter (E, Strg+D, Strg+L) flackern.

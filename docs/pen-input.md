@@ -34,6 +34,8 @@
 
 ## InkCanvas-Auswahl (Select-Modus, Recherche 2026-09-29)
 
+- `EditingMode` nie aus `SelectionChanged` heraus ändern, solange InkCanvas ein Lasso abschließt: das Capture besteht dann noch (`IsInMidStroke`), das aktive Verhalten ist schon der Auswahl-Editor, und `UpdateEditingState` wirft beim Cast auf `StylusEditingBehavior` eine `InvalidCastException` (Absturz 2026-09-30). `EditingModes` wendet solche Wechsel deshalb per Dispatcher nach dem Abheben an.
+- Wechselt der Modus mitten in einem Lasso weg von Select (Seitentaste kurz vor dem Abheben losgelassen), verwirft WPF das Lasso (`LassoSelectionBehavior.OnSwitchToMode`, `Commit(false)`). `SideButtonWatcher` zählt ein Loslassen der Taste deshalb erst nach dem Abheben.
 - Jeder Wechsel von `EditingMode` hebt die Auswahl auf (`EditingCoordinator.ChangeEditingBehavior` ruft `ClearSelection(true)`). Deshalb bleiben die Seiten im Select-Modus, solange etwas ausgewählt ist (`EditingModes`). `InkCanvas.Select(...)` schaltet selbst in den Select-Modus.
 - Lasso: ein Strich gilt als gewählt, wenn 80 % seiner Länge im Lasso liegen, ein Element bei 60 % seiner Fläche (Punktraster). Tippen (weniger als 7 Einheiten Bewegung) wählt den obersten Strich oder das Element unter dem Punkt, Tippen auf leere Fläche hebt die Auswahl auf, Ziehen außerhalb startet ein neues Lasso.
 - SelectionMoving / SelectionResizing kommen einmal beim Loslassen, `NewRectangle` ist setzbar und wird übernommen, `Cancel` wirkt. Striche werden mit `Stroke.Transform(matrix, false)` bewegt: die Punkte ändern sich an Ort und Stelle, die Stiftspitze (Breite) nie. Elemente bekommen InkCanvas.Left/Top und Width/Height neu (nur die geänderte Seite bei Kantengriffen, Margin wird abgezogen, Bilder haben keinen).

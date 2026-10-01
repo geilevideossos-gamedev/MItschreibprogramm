@@ -67,3 +67,9 @@ Fortsetzung von decisions.md, gleiche Regeln: chronologisch, je Eintrag Entschei
 
 - Stift, Radierer und Auswahl sind eine Gruppe von RadioButtons mit derselben Hervorhebung, genau eines ist aktiv. Die gehaltene obere Seitentaste schaltet das Lasso nur vorübergehend und ändert das angezeigte Werkzeug nicht.
 - „Formen“ war ein ToggleButton in derselben Gruppe und sah eingeschaltet wie ein viertes Werkzeug aus. Jetzt ist es ein eigener Button hinter einem Trenner, der seinen Zustand als Text zeigt („Formen: an“ / „Formen: aus“), wie „Linien: Blau“. Taste F schaltet weiter um, der Zustand wird nicht gespeichert.
+
+## 2026-10-01 Lasso per Taste wechselt ins Werkzeug Auswahl (Daniels Test)
+
+- Ein Lasso mit oberer Taste aus Stift oder Radierer schaltet das Werkzeug auf Auswahl, sichtbar in der Toolbar. Endet die Auswahl (Esc, Tippen daneben, Entf, Undo), kommt das vorherige Werkzeug zurück. Wer in der Zwischenzeit selbst ein Werkzeug wählt, behält es. Die Logik steckt in `ToolSwitch` (Services, mit xUnit getestet), damit sie ohne UI prüfbar ist.
+- Moduswechsel, die aus einer Auswahländerung folgen, laufen per Dispatcher nach dem Abheben. Verworfen: den Wechsel nur bei `IsInMidStroke` aufschieben, das Flag ist intern.
+- Das Loslassen der Seitentaste zählt erst nach dem Abheben, sonst verwirft WPF ein Lasso, wenn die Hand die Taste einen Moment zu früh loslässt.

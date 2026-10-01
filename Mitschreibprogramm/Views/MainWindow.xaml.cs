@@ -61,6 +61,7 @@ public partial class MainWindow : Window
         PressureCheck.IsChecked = _settings.PressureEnabled;
         Document.SetPressureEnabled(_settings.PressureEnabled);
         ToolPen.IsChecked = true;
+        Document.Tools.ToolChanged += ShowTool;
         ApplyShapes();
         NotebookPanelButton.IsChecked = _settings.NotebookPanelVisible;
         ApplyNotebookPanel();
@@ -168,7 +169,10 @@ public partial class MainWindow : Window
     }
 
     private void OnToolChecked(object sender, RoutedEventArgs e) =>
-        Document.Tools.SetTool(ToolEraser.IsChecked == true, ToolSelect.IsChecked == true);
+        Document.Tools.SetTool(ToolEraser.IsChecked == true ? Tool.Eraser : ToolSelect.IsChecked == true ? Tool.Select : Tool.Pen);
+
+    private void ShowTool() =>
+        (Document.Tools.Tool switch { Tool.Eraser => ToolEraser, Tool.Select => ToolSelect, _ => ToolPen }).IsChecked = true;
 
     private void OnShapesClick(object sender, RoutedEventArgs e) => ToggleShapes();
 

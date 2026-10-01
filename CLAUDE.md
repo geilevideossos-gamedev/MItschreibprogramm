@@ -14,19 +14,19 @@ Scope steht in docs/features.md. Was dort nicht steht, wird nicht gebaut.
 ## Git
 
 - Remote: origin = git@github.com:geilevideossos-gamedev/MItschreibprogramm.git (HTTPS-Fallback: https://github.com/geilevideossos-gamedev/MItschreibprogramm.git)
-- Committen: ja, nach jedem abgeschlossenen Schritt
+- Committen: ja, nach jedem abgeschlossenen Feature oder Bugfix (siehe unten)
 - Pushen: nur wenn Daniel es in seiner aktuellen Nachricht ausdrücklich sagt ("push"). Dann `ALLOW_PUSH=1 git push origin main`. Nie von selbst, nie am Ende eines Schritts, nie in einem Skript.
 - Pre-push Hook in .githooks/pre-push blockt jeden Push ohne `ALLOW_PUSH=1`. Hook nie ändern, nie `--no-verify`. Die Variable nur im Push-Befehl setzen, nie exportieren.
-- Ein Commit = eine logische Änderung. Kein "WIP", kein Sammel-Commit.
-- Conventional Commits, Englisch, Imperativ, klein nach dem Prefix:
+- Ein Commit pro abgeschlossenem Feature oder Bugfix, nicht pro Zwischenschritt. Kein Commit für reine Zwischenstände, kein "WIP".
+- Docs-, README- und status.md-Änderungen kommen immer in denselben Commit wie die feat/fix-Änderung, zu der sie gehören. Keine eigenen Docs-Commits, kein Prefix `docs:`.
+- Conventional Commits, Englisch, Imperativ, klein nach dem Prefix. Erlaubt sind nur:
   - `feat:` neue Funktion
   - `fix:` Bugfix
-  - `docs:` nur docs/ oder README
   - `refactor:` keine Verhaltensänderung
   - `chore:` Tooling, gitignore, Hooks, Dependencies
   - `build:` csproj, Publish, Build-Skripte
 - Beispiel: `feat: add eraser mode via pen side button`
-- Nach jedem feat/fix: docs/status.md und betroffene docs aktualisieren, eigener `docs:`-Commit.
+- Vor jedem feat/fix-Commit: docs/status.md und betroffene docs aktualisieren und mit in den Commit nehmen.
 
 ## Code
 
@@ -62,14 +62,14 @@ Scope steht in docs/features.md. Was dort nicht steht, wird nicht gebaut.
   - docs/testing.md: manuelle Test-Checkliste, Checkpoints
   - docs/decisions.md, docs/decisions-2.md: Entscheidungen mit Begründung, chronologisch (neue Einträge in decisions-2.md)
 - Sessionstart: CLAUDE.md, dann docs/track.md, dann docs/status.md, dann nur die docs, die der aktuelle Schritt braucht.
-- Sessionende und vor jedem /compact: status.md und betroffene docs aktualisieren, committen.
+- Sessionende und vor jedem /compact: status.md und betroffene docs aktualisieren. Sie gehen mit dem nächsten abgeschlossenen feat/fix in den Commit.
 
 ## Workflow
 
 1. Lesen (siehe Sessionstart), Schrittplan zeigen, auf "ok passt" warten.
-2. Schritte einzeln: implementieren, `dotnet build`, committen, docs aktualisieren, `docs:`-Commit.
+2. Schritte einzeln: implementieren, `dotnet build`, docs aktualisieren. Committet wird, wenn das Feature oder der Bugfix fertig und geprüft ist: ein Commit samt docs.
 3. Checkpoints (docs/testing.md): zuerst Selbsttest ohne Pen (tools/pen-sim.ps1, Debug-Log, Screenshots, xUnit). Ist Daniel mit Tablet da, testet er zusätzlich und du wartest auf "ok passt". Sonst weiter, und alles, was nur mit echtem Pen prüfbar ist, in docs/testing.md unter "Offen mit echtem Pen" sammeln. features.md: "done" nach Selbsttest, "getestet" erst nach echtem Pen.
-4. Kontext über 60 %: docs aktualisieren, committen, dann /compact.
+4. Kontext über 60 %: docs aktualisieren, dann /compact.
 5. Blocker: kurz melden, nicht drumherum bauen.
 6. Nicht bei jedem Schritt nachfragen. Nur bei Plan, Checkpoints, Blockern und echten Produktentscheidungen, die weder hier noch in docs/ stehen.
 

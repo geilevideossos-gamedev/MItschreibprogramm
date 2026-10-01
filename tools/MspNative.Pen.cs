@@ -115,9 +115,10 @@ public static partial class MspNative
     }
 
     // A stroke along a polyline (client DIPs), about one frame per stepPixels on screen, constant pressure. holdMs keeps
-    // the pen down and still on the last point before lifting (shape recognition by resting).
+    // the pen down and still on the last point before lifting (shape recognition by resting). releaseBarrel lets go of
+    // the side button for the hold and the lift, the way a hand lets go of it at the end of a lasso.
     public static string PenPath(IntPtr hwnd, double[] xs, double[] ys, int pressure, double stepPixels, int delayMs,
-        bool barrel, bool inverted, int holdMs)
+        bool barrel, bool inverted, int holdMs, bool releaseBarrel)
     {
         IntPtr previous = SetThreadDpiAwarenessContext(PerMonitorAwareV2);
         try
@@ -136,6 +137,8 @@ public static partial class MspNative
                 uint hoverPen = (barrel ? PEN_FLAG_BARREL : 0) | (inverted ? PEN_FLAG_INVERTED : 0);
                 uint contactPen = hoverPen | (inverted ? PEN_FLAG_ERASER : 0);
                 uint contact = POINTER_FLAG_INRANGE | POINTER_FLAG_INCONTACT | (barrel ? POINTER_FLAG_SECONDBUTTON : POINTER_FLAG_FIRSTBUTTON);
+                uint endPen = releaseBarrel ? hoverPen & ~PEN_FLAG_BARREL : hoverPen;
+                uint endContact = releaseBarrel ? POINTER_FLAG_INRANGE | POINTER_FLAG_INCONTACT | POINTER_FLAG_FIRSTBUTTON : contact;
                 POINT first = points[0], last = points[points.Length - 1];
                 for (int i = 0; i < 6; i++) PenFrame(device, first.X, first.Y, POINTER_FLAG_INRANGE | POINTER_FLAG_UPDATE, hoverPen, 0, delayMs);
                 PenFrame(device, first.X, first.Y, contact | POINTER_FLAG_DOWN, contactPen, (uint)pressure, delayMs);
@@ -153,13 +156,13 @@ public static partial class MspNative
                     }
                 }
                 for (int waited = 0; waited < holdMs; waited += delayMs)
-                    PenFrame(device, last.X, last.Y, contact | POINTER_FLAG_UPDATE, contactPen, (uint)pressure, delayMs);
-                PenFrame(device, last.X, last.Y, POINTER_FLAG_INRANGE | POINTER_FLAG_UP, hoverPen, 0, delayMs);
-                for (int i = 0; i < 6; i++) PenFrame(device, last.X, last.Y, POINTER_FLAG_INRANGE | POINTER_FLAG_UPDATE, hoverPen, 0, delayMs);
+                    PenFrame(device, last.X, last.Y, endContact | POINTER_FLAG_UPDATE, endPen | (contactPen & PEN_FLAG_ERASER), (uint)pressure, delayMs);
+                PenFrame(device, last.X, last.Y, POINTER_FLAG_INRANGE | POINTER_FLAG_UP, endPen, 0, delayMs);
+                for (int i = 0; i < 6; i++) PenFrame(device, last.X, last.Y, POINTER_FLAG_INRANGE | POINTER_FLAG_UPDATE, endPen, 0, delayMs);
                 PenFrame(device, last.X, last.Y, POINTER_FLAG_UPDATE, 0, 0, delayMs);
             }
             finally { DestroySyntheticPointerDevice(device); }
-            return "points=" + points.Length + " frames=" + frames + " hold=" + holdMs;
+            return "points=" + points.Length + " frames=" + frames + " hold=" + holdMs + " releaseBarrel=" + releaseBarrel;
         }
         finally { SetThreadDpiAwarenessContext(previous); }
     }

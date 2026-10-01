@@ -10,7 +10,8 @@ function Checkpoint1 {
     & "$toolsDir/pen-sim.ps1" -Path "280,270;720,270;720,330;280,330;280,272" -Barrel | Out-Null
     Start-Sleep -Milliseconds 400
     $s = @(Read-Log)
-    Check ($s.Count -ge 1 -and $s[-1].kind -eq "selection" -and $s[-1].strokes -eq "1" -and @($s | Where-Object { $_.kind -eq "stroke" }).Count -eq 0) "Gehaltene obere Seitentaste zieht ein Lasso und waehlt den Strich, ohne zu zeichnen"
+    $selected = @($s | Where-Object { $_.kind -eq "selection" })
+    Check ($selected.Count -ge 1 -and $selected[-1].strokes -eq "1" -and @($s | Where-Object { $_.kind -eq "stroke" }).Count -eq 0) "Gehaltene obere Seitentaste zieht ein Lasso und waehlt den Strich, ohne zu zeichnen"
     Ctl -Keys "esc"
     Read-Log | Out-Null
     Pen -From "300,450" -To "700,450"

@@ -10,7 +10,7 @@ Zuerst lesen. Danach docs/status.md, dann nur die docs, die der aktuelle Schritt
 
 ## Status
 
-- docs/status.md: aktueller Stand, nächster Schritt, offene Punkte, bekannte Bugs. Nach jedem feat/fix aktualisieren, eigener `docs:`-Commit.
+- docs/status.md: aktueller Stand, nächster Schritt, offene Punkte, bekannte Bugs. Nach jedem feat/fix aktualisieren, im selben Commit wie die Änderung.
 - docs/features.md: eine Zeile pro Feature mit ID und Status.
   - `todo`: nicht begonnen
   - `wip`: in Arbeit
@@ -22,7 +22,7 @@ Zuerst lesen. Danach docs/status.md, dann nur die docs, die der aktuelle Schritt
 
 - Liste und Ablauf in docs/testing.md.
 - An jedem Checkpoint: Selbsttest laufen lassen, Ergebnis in testing.md eintragen (Datum, Ergebnis, Auffälligkeiten) und im Chat in zwei Sätzen melden.
-- Fehler: `fix:`-Commit, Checkpoint wiederholen.
+- Fehler: beheben, Checkpoint wiederholen, dann ein `fix:`-Commit samt docs.
 - Alles, was nur mit echtem Pen prüfbar ist, kommt in testing.md unter "Offen mit echtem Pen".
 
 ## Entscheidungen
@@ -33,5 +33,6 @@ Zuerst lesen. Danach docs/status.md, dann nur die docs, die der aktuelle Schritt
 
 ## Commits
 
-- Conventional Commits, Englisch, ein Commit = eine logische Änderung (Details in CLAUDE.md).
+- Conventional Commits, Englisch, nur `feat`, `fix`, `refactor`, `chore`, `build` (Details in CLAUDE.md).
+- Ein Commit pro abgeschlossenem Feature oder Bugfix, docs und README im selben Commit. Keine Docs-Commits, keine Zwischenstände.
 - Push nur auf ausdrückliche Anweisung: `ALLOW_PUSH=1 git push origin main`.

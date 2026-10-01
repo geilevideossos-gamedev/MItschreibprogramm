@@ -1,4 +1,6 @@
 using System.Windows.Controls;
+using Mitschreibprogramm.Models;
+using Mitschreibprogramm.Services;
 
 namespace Mitschreibprogramm.Views;
 
@@ -11,8 +13,7 @@ public sealed class EditingModes
     private readonly DocumentView _document;
     private readonly SelectionEditor _selection;
     private readonly SideButtonWatcher _sideButton;
-    private bool _eraser;
-    private bool _select;
+    private readonly ToolSwitch _tools = new();
     private bool _panning;
 
     public EditingModes(DocumentView document, SelectionEditor selection)
@@ -21,13 +22,18 @@ public sealed class EditingModes
         _selection = selection;
         _sideButton = new SideButtonWatcher(document);
         _sideButton.Changed += Apply;
-        selection.ActiveChanged += Apply;
+        // A lasso ends inside InkCanvas's own pen-up handling, where any mode change throws (docs/status.md).
+        selection.ActiveChanged += () => document.Dispatcher.BeginInvoke(FollowSelection);
     }
 
-    public void SetTool(bool eraser, bool select)
+    public event Action? ToolChanged;
+
+    public Tool Tool => _tools.Current;
+
+    public void SetTool(Tool tool)
     {
-        (_eraser, _select) = (eraser, select);
-        if (!select)
+        _tools.Choose(tool);
+        if (tool != Tool.Select)
         {
             _selection.Clear();
         }
@@ -43,13 +49,33 @@ public sealed class EditingModes
 
     public void Apply()
     {
-        var selecting = _select || _sideButton.IsHeld || _selection.Active;
+        var selecting = _tools.Current == Tool.Select || _sideButton.IsHeld || _selection.Active;
         foreach (var page in _document.Pages)
         {
             page.Ink.EditingMode = _panning ? InkCanvasEditingMode.None
                 : selecting ? InkCanvasEditingMode.Select
-                : _eraser ? InkCanvasEditingMode.EraseByStroke : InkCanvasEditingMode.Ink;
+                : _tools.Current == Tool.Eraser ? InkCanvasEditingMode.EraseByStroke : InkCanvasEditingMode.Ink;
             page.Ink.EditingModeInverted = _panning ? InkCanvasEditingMode.None : InkCanvasEditingMode.EraseByStroke;
+        }
+    }
+
+    private void FollowSelection()
+    {
+        var before = _tools.Current;
+        if (_selection.Active)
+        {
+            _tools.SelectionStarted();
+        }
+        else
+        {
+            _tools.SelectionEnded();
+        }
+
+        Apply();
+        if (_tools.Current != before)
+        {
+            DebugLog.Write($"tool now={_tools.Current}");
+            ToolChanged?.Invoke();
         }
     }
 }

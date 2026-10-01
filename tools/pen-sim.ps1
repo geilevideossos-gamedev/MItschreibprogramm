@@ -5,6 +5,7 @@
 #   -Path "x,y;x,y;..."  a polyline instead of From/To, constant pressure (PressureFrom), about one frame per 6 screen pixels
 #   -HoldMs 700          with -Path: keep the pen down and still on the last point before lifting
 #   -Barrel    side button held (hover and contact)
+#   -ReleaseBarrel  with -Path -Barrel: let go of the side button at the lift, or HoldMs before it
 #   -Inverted  pen reported as inverted, contact frames carry the eraser flag
 param(
     [string]$From,
@@ -17,6 +18,7 @@ param(
     [int]$DelayMs = 8,
     [switch]$Barrel,
     [switch]$Inverted,
+    [switch]$ReleaseBarrel,
     [string]$ProcessName = "Mitschreibprogramm"
 )
 
@@ -29,7 +31,7 @@ if (-not [MspNative]::Activate($hwnd)) { throw "App-Fenster liess sich nicht in 
 if ($Path) {
     $pairs = @($Path.Split(";") | ForEach-Object { ,@($_.Split(",") | ForEach-Object { [double]::Parse($_, $invariant) }) })
     $result = [MspNative]::PenPath($hwnd, [double[]]@($pairs | ForEach-Object { $_[0] }), [double[]]@($pairs | ForEach-Object { $_[1] }),
-        $PressureFrom, 6, $DelayMs, $Barrel.IsPresent, $Inverted.IsPresent, $HoldMs)
+        $PressureFrom, 6, $DelayMs, $Barrel.IsPresent, $Inverted.IsPresent, $HoldMs, $ReleaseBarrel.IsPresent)
 } else {
     $start = $From.Split(",") | ForEach-Object { [double]::Parse($_, $invariant) }
     $end = $To.Split(",") | ForEach-Object { [double]::Parse($_, $invariant) }

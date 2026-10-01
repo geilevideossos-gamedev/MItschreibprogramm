@@ -4,7 +4,7 @@
 
 - `Mitschreibprogramm/`: WPF-App, net8.0-windows. Ordner Models/, Views/, Services/, Rendering/.
 - `Mitschreibprogramm.Tests/`: xUnit, nur Models/Services.
-- `tools/`: Selbsttest. pen-sim.ps1 (auch Linienzüge mit Stillhalten: `-Path`, `-HoldMs`), screenshot.ps1, app-control.ps1 (auch Maus-Lasso: `-DragPath`), selftest.ps1 mit den Checkpoints in `tools/selftest/` (8 Formen, 9 Bilder und Lasso, 10 Bilder löschen und Toolbar), gemeinsamer Win32-Code als partielle Klasse in MspNative.Window.cs, MspNative.Pen.cs, MspNative.Input.cs.
+- `tools/`: Selbsttest. pen-sim.ps1 (auch Linienzüge mit Stillhalten: `-Path`, `-HoldMs`), screenshot.ps1, app-control.ps1 (auch Maus-Lasso: `-DragPath`), selftest.ps1 mit den Checkpoints in `tools/selftest/` (8 Formen, 9 Bilder und Lasso, 10 Bilder löschen und Toolbar, 11 Lasso mit Taste aus Stift und Radierer; pen-sim `-ReleaseBarrel`, app-control `-Checked`), gemeinsamer Win32-Code als partielle Klasse in MspNative.Window.cs, MspNative.Pen.cs, MspNative.Input.cs.
 - `docs/`, `build.sh`, `dist/` (Build-Ausgabe, nicht im Repo).
 
 ## Klassen
@@ -40,8 +40,8 @@
 - `RelativeDateConverter`: bindet `RelativeDate` an die Zeile unter dem Heftnamen.
 - `RenameDialog`, `ConfirmDialog` (Löschen und Beenden trotz Schreibfehler), `ErrorMessage` (Warn-MessageBox und `Try` für Datei-Operationen).
 - `ExportDialog`: Checkbox "Hintergrundlinien mit exportieren", danach fragt `NotebookTransfer.ExportPdf` den Zielpfad ab (Vorschlag: Heftname.pdf).
-- `SideButtonWatcher`: verfolgt die Seitentaste des Stifts (Barrel) über die Preview-Stylus-Events.
-- `EditingModes`: setzt den InkCanvas-Modus aller Seiten. Select (Lasso), solange das Werkzeug „Auswahl“ an ist, die Seitentaste (Barrel) gehalten wird oder etwas ausgewählt ist; sonst Radierer oder Stift, beim Verschieben der Ansicht None. `EditingModeInverted` ist immer EraseByStroke.
+- `SideButtonWatcher`: verfolgt die Seitentaste des Stifts (Barrel) über die Preview-Stylus-Events. Ein Loslassen zählt erst nach dem Abheben, damit ein Lasso nicht kurz vor Schluss verworfen wird.
+- `EditingModes`: hält das Werkzeug (`ToolSwitch`, meldet Wechsel per `ToolChanged` an die Toolbar) und setzt den InkCanvas-Modus aller Seiten. Auswahländerungen wirken erst nach dem Abheben (Dispatcher), siehe pen-input.md. Select (Lasso), solange das Werkzeug „Auswahl“ an ist, die Seitentaste (Barrel) gehalten wird oder etwas ausgewählt ist; sonst Radierer oder Stift, beim Verschieben der Ansicht None. `EditingModeInverted` ist immer EraseByStroke.
 - `SelectionEditor`: eine Auswahl über alle Seiten (eine neue Auswahl hebt die auf dem anderen Blatt auf, ein Klick auf ein anderes Blatt beendet sie nur). Korrigiert in SelectionMoving/-Resizing das Rechteck (`SelectionBounds`), macht vorher und nachher eine `SelectionSnapshot` und legt daraus den Undo-Schritt an, löscht mit Entf (Striche und Bilder an ihren alten Platz zurück beim Undo), hebt mit Esc auf.
 - `SelectionSnapshot`: Punkte der gewählten Striche und Rahmen der gewählten Bilder, zum Wiederherstellen.
 - `ImageDrag`: zieht ein allein gewähltes Bild an seiner Mitte (Stift und Maus), weil InkCanvas das dann nicht tut.

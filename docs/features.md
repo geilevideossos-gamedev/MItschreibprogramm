@@ -149,3 +149,9 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | F76 | „Formen“ ist ein An/Aus-Schalter, kein Werkzeug: „Formen: an“ / „Formen: aus“ (wie „Linien: Blau“), sichtbar abgesetzt von der Werkzeuggruppe. Tooltips: Auswahl = „Lasso: Bereich umkreisen, dann verschieben, skalieren oder mit Entf löschen (S)“, Formen = „An: jeder Strich wird zu Linie, Kreis, Rechteck oder Dreieck. Aus: nur wenn der Stift am Ende kurz stillgehalten wird (F)“. README-Abschnitt klarer | done |
 | F77 | Im Auswahl-Modus wählt ein einfacher Klick / Tipp auf ein Bild dieses direkt aus, ohne Lasso, Entf löscht es. Per Lasso ausgewählte Bilder löscht Entf ebenfalls, zusammen mit mitausgewählten Strichen. Undo / Redo | done |
 | F78 | Der Radierer (Werkzeug und untere Seitentaste) löscht ein Bild ganz, sobald er es berührt, genau wie einen ganzen Strich. Undo / Redo | done |
+
+## Korrekturen nach Daniels Test (2026-10-01)
+
+| ID | Feature | Status |
+|----|---------|--------|
+| F79 | Lasso mit oberer Seitentaste aus jedem Werkzeug (Stift, Radierer), für Striche und Bilder. Nach dem Loslassen bleibt die Auswahl, die App wechselt sichtbar ins Werkzeug Auswahl (verschieben ohne Taste, Griffe, Entf). Endet die Auswahl (Esc, Tippen daneben, Entf), kommt das vorherige Werkzeug zurück. Ist Auswahl schon aktiv, ändert sich nichts. Undo / Redo für Verschieben, Skalieren, Löschen | done |

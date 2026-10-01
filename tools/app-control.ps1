@@ -13,6 +13,7 @@
 #   tools/app-control.ps1 -RightClick <id>                  right mouse click on the centre of a control (context menu)
 #   tools/app-control.ps1 -DoubleClick <id>                 left double click on the centre of a control
 #   tools/app-control.ps1 -Value 1001                       prints the text of a control (Value pattern, or a Win32 Edit by control id in a file dialog), "" if absent
+#   tools/app-control.ps1 -Checked ToolSelect              prints True or False: radio button selected or toggle button on
 #   tools/app-control.ps1 -Exists NotebookList              prints True or False (collapsed controls are not in the UI Automation tree)
 #   tools/app-control.ps1 -Items NotebookList               prints the names of a list's items, one per line, in display order
 param(
@@ -29,6 +30,7 @@ param(
     [string]$Hold,
     [string]$Read,
     [string]$Exists,
+    [string]$Checked,
     [string]$Items,
     [string]$Pixel,
     [switch]$Bounds,
@@ -122,6 +124,13 @@ if ($Pixel) {
 if ($Exists) {
     $element = Find-Control ([MspNative]::ForegroundWindowOf($hwnd)) $Exists -Optional
     Write-Output ([string]($null -ne $element -and -not $element.Current.IsOffscreen))
+}
+if ($Checked) {
+    $element = Find-Control ([MspNative]::ForegroundWindowOf($hwnd)) $Checked
+    $pattern = $null
+    if ($element.TryGetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern, [ref]$pattern)) { Write-Output ([string]$pattern.Current.IsSelected) }
+    elseif ($element.TryGetCurrentPattern([System.Windows.Automation.TogglePattern]::Pattern, [ref]$pattern)) { Write-Output ([string]($pattern.Current.ToggleState -eq "On")) }
+    else { throw "Control '$Checked' hat keinen Auswahl- oder Schaltzustand." }
 }
 if ($Items) {
     $list = Find-Control ([MspNative]::ForegroundWindowOf($hwnd)) $Items
