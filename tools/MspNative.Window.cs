@@ -110,6 +110,8 @@ public static partial class MspNative
         finally { SetThreadDpiAwarenessContext(previous); }
     }
 
+    public static double DpiScale(IntPtr hwnd) { return GetDpiForWindow(hwnd) / 96.0; }
+
     public static void Place(IntPtr hwnd, int x, int y, int width, int height)
     {
         IntPtr previous = SetThreadDpiAwarenessContext(PerMonitorAwareV2);
@@ -118,7 +120,7 @@ public static partial class MspNative
     }
 
     // PrintWindow renders the window itself, so the image is correct even if another window covers it.
-    public static string Capture(IntPtr hwnd, string path)
+    public static string Capture(IntPtr hwnd, string path, bool withCursor)
     {
         IntPtr previous = SetThreadDpiAwarenessContext(PerMonitorAwareV2);
         try
@@ -131,7 +133,11 @@ public static partial class MspNative
                 using (Graphics g = Graphics.FromImage(full))
                 {
                     IntPtr hdc = g.GetHdc();
-                    try { PrintWindow(hwnd, hdc, PW_RENDERFULLCONTENT); }
+                    try
+                    {
+                        PrintWindow(hwnd, hdc, PW_RENDERFULLCONTENT);
+                        if (withCursor) DrawCursor(hdc, window.Left, window.Top);
+                    }
                     finally { g.ReleaseHdc(hdc); }
                 }
                 Rectangle visible = new Rectangle(frame.Left - window.Left, frame.Top - window.Top, frame.Right - frame.Left, frame.Bottom - frame.Top);

@@ -15,6 +15,7 @@ public sealed class DocumentView : StackPanel
     private readonly List<PageView> _created = [];
     private readonly UndoHistory _history = new();
     private readonly ShapeAssist _shapes;
+    private readonly InkCursor _cursor;
     private double _zoom = AppConstants.DefaultZoom;
     private PenColor _penColor;
     private bool _dark;
@@ -24,6 +25,7 @@ public sealed class DocumentView : StackPanel
         Selection = new SelectionEditor(this);
         Tools = new EditingModes(this, Selection);
         _shapes = new ShapeAssist(this);
+        _cursor = new InkCursor(this, _pen);
         _ = new ImageEraser(this);
         if (DebugLog.IsEnabled)
         {
@@ -58,6 +60,7 @@ public sealed class DocumentView : StackPanel
         {
             _zoom = value;
             LayoutTransform = new ScaleTransform(value, value);
+            _cursor.Update(_dark);
         }
     }
 
@@ -65,6 +68,7 @@ public sealed class DocumentView : StackPanel
     {
         _penColor = color;
         _pen.Color = Palette.PenOnPage(color, _dark);
+        _cursor.Update(_dark);
     }
 
     public void SetDarkMode(bool dark)
@@ -78,6 +82,7 @@ public sealed class DocumentView : StackPanel
     {
         _pen.Width = width;
         _pen.Height = width;
+        _cursor.Update(_dark);
     }
 
     public void SetPressureEnabled(bool enabled) => _pen.IgnorePressure = !enabled;

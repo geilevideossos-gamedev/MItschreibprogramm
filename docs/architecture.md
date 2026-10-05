@@ -4,14 +4,14 @@
 
 - `Mitschreibprogramm/`: WPF-App, net8.0-windows. Ordner Models/, Views/, Services/, Rendering/.
 - `Mitschreibprogramm.Tests/`: xUnit, nur Models/Services.
-- `tools/`: Selbsttest. pen-sim.ps1 (auch Linienzüge mit Stillhalten: `-Path`, `-HoldMs`), screenshot.ps1, app-control.ps1 (auch Maus-Lasso: `-DragPath`), selftest.ps1 mit den Checkpoints in `tools/selftest/` (8 Formen, 9 Bilder und Lasso, 10 Bilder löschen und Toolbar, 11 Lasso mit Taste aus Stift und Radierer; pen-sim `-ReleaseBarrel`, app-control `-Checked`), gemeinsamer Win32-Code als partielle Klasse in MspNative.Window.cs, MspNative.Pen.cs, MspNative.Input.cs.
+- `tools/`: Selbsttest. pen-sim.ps1 (auch Linienzüge mit Stillhalten: `-Path`, `-HoldMs`), screenshot.ps1, app-control.ps1 (auch Maus-Lasso: `-DragPath`), selftest.ps1 mit den Checkpoints in `tools/selftest/` (8 Formen, 9 Bilder und Lasso, 10 Bilder löschen und Toolbar, 11 Lasso mit Taste aus Stift und Radierer, 12 Cursor; pen-sim `-ReleaseBarrel` und `-Hover`, app-control `-Checked`, `-Move` und `-Cursor`, screenshot `-Cursor`), gemeinsamer Win32-Code als partielle Klasse in MspNative.Window.cs, MspNative.Pen.cs, MspNative.Input.cs, MspNative.Cursor.cs (welcher Cursor gerade gezeigt wird, Größe und Farbe).
 - `docs/`, `build.sh`, `dist/` (Build-Ausgabe, nicht im Repo).
 
 ## Klassen
 
 ### Models
 
-- `AppConstants`: alle Maße und Grenzen (A4 in Pixeln bei 96 DPI, Linienabstand 8 mm, Gitterabstand 5 mm, Strichbreiten, Zoomgrenzen und -stufen, Mindestgröße, Haltezeit und Ruhetoleranz der Formerkennung).
+- `AppConstants`: alle Maße und Grenzen (A4 in Pixeln bei 96 DPI, Linienabstand 8 mm, Gitterabstand 5 mm, Strichbreiten, Radiergröße, Cursor-Mindestgröße, Zoomgrenzen und -stufen, Mindestgröße, Haltezeit und Ruhetoleranz der Formerkennung).
 - `RuleLines`: Positionen der Hintergrundlinien je Seitenstil. `Rows` (Liniert 8 mm, Kariert 5 mm, pro A4-Höhe neu gestartet) und `Columns` (nur Kariert). Wird vom Bildschirm-Hintergrund und vom PDF-Export benutzt.
 - Enums `PenColor`, `PageStyle`, `LineColor`, `PageMode`.
 - `AppSettings`: alles, was settings.json speichert, mit Standardwerten.
@@ -22,15 +22,16 @@
 
 ### Rendering
 
-- `Palette`: Stift-, Seiten- und Hilfslinienfarben für hell und dunkel, dazu die Umrechnung logische Farbe zu angezeigter Farbe und zurück.
+- `Palette`: Stift-, Seiten- und Hilfslinienfarben für hell und dunkel, dazu die Umrechnung logische Farbe zu angezeigter Farbe und zurück und der Rand des Cursors.
+- `CursorImage`: zeichnet den Stift-Cursor (gefüllter Punkt mit Rand) und den Radierer-Cursor (Ring mit Halo) in physischen Pixeln und lädt ihn als .cur-Datei mit einem PNG über `new Cursor(Stream)`, Hotspot in der Mitte.
 - `Theme`: UI-Farben beider Themen, tauscht die Pinsel in den Application-Resources und färbt die Titelleiste (DWM).
 - `PageBackground`: FrameworkElement, zeichnet Seite und Linien in OnRender (GuidelineSet für scharfe 1-px-Linien). Kein Strich, nicht radierbar.
 
 ### Views
 
 - `MainWindow`: Toolbar (Border + WrapPanel), links das `NotebookPanel`, Statusleiste, ScrollViewer. Verdrahtet Controls mit `DocumentView` und `NotebookSession`, hält die Shortcut-Tabelle (`Dictionary<(ModifierKeys, Key), Action>`) und die `AppSettings` als einzigen Zustand für Werkzeug, Seite und Seitenleiste. Lädt die Settings im Konstruktor, speichert sie in OnClosing, nachdem die Session das Heft gesichert hat. `WindowPlacement`: Fensterlage merken und wiederherstellen. `ScrollPosition`: Dokumentpunkt oben links im Fenster erfassen und wiederherstellen (beim Start erst nach dem ersten Layout, 0/0 = ganz oben).
-- `DocumentView` (StackPanel): hält die `PageView`-Liste, Seitenmodus, das gemeinsame `DrawingAttributes`-Objekt, Radierer-/Pan-Zustand, Undo-Verlauf und den Zoom (LayoutTransform). `Load(NoteDocument)` / `ToDocument()` wandeln zwischen Ansicht und Datenklassen, `SetMode` konvertiert, `AddPage` hängt an, Auto-Seite und Endlos-Wachstum hängen an StrokeCollected. `Record(UndoStep)` nimmt Änderungen auf, die nicht aus den InkCanvas-Ereignissen kommen (Formen, Bilder, Auswahl).
-- `PageView` (Grid): eine Seite = `PageBackground` + transparenter `InkCanvas`, auf Seitengröße geclippt. Lädt ihren Inhalt (Striche und Bilder) aus einer `NotePage`, gibt ihn mit `ToModel` zurück und färbt ihn mit `ApplyTheme` ein. `GrowToFit` vergrößert die Endlos-Fläche.
+- `DocumentView` (StackPanel): hält die `PageView`-Liste, Seitenmodus, das gemeinsame `DrawingAttributes`-Objekt, Radierer-/Pan-Zustand, Undo-Verlauf und den Zoom (LayoutTransform). `Load(NoteDocument)` / `ToDocument()` wandeln zwischen Ansicht und Datenklassen, `SetMode` konvertiert, `AddPage` hängt an, Auto-Seite und Endlos-Wachstum hängen an StrokeCollected. Farb-, Breiten-, Zoom- und Themenwechsel gibt sie an `InkCursor` weiter. `Record(UndoStep)` nimmt Änderungen auf, die nicht aus den InkCanvas-Ereignissen kommen (Formen, Bilder, Auswahl).
+- `PageView` (Grid): eine Seite = `PageBackground` + transparenter `InkCanvas` (Radierform `AppConstants.EraserSize`), auf Seitengröße geclippt. Lädt ihren Inhalt (Striche und Bilder) aus einer `NotePage`, gibt ihn mit `ToModel` zurück und färbt ihn mit `ApplyTheme` ein. `GrowToFit` vergrößert die Endlos-Fläche.
 - `PageImage`: ein Bild ist ein `Image`-Kind des InkCanvas der Seite (InkCanvas.Left/Top, Width/Height, das PNG im Tag). Erzeugen aus `NoteImage`, zurück in `NoteImage`, Rahmen.
 - `ImageInserter`: Strg+V. Liest die Zwischenablage (Format „PNG“, sonst das Bitmap ohne Alphakanal) und speichert immer ein 8-Bit-PNG, legt das Bild auf die Seite in der Mitte des sichtbaren Bereichs (höchstens 80 % der Seitenbreite und -höhe, Seitenverhältnis bleibt, innerhalb der Seite) und nimmt es über `DocumentView.Record` in den Undo-Verlauf.
 - `ShapeAssist`: verfolgt Aufsetzen, Bewegung und Abheben (Stift und echte Maus, Positionen in Fenster-Einheiten) mit einem `HoldDetector`. Nach StrokeCollected ersetzt `Apply` den Strich durch die erkannte Form, wenn der Schalter „Formen: an“ steht oder der Stift am Ende stillstand, und legt dafür einen eigenen Undo-Schritt an.
@@ -47,6 +48,7 @@
 - `ImageDrag`: zieht ein allein gewähltes Bild an seiner Mitte (Stift und Maus), weil InkCanvas das dann nicht tut.
 - `ImageEraser`: der Radierer (Werkzeug, invertierter Stift, Maus) entfernt ein Bild, sobald er seinen Rahmen berührt, ein Undo-Schritt pro Bild. EraseByStroke von InkCanvas kennt nur Striche.
 - `TapSelection`: wertet ein Stift-Tippen im Select-Modus nach InkCanvas aus; hat InkCanvas die Auswahl nicht geändert, wählt es Strich oder Bild unter dem Stift bzw. hebt die Auswahl auf (pen-input.md).
+- `InkCursor`: baut Stift- und Radierer-Cursor bei jeder Änderung von Farbe, Breite, Zoom, Dark Mode und DPI neu und setzt sie je Seite nach `InkCanvas.ActiveEditingMode` (Ink: Punkt, EraseByStroke: Ring, auch für den invertierten Stift; sonst `UseCustomCursor = false` und der Cursor von InkCanvas). `ActiveEditingModeChanged` und `PagesChanged` halten auch neue und per Undo zurückgekehrte Seiten aktuell.
 - `ZoomPanController`: Mausrad, Ctrl/Shift+Mausrad, mittlere Maustaste, Leertaste+Ziehen, Zoom um den Zeiger.
 - `StrokeLogger`: nur mit MSP_DEBUG_LOG erzeugt, schreibt pro Strich eine Logzeile.
 

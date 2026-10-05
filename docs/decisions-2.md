@@ -73,3 +73,12 @@ Fortsetzung von decisions.md, gleiche Regeln: chronologisch, je Eintrag Entschei
 - Ein Lasso mit oberer Taste aus Stift oder Radierer schaltet das Werkzeug auf Auswahl, sichtbar in der Toolbar. Endet die Auswahl (Esc, Tippen daneben, Entf, Undo), kommt das vorherige Werkzeug zurück. Wer in der Zwischenzeit selbst ein Werkzeug wählt, behält es. Die Logik steckt in `ToolSwitch` (Services, mit xUnit getestet), damit sie ohne UI prüfbar ist.
 - Moduswechsel, die aus einer Auswahländerung folgen, laufen per Dispatcher nach dem Abheben. Verworfen: den Wechsel nur bei `IsInMidStroke` aufschieben, das Flag ist intern.
 - Das Loslassen der Seitentaste zählt erst nach dem Abheben, sonst verwirft WPF ein Lasso, wenn die Hand die Taste einen Moment zu früh loslässt.
+
+## 2026-10-05 Eigener Cursor für Stift und Radierer
+
+- Daniels Befund: bei dünnen Breiten ist der Stift-Cursor fast unsichtbar. InkCanvas zeichnet ihn genau so groß wie die Stiftspitze (pen-input.md, Abschnitt Cursor), mit der alten exe gemessen 2 px bei „dünn“ und 4 px bei „mittel“, beim Zoom unverändert.
+- Entscheidung: Punkt und Ring selbst zeichnen (`Rendering/CursorImage`: DrawingVisual, RenderTargetBitmap in physischen Pixeln, PNG in einer .cur-Datei, `new Cursor(Stream)`) und pro Seite nur in Ink und EraseByStroke `UseCustomCursor` setzen (`Views/InkCursor`). Select und None behalten die Cursor von InkCanvas, also Lasso-Kreuz, Verschieben und Größenpfeile wie bisher.
+- Maße: Punkt = max(8, Breite × Zoom), der Rand (1 px) liegt außen, damit der gefüllte Teil genau die Strichbreite zeigt. Bildgröße ungerade, Hotspot in der Mitte. Radierer = Ring auf max(8, Radiergröße × Zoom) mit Halo im Randton (Daniel: Ring wächst mit, ok). `InkCanvas.EraserShape` steht dafür ausdrücklich auf 8 × 8 (`AppConstants.EraserSize`, vorher derselbe WPF-Standard), `ImageEraser` nimmt die halbe Größe aus derselben Konstante.
+- Farben: Punkt in der angezeigten Stiftfarbe, Rand weiß (hell) bzw. schwarz (Dark Mode) aus `Palette.CursorRim`, Ring in der angezeigten Farbe von Schwarz.
+- Alte Cursor werden nicht von Hand freigegeben, das übernimmt der GC: Seiten im Undo-Verlauf halten noch den alten Cursor, ein Dispose würde ihn ungültig machen, bevor sie wieder angezeigt und neu gesetzt werden.
+- Verworfen: größere DrawingAttributes für den Cursor (InkCanvas leitet ihn aus dem Stift ab, die Strichbreite würde sich ändern); Win32 `CreateIconIndirect` per P/Invoke (mehr Interop-Code und ein eigener SafeHandle); `Mouse.OverrideCursor` (träfe auch Toolbar und graue Fläche).

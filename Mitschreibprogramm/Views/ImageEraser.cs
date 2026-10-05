@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mitschreibprogramm.Models;
 using Mitschreibprogramm.Services;
 
 namespace Mitschreibprogramm.Views;
@@ -9,8 +10,7 @@ namespace Mitschreibprogramm.Views;
 // as soon as it touches it, the way it removes a whole stroke, one undo step per picture.
 public sealed class ImageEraser
 {
-    // Half the size of InkCanvas's default eraser shape.
-    private const double Reach = 4;
+    private const double Reach = AppConstants.EraserSize / 2;
 
     private readonly DocumentView _document;
 

@@ -92,6 +92,26 @@ public static partial class MspNative
         finally { SetThreadDpiAwarenessContext(previous); }
     }
 
+    // Moves the mouse without a button. It comes in from two pixels away: a move onto the spot where the cursor already
+    // is (for example where the pen left it) produces no mouse event.
+    public static void MouseMoveTo(IntPtr hwnd, double x, double y)
+    {
+        IntPtr previous = SetThreadDpiAwarenessContext(PerMonitorAwareV2);
+        try
+        {
+            POINT at = ToScreen(hwnd, x, y);
+            RequireAppAt(hwnd, at);
+            POINT near = at;
+            near.X += 2;
+            near.Y += 2;
+            MouseMove(near);
+            Thread.Sleep(30);
+            MouseMove(at);
+            Thread.Sleep(150);
+        }
+        finally { SetThreadDpiAwarenessContext(previous); }
+    }
+
     // button: "left" or "middle"
     public static void MouseDrag(IntPtr hwnd, string button, double fromX, double fromY, double toX, double toY, int steps)
     {

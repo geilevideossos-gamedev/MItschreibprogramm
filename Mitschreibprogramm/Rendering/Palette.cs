@@ -32,6 +32,8 @@ public static class Palette
 
     public static Color Page(bool dark) => Parse(dark ? DarkPageHex : WhiteHex);
 
+    public static Color CursorRim(bool dark) => Parse(dark ? BlackHex : WhiteHex);
+
     public static Color RuleLine(LineColor color, bool dark)
     {
         var line = Parse(color == LineColor.Blue ? (dark ? DarkRuleBlueHex : BlueHex) : (dark ? WhiteHex : BlackHex));

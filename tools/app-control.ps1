@@ -7,6 +7,8 @@
 #   tools/app-control.ps1 -Wheel "500,400,120" -Hold ctrl   mouse wheel at a point, optional held key
 #   tools/app-control.ps1 -Drag "middle,500,400,500,250"    mouse drag (left or middle), optional -Hold space
 #   tools/app-control.ps1 -DragPath "300,300;500,300;400,450;300,300"  left-button drag along a polyline (mouse lasso)
+#   tools/app-control.ps1 -Move "585,300"                   moves the mouse there without a button
+#   tools/app-control.ps1 -Cursor                           prints the shown cursor: flags, kind, outer, fill, center (MspNative.Cursor.cs)
 #   tools/app-control.ps1 -Bounds                           prints the window rectangle in physical pixels (does not activate)
 #   tools/app-control.ps1 -Pixel "500,300"                  prints the screen colour at a client position as r,g,b
 #   tools/app-control.ps1 -Read ZoomText                    prints the Name (text) of a control, "Window" = title of the foreground app window
@@ -27,6 +29,8 @@ param(
     [string]$Wheel,
     [string]$Drag,
     [string]$DragPath,
+    [string]$Move,
+    [switch]$Cursor,
     [string]$Hold,
     [string]$Read,
     [string]$Exists,
@@ -159,6 +163,10 @@ try {
         $pairs = @($DragPath.Split(";") | ForEach-Object { ,(Get-Numbers $_) })
         [MspNative]::MouseDragPath($hwnd, [double[]]@($pairs | ForEach-Object { $_[0] }), [double[]]@($pairs | ForEach-Object { $_[1] }), 6)
     }
+    if ($Move) {
+        $m = Get-Numbers $Move
+        [MspNative]::MouseMoveTo($hwnd, $m[0], $m[1])
+    }
     if ($Drag) {
         $parts = $Drag.Split(",")
         $d = Get-Numbers (($parts | Select-Object -Skip 1) -join ",")
@@ -167,3 +175,4 @@ try {
 } finally {
     if ($held) { [MspNative]::KeyUp($held) }
 }
+if ($Cursor) { Write-Output ([MspNative]::CursorState()) }

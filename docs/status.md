@@ -1,6 +1,6 @@
 # Status
 
-Stand: 2026-10-01
+Stand: 2026-10-05
 
 ## Aktuell
 
@@ -12,11 +12,12 @@ Stand: 2026-10-01
 - Selbsttest gegen die neue exe: Checkpoint 10 12/12, Regression 8 11/11, 9 20/20, 1 7/7. `dotnet test` 94 grün, 0 Warnings.
 - Gepusht am 2026-09-29 (origin/main 3162d04).
 - 2026-10-01: Absturz beim Lasso mit oberer Taste behoben (Ursache unter „Bekannte Bugs“). F79: Lasso per Taste aus Stift und Radierer wechselt ins Werkzeug Auswahl und nach dem Ende der Auswahl zurück (`ToolSwitch`, `EditingModes`); die Taste darf kurz vor dem Abheben losgelassen werden (`SideButtonWatcher`). `dotnet test` 101 grün, 0 Warnings. Selbsttest gegen die neue exe: Checkpoint 11 20/20, Regression 1 7/7, 9 20/20, 10 12/12.
+- 2026-10-05: eigener Cursor (F80 bis F82, `InkCursor`, `CursorImage`). Stift: Punkt in der Stiftfarbe mit Kontrastrand, mindestens 8 px, bei Breite × Zoom darüber genau so breit wie der Strich. Radierer: Ring, mindestens 8 px, wächst mit Radiergröße × Zoom. Auswahl und graue Fläche wie bisher. Die Strichbreite ist unverändert (dünn: `width=1.5`, 1,877 px vorher und nachher). `dotnet test` 101 grün, 0 Warnings. Selbsttest gegen die neue exe: Checkpoint 12 24/24, Regression 1 7/7, 7 13/13, 10 12/12, 11 20/20.
 - Ab 2026-10-01 gilt: ein Commit pro Feature oder Bugfix, docs im selben Commit, keine `docs:`-Commits (CLAUDE.md, track.md).
 
 ## Nächster Schritt
 
-- Daniel testet mit der echten One by Wacom nach testing.md, Abschnitt "Offen mit echtem Pen" (mit MSP_DEBUG_LOG liegt die Bibliothek neben dem Log), vor allem das Lasso mit oberer Taste aus Stift und Radierer (Werkzeugwechsel hin und zurück), das Löschen von Bildern (Tippen, Entf, Radierer), die Belegung der Seitentasten (oben „Rechtsklick“ = Lasso, unten „Radieren“), das Stillhalten für Formen und das Lasso. Was dort bestätigt ist, wandert in features.md von `done` auf `getestet`.
+- Daniel testet mit der echten One by Wacom nach testing.md, Abschnitt "Offen mit echtem Pen" (mit MSP_DEBUG_LOG liegt die Bibliothek neben dem Log), vor allem den neuen Cursor im Hover (Punkt, Ring mit unterer Taste, Kreuz mit oberer), das Lasso mit oberer Taste aus Stift und Radierer (Werkzeugwechsel hin und zurück), das Löschen von Bildern (Tippen, Entf, Radierer), die Belegung der Seitentasten (oben „Rechtsklick“ = Lasso, unten „Radieren“), das Stillhalten für Formen und das Lasso. Was dort bestätigt ist, wandert in features.md von `done` auf `getestet`.
 - Weitere Pushes nur auf ausdrückliche Anweisung: `ALLOW_PUSH=1 git push origin main`.
 
 ## Schrittplan
@@ -34,6 +35,7 @@ Stand: 2026-10-01
 11. Hardware-Korrektur, relative Änderungszeit, Formerkennung, Bilder, Lasso, Selbsttest Checkpoint 8 und 9 gegen die exe (fertig)
 12. Korrekturen nach Daniels Test: Toolbar, Bilder löschen per Tippen, Entf und Radierer, Selbsttest Checkpoint 10 (fertig)
 13. Absturz beim Lasso mit oberer Taste, automatischer Werkzeugwechsel, Selbsttest Checkpoint 11 (fertig)
+14. Eigener Cursor für Stift und Radierer, Selbsttest Checkpoint 12 (fertig)
 
 ## Offene Punkte
 

@@ -32,6 +32,7 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 | 9 | Bilder und Lasso: Strg+V ohne und mit Bild, Lage und Farben, Strich auf dem Bild, Lasso mit Seitentaste, Verschieben, Eckgriff mit Seitenverhältnis, Undo / Redo, auf dem Blatt bleiben, Esc, Auswahl-Werkzeug mit Maus-Lasso, Entf und Undo, allein gewähltes Bild ziehen und löschen, Neustart, PDF mit Bild | bestanden 2026-09-29 gegen die exe, 20/20 |
 | 10 | Bilder löschen und Toolbar (nach Daniels Test): Bild einfügen, per Stift-Tippen, Mausklick und Tippen mit oberer Taste und 10 Einheiten Bewegung wählen, Entf, Undo; Tippen daneben hebt die Auswahl auf; Lasso um Bild und zwei Striche, Entf, Undo; Radierer-Werkzeug und invertierter Stift über dem Bild, Undo, Redo; Schalter „Formen: an / aus“ über F und Klick; Screenshot der Toolbar für jedes Werkzeug mit Formen an und aus | bestanden 2026-09-29 gegen die exe, 12/12 |
 | 11 | Lasso mit oberer Taste aus Stift und Radierer (Taste beim Abheben bzw. 150 ms davor losgelassen): Auswahl, Toolbar zeigt Auswahl, ohne Taste verschieben, Eckgriff skalieren, Esc, Toolbar zeigt wieder das alte Werkzeug, Undo / Redo; Entf, Undo; Tippen daneben (der Absturz-Fall); Werkzeug Auswahl bleibt; dasselbe mit Bild und Strich aus dem Radierer | bestanden 2026-10-01 gegen die exe, 20/20 |
+| 12 | Cursor: dünner Strich vorher und nachher (Breite im Log und im Screenshot), dann ruht die Maus auf der Seite, während Breite (dünn, mittel, dick), Zoom (50, 100, 200 %), die vier Farben, Dark Mode und Werkzeug (Radierer, Auswahl) wechseln. Gemessen wird der angezeigte Cursor (`app-control -Cursor`: Art, Breite, Farbe der Mitte), Screenshots mit eingezeichnetem Cursor. Graue Fläche, Stift im Hover ohne Taste, mit unterer und mit oberer Taste | bestanden 2026-10-05 gegen die exe, 24/24 |
 
 ### Lauf 2026-09-29 (gegen die neu gepublishte dist/Mitschreibprogramm.exe)
 
@@ -68,6 +69,19 @@ Voraussetzungen: Laptop an, angemeldet, Bildschirm entsperrt, niemand benutzt w�
 | Regression Checkpoint 1, 9, 10 | 7/7, 20/20, 12/12 (Checkpoint 1 erst 6/7: Prüfung erwartete die Auswahl als letzte Logzeile, jetzt folgt `tool now=Select`) |
 
 - Screenshot cp11-auto-select.png: Auswahlrahmen mit Griffen, in der Toolbar ist „Auswahl“ hervorgehoben.
+
+### Lauf 2026-10-05, Cursor (gegen die neu gepublishte exe)
+
+| Block | Ergebnis |
+|-------|----------|
+| Vorher: exe vom 2026-10-01, Checkpoint 12 | dünner Strich `width=1.5`, im Bild 1,877 px. Cursor 2 px (dünn), 4 px (mittel), 8 px (dick), bei 200 % unverändert, Radierer als Symbol. Die Cursor-Prüfungen schlagen dort erwartungsgemäß fehl |
+| Checkpoint 12 | 24/24, dünner Strich `width=1.5`, im Bild 1,877 px (gleich wie vorher) |
+| Regression Checkpoint 1, 7, 10, 11 | 7/7, 13/13, 12/12, 20/20 (in 11 ein RETRY) |
+
+- Messwerte bei 125 %: Punkt 8 px = 13 px Bild mit Rand, davon 9 bis 10 px Füllung; dick bei 200 % 12 px (14 px Füllung); Ring 8 px = 15 px, bei 200 % 16 px = 25 px. Auswahl und Stift mit oberer Taste: Kreuz von InkCanvas, graue Fläche: Pfeil. Der synthetische Stift im Hover zeigt Punkt bzw. Ring (`flags=1`).
+- Erster Regressionslauf: Checkpoint 1 5/7, weil die neuen `cursor`-Logzeilen vom Start mitgezählt wurden. `Read-Log` legt sie jetzt beiseite (`$script:cursorLog`), wie die `window`-Zeilen.
+- Gefunden und behoben: `Window.DpiChanged` kam auch beim Einfügen eines Bilds (Bubble-Event von `Image`) und baute den Cursor ohne Grund neu.
+- Screenshots cp12-*.png: Punkt in vier Farben auf Karo und über dem schwarzen Strich (heller Rand trennt), im Dark Mode weiß bzw. blau mit dunklem Rand, Ring hohl und klar vom Punkt zu unterscheiden.
 
 ### Ergebnis Checkpoint 1
 
@@ -155,6 +169,7 @@ Nur mit dem One by Wacom (CTL-672) prüfbar. features.md bleibt bis dahin auf `d
 - **Glättung (FitToCurve):** verändert kleine Schrift beim Abheben sichtbar? Bei der Simulation (gerade Linien) nicht beurteilbar.
 - **Latenz:** Strichbeginn ohne Verzögerung (Press-and-Hold ist für die Schreibfläche aus), nasse Tinte folgt dem Stift flüssig, auch bei 200 % Zoom und auf einer langen Endlos-Fläche.
 - **Mapping der Fläche:** Tablett auf einen Bildschirm-Teilbereich mappen. Stimmen Stiftspitze und Strich weiter überein (auch bei 125 % Skalierung und auf einem zweiten Monitor mit anderer Skalierung, PerMonitorV2)?
+- **Cursor mit echtem Stift:** Punkt im Hover sichtbar und genau an der Spitze, Ring bei gehaltener unterer Taste, Kreuz bei oberer, Pfeil neben der Seite. Zeigt Windows den Cursor im Hover überhaupt (Stift-Einstellung „Cursor anzeigen“)? Ist der Punkt groß genug, stört er beim Schreiben?
 - **Handballen / Hover:** Hover über der Toolbar und Wechsel zurück auf die Seite, Stift verlässt den Erfassungsbereich mit gedrückter Seitentaste (das Lasso darf nicht hängen bleiben).
 - **Strich direkt nach Zoomwechsel:** zoomen (Strg+Mausrad, Strg+Plus) und sofort schreiben. Geht dabei je ein Strich verloren? Im Selbsttest trat das nur auf, während parallel andere Prozesse Fenster öffneten (siehe Ergebnis Checkpoint 6).
 - **Pan mit Stift:** Leertaste halten und mit dem Stift ziehen verschiebt die Ansicht, ohne zu zeichnen.

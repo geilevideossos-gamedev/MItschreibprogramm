@@ -2,11 +2,13 @@
 # Usage: powershell -ExecutionPolicy Bypass -File tools/screenshot.ps1 -Out tmp/shot.png
 #   -Dialog  capture the app's foreground window instead (modal dialog)
 #   -Screen  capture the whole screen
+#   -Cursor  draw the mouse cursor in at its position (PrintWindow leaves it out)
 param(
     [string]$Out = "tmp/screenshot.png",
     [string]$ProcessName = "Mitschreibprogramm",
     [switch]$Dialog,
-    [switch]$Screen
+    [switch]$Screen,
+    [switch]$Cursor
 )
 
 $ErrorActionPreference = "Stop"
@@ -23,6 +25,6 @@ if ($Screen) {
         $hwnd = [MspNative]::ForegroundWindowOf($hwnd)
         if ($hwnd -eq [IntPtr]::Zero) { throw "Kein Vordergrundfenster der App gefunden." }
     }
-    $size = [MspNative]::Capture($hwnd, $target)
+    $size = [MspNative]::Capture($hwnd, $target, $Cursor.IsPresent)
 }
 Write-Output "screenshot $target ($size)"

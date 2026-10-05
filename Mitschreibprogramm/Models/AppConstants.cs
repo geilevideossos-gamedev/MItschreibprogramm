@@ -29,6 +29,8 @@ public static class AppConstants
     public const double ThinStrokeWidth = 1.5;
     public const double MediumStrokeWidth = 3;
     public const double ThickStrokeWidth = 6;
+    public const double EraserSize = 8;
+    public const double MinCursorSize = 8;
 
     public const double MinVisibleWindowPart = 100;
     public const double PastedImageMaxShare = 0.8;

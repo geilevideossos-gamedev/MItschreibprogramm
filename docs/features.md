@@ -155,3 +155,11 @@ Vollständiger Scope. Status: todo / wip / done / getestet (siehe track.md).
 | ID | Feature | Status |
 |----|---------|--------|
 | F79 | Lasso mit oberer Seitentaste aus jedem Werkzeug (Stift, Radierer), für Striche und Bilder. Nach dem Loslassen bleibt die Auswahl, die App wechselt sichtbar ins Werkzeug Auswahl (verschieben ohne Taste, Griffe, Entf). Endet die Auswahl (Esc, Tippen daneben, Entf), kommt das vorherige Werkzeug zurück. Ist Auswahl schon aktiv, ändert sich nichts. Undo / Redo für Verschieben, Skalieren, Löschen | done |
+
+## Cursor (Auftrag vom 2026-10-05)
+
+| ID | Feature | Status |
+|----|---------|--------|
+| F80 | Eigener Stift-Cursor über `InkCanvas.UseCustomCursor`: gefüllter Punkt in der aktuellen Stiftfarbe (so wie der Strich angezeigt wird, im Dark Mode also Weiß statt Schwarz) mit dünnem Kontrastrand, hell im normalen Modus, dunkel im Dark Mode. Durchmesser mindestens 8 px (`AppConstants.MinCursorSize`); ist die Strichbreite beim aktuellen Zoom größer, zeigt der Punkt genau diese Breite. Die Strichbreite selbst bleibt unverändert | done |
+| F81 | Radierer-Cursor: Kreisumriss, mindestens 8 px, wächst mit der Radiergröße (`AppConstants.EraserSize`, 8 Seiteneinheiten) bei Zoom über 100 %. Gilt auch für die untere Seitentaste (invertierter Stift) | done |
+| F82 | Auswahl (Werkzeug und obere Seitentaste) behält die Cursor von InkCanvas (Kreuz für das Lasso, Verschieben- und Größenpfeile an der Auswahl), die graue Fläche neben den Seiten den Pfeil. Der Cursor folgt sofort Farbe, Breite, Zoom, Dark Mode und Werkzeug, mit der Maus und mit dem Stift im Hover | done |

@@ -4,7 +4,7 @@
 # starts and stops sending keys the moment another program comes to the foreground. Screenshots land in tmp/selftest/.
 param(
     [string]$Exe = "Mitschreibprogramm/bin/Debug/net8.0-windows/Mitschreibprogramm.exe",
-    [string]$Checkpoint = "1,2,3,4,5,7,8,9,10,11",
+    [string]$Checkpoint = "1,2,3,4,5,7,8,9,10,11,12",
     [int]$IdleSeconds = 15,
     [int]$IdleWaitSeconds = 120
 )
@@ -20,6 +20,7 @@ $script:failures = 0
 $script:retries = 0
 $script:logOffset = 0
 $script:windowEvents = @()
+$script:cursorLog = @{}
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
 # On a failure the window events since the last check are printed: a foreign window taking the foreground
@@ -64,6 +65,7 @@ function Start-App([switch]$KeepSettings, [switch]$Panel) {
         if (-not $Panel) { Set-Content (Join-Path $outDir "settings.json") '{ "notebookPanelVisible": false }' }
     }
     $script:logOffset = 0
+    $script:cursorLog = @{}
     $env:MSP_DEBUG_LOG = $logPath
     try { Start-Process -FilePath $exePath } finally { $env:MSP_DEBUG_LOG = $null }
     foreach ($attempt in 1..120) {
@@ -78,19 +80,23 @@ function Stop-App {
     Start-Sleep -Milliseconds 400
 }
 
-# Returns the log lines written since the previous call, parsed into key/value tables.
+# Returns the log lines written since the previous call, parsed into key/value tables. Window events and cursor
+# lines are set aside: every colour, width or zoom change writes a cursor line, checkpoint 12 reads the newest one
+# from $script:cursorLog.
 function Read-Log {
     Start-Sleep -Milliseconds 300
     $lines = @(if (Test-Path $logPath) { Get-Content $logPath })
     $fresh = @($lines | Select-Object -Skip $script:logOffset)
     $script:windowEvents += @($fresh | Where-Object { $_ -match "^\S+ window " })
-    $new = @($fresh | Where-Object { $_ -notmatch "^\S+ window " })
+    foreach ($line in @($fresh | Where-Object { $_ -match "^\S+ cursor " })) { $script:cursorLog = ConvertFrom-LogLine $line }
+    $new = @($fresh | Where-Object { $_ -notmatch "^\S+ (window|cursor) " })
     $script:logOffset = $lines.Count
-    foreach ($line in $new) {
-        $entry = @{ raw = $line; kind = ($line -split " ")[1] }
-        foreach ($match in [regex]::Matches($line, "(\w+)=(\([^)]*\)|\S+)")) { $entry[$match.Groups[1].Value] = $match.Groups[2].Value }
-        $entry
-    }
+    foreach ($line in $new) { ConvertFrom-LogLine $line }
+}
+function ConvertFrom-LogLine([string]$line) {
+    $entry = @{ raw = $line; kind = ($line -split " ")[1] }
+    foreach ($match in [regex]::Matches($line, "(\w+)=(\([^)]*\)|\S+)")) { $entry[$match.Groups[1].Value] = $match.Groups[2].Value }
+    $entry
 }
 # A missing log entry yields NaN, so the affected checks fail instead of stopping the whole run.
 function Number([string]$value) { if ($value) { [double]::Parse($value, $invariant) } else { [double]::NaN } }

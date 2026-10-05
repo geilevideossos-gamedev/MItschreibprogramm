@@ -45,6 +45,16 @@
 - Tastenbefehle (Entf, Esc) bindet InkCanvas nur mit Tastaturfokus. Die Seiten sind nicht fokussierbar, die App erledigt Entf und Esc in ihrer Shortcut-Tabelle.
 - Tinte über Bildern: die Striche liegen über den Kind-Elementen (`InkPresenter.GetVisualChild`: 0 = Kinder, 1 = Striche), Schreiben auf einem Bild geht ohne Einstellung.
 
+## Cursor (Recherche 2026-10-05, dotnet/wpf release/8.0)
+
+- InkCanvas setzt den Cursor in einem eigenen QueryCursor-Handler aus dem aktiven Verhalten (`EditingCoordinator.GetActiveBehaviorCursor`). Mit `UseCustomCursor = true` steigt der Handler aus, dann gilt wie bei jedem FrameworkElement die Eigenschaft `Cursor`. Das Setzen von `Cursor` oder `UseCustomCursor` ruft `Mouse.UpdateCursor`, wenn die Maus darüber ist: der Cursor wechselt ohne Mausbewegung.
+- Stift (Ink): `InkCollectionBehavior.PenCursor` baut den Cursor über `PenCursorManager.GetPenCursor` genau so groß wie die Stiftspitze und nur neu, wenn sich DefaultDrawingAttributes ändern, nicht beim Zoom. Gemessen mit der exe vom 2026-10-01: 2 px bei dünn, 4 px bei mittel, bei 200 % gleich.
+- Radierer (EraseByStroke): festes Radiergummi-Symbol (`GetStrokeEraserCursor`). Getroffen wird mit `InkCanvas.EraserShape` in Seiteneinheiten, Standard `RectangleStylusShape(8, 8)`, auf dem Bildschirm also 8 × Zoom.
+- Auswahl (Select): Lasso = `Cursors.Cross`, an der Auswahl SizeAll und die Größenpfeile. Bleibt unverändert.
+- `InkCanvas.ActiveEditingMode` schließt den invertierten Stift ein (`EditingModeInverted`). `ActiveEditingModeChanged` kommt bei jedem Wechsel des Verhaltens, auch wenn der Stift im Hover invertiert wird. Darin nur den Cursor zu setzen ist unkritisch, es ist kein Moduswechsel (anders als `EditingMode` in `SelectionChanged`).
+- `new Cursor(Stream)` schreibt den Stream in eine Temp-Datei und lädt sie mit `LoadImage(IMAGE_CURSOR, LR_LOADFROMFILE)` ohne `LR_DEFAULTSIZE`: das Bild bleibt in seiner echten Pixelgröße, PNG-Einträge in der .cur-Datei gehen. Das Bild muss deshalb schon in physischen Pixeln (DPI-Faktor) gezeichnet sein.
+- `Window.DpiChanged` ist ein Bubble-Event, das auch jedes `Image` beim Einhängen auslöst (`Image.DpiChangedEvent = Window.DpiChangedEvent.AddOwner`, auch bei gleichem DPI). `InkCursor` baut deshalb nur bei geändertem Faktor neu.
+
 ## Synthetischer Pen (Selbsttest)
 
 - API: `CreateSyntheticPointerDevice(PT_PEN = 3, 1, POINTER_FEEDBACK_DEFAULT = 1)`, `InjectSyntheticPointerInput`, `DestroySyntheticPointerDevice` (user32, Windows 10 1809+, kein Admin).
@@ -53,6 +63,7 @@
 - penFlags: BARREL = 1 (Seitentaste, schon im Hover setzen), INVERTED = 2, ERASER = 4 (nur mit Kontakt). Der Stift muss schon invertiert in den Bereich kommen. penMask PRESSURE = 1, Druck 0..1024.
 - Koordinaten sind physische Pixel. PowerShell 5.1 ist DPI-unaware, deshalb `SetThreadDpiAwarenessContext(-4)` im selben nativen Aufruf wie die Injektion.
 - Artefakte der Injektion (2026-09-29), kein Verhalten echter Geräte: ein Stift-Tippen ohne Kontakt-Pakete zwischen Aufsetzen und Abheben kommt oft nicht an, deshalb liegen Test-Tipps 60 bis 80 ms auf. Ein Mausklick ohne jede Mausbewegung genau an der Stelle, an der der Stift den Cursor gelassen hat, kommt ebenfalls nicht an (20 Einheiten daneben immer). Test-Klicks deshalb nie auf den letzten Stiftpunkt.
+- Cursor im Selbsttest (2026-10-05): PrintWindow-Screenshots enthalten keinen Cursor, `screenshot.ps1 -Cursor` zeichnet ihn über `GetCursorInfo` und `DrawIconEx` an seiner Position ein. Der synthetische Stift im Hover zeigt den Cursor der App (`flags=1`), auch invertiert und mit Seitentaste.
 - Befund 2026-09-19: WPFs Standard-Stack liefert die Injektion als echten Stylus mit Druck, Barrel und Inverted (Debug-Log `device=stylus pmin=0.098 pmax=0.977`).
 - Sicherung: `tools/MspNative.*.cs` injiziert nur, wenn der Zielpixel zum App-Prozess gehört (`RequireAppAt` mit `WindowFromPoint`). pen-sim.ps1 und app-control.ps1 holen das Fenster vorher mit `Activate` in den Vordergrund. Ohne das landet der Strich im Fenster darüber und öffnet die Bildschirmtastatur.
 

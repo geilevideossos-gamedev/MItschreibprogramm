@@ -21,6 +21,7 @@ public sealed class PageView : Grid
         {
             Background = Brushes.Transparent,
             DefaultDrawingAttributes = pen,
+            EraserShape = new RectangleStylusShape(AppConstants.EraserSize, AppConstants.EraserSize),
             Focusable = false,
             Strokes = new StrokeCollection(content.Strokes.Where(stroke => stroke.Points.Count > 0).Select(StrokeMapper.ToStroke)),
         };

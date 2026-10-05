@@ -7,10 +7,13 @@
 #   -Barrel    side button held (hover and contact)
 #   -ReleaseBarrel  with -Path -Barrel: let go of the side button at the lift, or HoldMs before it
 #   -Inverted  pen reported as inverted, contact frames carry the eraser flag
+#   -Hover "x,y"  no stroke: hold the pen in the air there for HoldMs (default 300), print the cursor, -Shot saves a screenshot with it
 param(
     [string]$From,
     [string]$To,
     [string]$Path,
+    [string]$Hover,
+    [string]$Shot,
     [int]$HoldMs = 0,
     [int]$PressureFrom = 512,
     [int]$PressureTo = 512,
@@ -28,6 +31,13 @@ if (-not ("MspNative" -as [type])) { Add-Type -Path (Get-ChildItem $PSScriptRoot
 $invariant = [System.Globalization.CultureInfo]::InvariantCulture
 $hwnd = [MspNative]::FindAppWindow($ProcessName)
 if (-not [MspNative]::Activate($hwnd)) { throw "App-Fenster liess sich nicht in den Vordergrund holen." }
+if ($Hover) {
+    $at = $Hover.Split(",") | ForEach-Object { [double]::Parse($_, $invariant) }
+    $shotPath = if (-not $Shot) { "" } elseif ([System.IO.Path]::IsPathRooted($Shot)) { $Shot } else { Join-Path (Get-Location) $Shot }
+    $hold = if ($HoldMs -gt 0) { $HoldMs } else { 300 }
+    Write-Output ([MspNative]::PenHover($hwnd, $at[0], $at[1], $hold, $Barrel.IsPresent, $Inverted.IsPresent, $shotPath))
+    return
+}
 if ($Path) {
     $pairs = @($Path.Split(";") | ForEach-Object { ,@($_.Split(",") | ForEach-Object { [double]::Parse($_, $invariant) }) })
     $result = [MspNative]::PenPath($hwnd, [double[]]@($pairs | ForEach-Object { $_[0] }), [double[]]@($pairs | ForEach-Object { $_[1] }),

@@ -167,6 +167,34 @@ public static partial class MspNative
         finally { SetThreadDpiAwarenessContext(previous); }
     }
 
+    // Holds the pen in the air over a point, reads the cursor while it is still in range and optionally takes a
+    // screenshot with the cursor, then takes the pen out of range.
+    public static string PenHover(IntPtr hwnd, double x, double y, int holdMs, bool barrel, bool inverted, string shotPath)
+    {
+        IntPtr previous = SetThreadDpiAwarenessContext(PerMonitorAwareV2);
+        try
+        {
+            POINT at = ToScreen(hwnd, x, y);
+            RequireAppAt(hwnd, at);
+            IntPtr device = CreateSyntheticPointerDevice(PT_PEN, 1, POINTER_FEEDBACK_DEFAULT);
+            if (device == IntPtr.Zero) throw new Win32Exception(Marshal.GetLastWin32Error(), "CreateSyntheticPointerDevice");
+            try
+            {
+                uint hoverPen = (barrel ? PEN_FLAG_BARREL : 0) | (inverted ? PEN_FLAG_INVERTED : 0);
+                for (int waited = 0; waited < holdMs; waited += 8)
+                    PenFrame(device, at.X + (waited / 8) % 2, at.Y, POINTER_FLAG_INRANGE | POINTER_FLAG_UPDATE, hoverPen, 0, 8);
+                PenFrame(device, at.X, at.Y, POINTER_FLAG_INRANGE | POINTER_FLAG_UPDATE, hoverPen, 0, 8);
+                Thread.Sleep(150);
+                string state = CursorState();
+                if (!string.IsNullOrEmpty(shotPath)) Capture(hwnd, shotPath, true);
+                PenFrame(device, at.X, at.Y, POINTER_FLAG_UPDATE, 0, 0, 8);
+                return state;
+            }
+            finally { DestroySyntheticPointerDevice(device); }
+        }
+        finally { SetThreadDpiAwarenessContext(previous); }
+    }
+
     private static void PenFrame(IntPtr device, int x, int y, uint pointerFlags, uint penFlags, uint pressure, int delayMs)
     {
         POINTER_TYPE_INFO[] info = new POINTER_TYPE_INFO[1];
